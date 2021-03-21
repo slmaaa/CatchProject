@@ -10,13 +10,14 @@ import Runner from './components/Runner';
 import Map from './components/Map';
 
 import * as colorCode from './ColorCode';
+import Task from './components/TaskList';
 
 const Stack = createStackNavigator();
 
 const App = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Map">
+      <Stack.Navigator initialRouteName="Task">
         <Stack.Screen
           name="Login"
           component={Login}
@@ -49,6 +50,17 @@ const App = () => {
         <Stack.Screen
           name="Map"
           component={Map}
+          options={{
+            headerLeft: null,
+            title: null,
+            headerStyle: {
+              backgroundColor: colorCode.primary,
+            },
+          }}
+        />
+        <Stack.Screen
+          name="Task"
+          component={Task}
           options={{
             headerLeft: null,
             title: null,
