@@ -1,0 +1,23 @@
+{
+  "easy": [
+    {"type": "walk", "quantity": 400},
+    {"type": "run", "quantity": 50},
+    {"type": "run", "quantity": 100},
+    {"type": "heartrate", "quantity": 75},
+    {"type": "heartrate", "quantity": 85}
+  ],
+  "medium": [
+    {"type": "walk", "quantity": 800},
+    {"type": "run", "quantity": 200},
+    {"type": "run", "quantity": 400},
+    {"type": "heartrate", "quantity": 95},
+    {"type": "heartrate", "quantity": 105}
+  ],
+  "hard": [
+    {"type": "walk", "quantity": 1200},
+    {"type": "run", "quantity": 600},
+    {"type": "run", "quantity": 800},
+    {"type": "heartrate", "quantity": 110},
+    {"type": "heartrate", "quantity": 120}
+  ]
+}
