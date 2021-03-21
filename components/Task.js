@@ -14,24 +14,11 @@ import * as colorCode from '../ColorCode';
 import * as tasks from './task_list.json';
 
 const Task = props => {
-  let type,
-    quantity,
-    taskText,
-    task = Number(props.task);
-  if (props.difficulty === 'easy') {
-    type = tasks.easy[task].type;
-    quantity = tasks.easy[task].quantity;
-  } else if (props.difficulty === 'hard') {
-    type = tasks.hard[task].type;
-    quantity = tasks.hard[task].quantity;
+  let taskText;
+  if (props.type === 'Heartrate') {
+    taskText = 'Reach a heart rate of ' + String(props.quantity);
   } else {
-    type = tasks.medium[task].type;
-    quantity = tasks.medium[task].quantity;
-  }
-  if (type === 'Heartrate') {
-    taskText = 'Reach a heart rate of ' + String(quantity);
-  } else {
-    taskText = type + ' ' + String(quantity) + 'm';
+    taskText = props.type + ' ' + String(props.quantity) + 'm';
   }
   const [text, setText] = useState(taskText);
   return (

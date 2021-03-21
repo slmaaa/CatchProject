@@ -16,7 +16,6 @@ import * as colorCode from '../ColorCode';
 
 import CatchCountdown from './CatchCountdown';
 import {CatchData} from './test';
-import {easy, medium, hard} from './task_list.json';
 
 function Chaser(props) {
   const [end, setEnd] = useState(false);
