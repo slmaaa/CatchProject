@@ -17,7 +17,7 @@ const Stack = createStackNavigator();
 const App = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Task">
+      <Stack.Navigator initialRouteName="Task"> //Change this to change screen
         <Stack.Screen
           name="Login"
           component={Login}
