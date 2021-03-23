@@ -1,6 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 
 import Geolocation from 'react-native-geolocation-service';
+import {getPreciseDistance} from 'geolib';
 
 import {
   Text,
@@ -16,6 +17,7 @@ import {
 import CatchCountdown from './CatchCountdown';
 import * as colorCode from '../ColorCode';
 import {easy, medium, hard} from './task_list.json';
+import {detail} from './location_record.json';
 import Task from './Task';
 
 const randomNumber = () => Math.floor(Math.random() * 5);
@@ -32,13 +34,22 @@ const TaskList = props => {
   x = randomNumber();
   const [type4, setType4] = useState(hard[x].type);
   const [quantity4, setQuantity4] = useState(hard[x].quantity);
+  const [locationText, setLocationText] = useState(null);
   const [location, setLocation] = useState(null);
+  const [lastLocation, setLastLocation] = useState(null);
+  const [distance, setDistance] = useState(0);
   useEffect(() => {
     if (1) {
       Geolocation.watchPosition(
         position => {
-          setLocation(JSON.stringify(position));
-          console.log(position);
+          setLocationText(JSON.stringify(position.coords));
+          setLastLocation(location);
+          setLocation(position);
+          if (lastLocation != null)
+            setDistance(
+              distance +
+                getPreciseDistance(position.coords, lastLocation.coords),
+            );
         },
         error => {
           // See error code charts below.
@@ -48,7 +59,8 @@ const TaskList = props => {
           enableHighAccuracy: true,
           timeout: 15000,
           distanceFilter: 0,
-          fastestInterval: 0,
+          interval: 5000,
+          fastestInterval: 5000,
         },
       );
     }
@@ -60,7 +72,8 @@ const TaskList = props => {
       <Task difficulty={'medium'} type={type2} quantity={quantity2} />
       <Task difficulty={'medium'} type={type3} quantity={quantity3} />
       <Task difficulty={'hard'} type={type4} quantity={quantity4} />
-      <Text>{location}</Text>
+      <Text>{locationText}</Text>
+      <Text>{distance}</Text>
     </View>
   );
 };
