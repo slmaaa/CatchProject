@@ -8,9 +8,7 @@ class Location:
 
     def __init__(self, lat, lng, time=None):
         self.lat, self.lng = lat, lng
-        self.time = time
-        if time is None:
-            self.time = round(now(), 2)
+        self.time = time or round(now(), 2)
 
     def to_dict(self):
         return {"lat": self.lat,

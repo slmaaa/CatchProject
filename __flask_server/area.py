@@ -2,11 +2,10 @@ from time import time as now
 from random import random
 from location import Location
 
+
 class Area:
     def __init__(self, time):
-        self.time = time
-        if time is None:
-            self.time = round(now(), 2)
+        self.time = time or round(now(), 2)
 
     def to_dict(self):
         pass
@@ -20,10 +19,10 @@ class Area:
         else:
             return None
 
-    def has_inside(self, loc):
+    def has_inside(self, loc: Location):
         pass
 
-    def has_outside(self, loc):
+    def has_outside(self, loc: Location):
         pass
 
     def random_location(self):
@@ -31,7 +30,7 @@ class Area:
 
 
 class RectArea(Area):
-    def __init__(self, loc1, loc2, time=None):
+    def __init__(self, loc1: Location, loc2: Location, time=None):
         super().__init__(time)
         self.loc1, self.loc2 = loc1, loc2
         self.lats = sorted([loc1.lat, loc2.lat])
@@ -52,12 +51,12 @@ class RectArea(Area):
             return RectArea(loc1, loc2, time)
         return None
 
-    def has_inside(self, loc):
+    def has_inside(self, loc: Location):
         return \
             (self.lats[0] <= loc.lat <= self.lats[1] and
              self.lngs[0] <= loc.lng <= self.lngs[1])
 
-    def has_outside(self, loc):
+    def has_outside(self, loc: Location):
         return not (self.has_inside(loc))
 
     def random_location(self):
@@ -70,10 +69,6 @@ class CircleArea(Area):
     def __init__(self, center: Location, radius, time=None):
         super().__init__(time)
         self.center, self.radius = center, radius
-        if time is None:
-            self.time = round(now(), 2)
-        else:
-            self.time = time
 
     def to_dict(self):
         return {"area": "CIRCLE",
@@ -90,10 +85,10 @@ class CircleArea(Area):
             return CircleArea(center, radius, time)
         return None
 
-    def has_inside(self, loc):
+    def has_inside(self, loc: Location):
         return self.center.distance_to(loc) <= self.radius
 
-    def has_outside(self, loc):
+    def has_outside(self, loc: Location):
         return not (self.has_inside(loc))
 
     def random_location(self):
