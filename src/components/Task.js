@@ -10,7 +10,7 @@ import {
   StyleSheet,
 } from 'react-native';
 
-import * as colorCode from '../ColorCode';
+import * as colorCode from '../src/ColorCode';
 import * as tasks from './task_list.json';
 
 const Task = props => {

@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 
 import CatchCountdown from './CatchCountdown';
-import * as colorCode from '../ColorCode';
+import * as colorCode from '../src/ColorCode';
 import {easy, medium, hard} from './task_list.json';
 import {detail} from './location_record.json';
 import Task from './Task';

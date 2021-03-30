@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 
 import {Text, View, TouchableOpacity, StyleSheet} from 'react-native';
 
-import * as colorCode from '../ColorCode';
+import * as colorCode from '../src/ColorCode';
 import useInterval from './useInterval';
 
 let padToTwo = number => (number <= 9 ? `0${number}` : number);

@@ -12,7 +12,7 @@ import {
   StyleSheet,
 } from 'react-native';
 
-import * as colorCode from '../ColorCode';
+import * as colorCode from '../src/ColorCode';
 
 const NUM_OF_CP = 4;
 const CP_LOCATION = [

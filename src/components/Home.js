@@ -15,7 +15,7 @@ import {
   Keyboard,
 } from 'react-native';
 
-import * as colorCode from '../ColorCode';
+import * as colorCode from '../src/ColorCode';
 
 import {Icon} from 'react-native-elements';
 

@@ -17,7 +17,7 @@ import {
 
 import {NavigationContainer} from '@react-navigation/native';
 
-import * as colorCode from '../ColorCode';
+import * as colorCode from '../src/ColorCode';
 
 import {Icon} from 'react-native-elements';
 

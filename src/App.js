@@ -7,7 +7,6 @@ import {createStackNavigator} from '@react-navigation/stack';
 import Login from './components/Login';
 import Home from './components/Home';
 import Runner from './components/Runner';
-import Map from './components/Map';
 import InGame from './components/InGame';
 
 import * as colorCode from './ColorCode';
@@ -39,17 +38,6 @@ const App = props => {
         <Stack.Screen
           name="Runner"
           component={Runner}
-          options={{
-            headerLeft: null,
-            title: null,
-            headerStyle: {
-              backgroundColor: colorCode.primary,
-            },
-          }}
-        />
-        <Stack.Screen
-          name="Map"
-          component={Map}
           options={{
             headerLeft: null,
             title: null,

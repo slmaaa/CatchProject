@@ -12,7 +12,7 @@ import {
   StyleSheet,
 } from 'react-native';
 
-import * as colorCode from '../ColorCode';
+import * as colorCode from '../src/ColorCode';
 
 import CatchCountdown from './CatchCountdown';
 import {CatchData} from './test';
