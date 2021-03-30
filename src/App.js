@@ -1,15 +1,10 @@
 import 'react-native-gesture-handler';
 import * as React from 'react';
-import {View} from 'react-native';
-import {NavigationContainer} from '@react-navigation/native';
-import {createStackNavigator} from '@react-navigation/stack';
-//HGDCHGFHJFHFHJFCHG
-import Login from './components/Login';
-import Home from './components/Home';
-import Runner from './components/Runner';
-import InGame from './components/InGame';
+import { View } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 
-import * as colorCode from './ColorCode';
+import InGame from './components/InGame';
 
 const Stack = createStackNavigator();
 
@@ -18,42 +13,13 @@ const App = props => {
     <NavigationContainer>
       <Stack.Navigator initialRouteName="InGame">
         <Stack.Screen
-          name="Login"
-          component={Login}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="Home"
-          component={Home}
-          options={{
-            headerLeft: null,
-            title: null,
-            headerStyle: {
-              backgroundColor: colorCode.primary,
-            },
-          }}
-        />
-        <Stack.Screen
-          name="Runner"
-          component={Runner}
-          options={{
-            headerLeft: null,
-            title: null,
-            headerStyle: {
-              backgroundColor: colorCode.primary,
-            },
-          }}
-        />
-        <Stack.Screen
           name="InGame"
           component={InGame}
           options={{
             headerLeft: null,
             title: null,
             headerStyle: {
-              backgroundColor: colorCode.primary,
+              backgroundColor: "black",
             },
           }}
         />

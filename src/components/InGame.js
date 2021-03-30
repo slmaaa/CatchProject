@@ -1,10 +1,13 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Geolocation from 'react-native-geolocation-service';
-import {getDistance} from 'geolib';
+import MapboxGL from '@react-native-mapbox-gl/maps';
+import { getDistance } from 'geolib';
+import { PermissionsAndroid } from 'react-native';
 
 import {
   Text,
   View,
+  Dimensions,
   Vibration,
   TouchableHighlight,
   SafeAreaView,
@@ -12,14 +15,12 @@ import {
   StyleSheet,
 } from 'react-native';
 
-import * as colorCode from '../src/ColorCode';
-
 const NUM_OF_CP = 4;
 const CP_LOCATION = [
-  {latitude: 22.335083, longitude: 114.262832},
-  {latitude: 22.33459, longitude: 114.262834},
-  {latitude: 22.334605, longitude: 114.263299},
-  {latitude: 22.335091, longitude: 114.263291},
+  { latitude: 22.335083, longitude: 114.262832 },
+  { latitude: 22.33459, longitude: 114.262834 },
+  { latitude: 22.334605, longitude: 114.263299 },
+  { latitude: 22.335091, longitude: 114.263291 },
 ];
 const CP_RANGE = 5;
 
@@ -53,7 +54,7 @@ const timestampToDate = timestamp => {
 
 const InGame = props => {
   const [locationText, setLocationText] = useState('');
-  const [location, setLocation] = useState(null);
+  const [location, setLocation] = useState('a');
   const [cpFlag, setCPFlag] = useState(-1);
   const [time, setTime] = useState(0);
   const [formattedTime, setFormattedTime] = useState('');
@@ -67,10 +68,10 @@ const InGame = props => {
         console.log('Location updated at ' + f);
         setLocationText(
           'Latitude: ' +
-            JSON.stringify(position.coords.latitude) +
-            '\n' +
-            'Longitude: ' +
-            JSON.stringify(position.coords.longitude),
+          JSON.stringify(position.coords.latitude) +
+          '\n' +
+          'Longitude: ' +
+          JSON.stringify(position.coords.longitude),
         );
       },
       error => {
@@ -86,7 +87,7 @@ const InGame = props => {
       },
     );
     setCPFlag(-1);
-    if (location != null) {
+    if (location != 'a') {
       for (let i = 0; i < NUM_OF_CP; i++) {
         if (getDistance(location, CP_LOCATION[i]) <= CP_RANGE) {
           setCPFlag(i);
@@ -99,7 +100,11 @@ const InGame = props => {
         Geolocation.clearWatch(_watchId);
       }
     };
-  });
+  }, [location]);
+  MapboxGL.setConnected(true);
+  MapboxGL.setAccessToken(
+    'pk.eyJ1IjoiaGVjdG9yY2hjaCIsImEiOiJja205YmhldXUwdHQ1Mm9xbGw4N2RodndhIn0.yX90QKE2jcgG-7V5wOGXeQ',
+  );
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.mapContainer}>
@@ -123,18 +128,26 @@ const InGame = props => {
 
 export default InGame;
 const styles = StyleSheet.create({
-  container: {flex: 1},
+  container: {
+    position: "absolute",
+    height: Dimensions.get("window").height,
+    width: Dimensions.get("window").width,
+  },
   mapContainer: {
     flex: 0.6,
-    borderWidth: 1,
+    justifyContent: "center",
+    backgroundColor: "tomato",
   },
   scoreBarContainer: {
     flex: 0.1,
+    backgroundColor: "yellow",
   },
   eventLogContainer: {
     flex: 0.15,
+    backgroundColor: "blue",
   },
   currentEnergyBarContainer: {
     flex: 0.15,
+    backgroundColor: "orange",
   },
 });
