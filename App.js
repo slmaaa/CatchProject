@@ -8,16 +8,16 @@ import Login from './components/Login';
 import Home from './components/Home';
 import Runner from './components/Runner';
 import Map from './components/Map';
+import InGame from './components/InGame';
 
 import * as colorCode from './ColorCode';
-import Task from './components/TaskList';
 
 const Stack = createStackNavigator();
 
 const App = props => {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Task">
+      <Stack.Navigator initialRouteName="InGame">
         <Stack.Screen
           name="Login"
           component={Login}
@@ -59,8 +59,8 @@ const App = props => {
           }}
         />
         <Stack.Screen
-          name="Task"
-          component={Task}
+          name="InGame"
+          component={InGame}
           options={{
             headerLeft: null,
             title: null,
