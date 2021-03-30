@@ -14,10 +14,10 @@ import Task from './components/TaskList';
 
 const Stack = createStackNavigator();
 
-const App = () => {
+const App = props => {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Task"> //Change this to change screen
+      <Stack.Navigator initialRouteName="Task">
         <Stack.Screen
           name="Login"
           component={Login}
