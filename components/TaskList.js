@@ -20,6 +20,8 @@ import {easy, medium, hard} from './task_list.json';
 import {detail} from './location_record.json';
 import Task from './Task';
 
+const TRACKING_THRESHOLD = 2;
+
 const randomNumber = () => Math.floor(Math.random() * 5);
 const TaskList = props => {
   let x = randomNumber();
@@ -35,35 +37,54 @@ const TaskList = props => {
   const [type4, setType4] = useState(hard[x].type);
   const [quantity4, setQuantity4] = useState(hard[x].quantity);
   const [locationText, setLocationText] = useState(null);
-  const [location, setLocation] = useState(null);
-  const [lastLocation, setLastLocation] = useState(null);
+  const [locations, setLocations] = useState([undefined]);
+  const [location, setLocation] = useState();
   const [distance, setDistance] = useState(0);
-  useEffect(() => {
-    if (1) {
-      Geolocation.watchPosition(
-        position => {
-          setLocationText(JSON.stringify(position.coords));
-          setLastLocation(location);
-          setLocation(position);
-          if (lastLocation != null)
-            setDistance(
-              distance +
-                getPreciseDistance(position.coords, lastLocation.coords),
-            );
-        },
-        error => {
-          // See error code charts below.
-          console.log(error.code, error.message);
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 15000,
-          distanceFilter: 0,
-          interval: 5000,
-          fastestInterval: 5000,
-        },
-      );
+
+  const calDistance = coords => {
+    if (locations == [undefined]) setLocations([coords]);
+    else setLocations(past => [...past, coords]);
+    console.log(locations);
+    if (locations.length >= 5) {
+      let i = 1;
+      while (i < locations.length) {
+        const dis = getPreciseDistance(
+          locations[i - 1].coord,
+          locations[i].coord,
+        );
+        if (dis < TRACKING_THRESHOLD) {
+          locations.splice(i, 1);
+        } else {
+          setDistance(distance + dis);
+          ++i;
+        }
+      }
     }
+  };
+
+  useEffect(() => {
+    const _watchId = Geolocation.watchPosition(
+      position => {
+        setLocationText(JSON.stringify(position.coords));
+        calDistance(position.coords);
+      },
+      error => {
+        // See error code charts below.
+        console.log(error.code, error.message);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        distanceFilter: 0,
+        interval: 1000,
+        fastestInterval: 1000,
+      },
+    );
+    return () => {
+      if (_watchId) {
+        Geolocation.clearWatch(_watchId);
+      }
+    };
   });
   return (
     <View style={styles.container}>
