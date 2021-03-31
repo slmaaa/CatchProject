@@ -5,9 +5,11 @@ from area import *
 
 
 class Transaction:
-    def __init__(self, team, checkpoint: Checkpoint, points=0, time=None):
-        self.team = team
+    # Transactions are stored on Role and Processed by Game.
+    # This allows checking for Max Cumulative Points.
+    def __init__(self, checkpoint: Checkpoint, team, points=0, time=None):
         self.checkpoint = checkpoint
+        self.team = team
         self.points = points
         self.time = time or round(now(), 2)
 
@@ -16,11 +18,11 @@ class Role:
     def __init__(self, player: Player, team, transactions: [Transaction]):
         self.player = player
         self.team = team
-        self.transactions = transactions or None
+        self.transactions = transactions or []
 
     def add_transaction(self, transaction: Transaction):
         if transaction.checkpoint == self.transactions[-1].checkpoint:
-            self.transactions[-1].points = max(transaction.points, self.transactions[-1].points)
+            self.transactions[-1] = transaction
         else:
             self.transactions.append(transaction)
         return transaction

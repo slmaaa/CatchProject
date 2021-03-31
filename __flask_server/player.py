@@ -25,6 +25,8 @@ class Player:
         loc_his = [Location.from_dict(loc) for loc in _dict["loc_his"]]
         return Player(pid, name, avatar, loc_his)
 
+    # loc_his related methods
+
     @property
     def discontinue_pt(self):
         DISCONTINUE_DIFF = 5 * self.LOC_HISTORY_DELAY
@@ -47,16 +49,6 @@ class Player:
     @property
     def location(self):
         return self.loc_his[-1]
-
-    def get_time_location(self, time, lower=0.0, upper=1.0, first=True) -> Location:
-        res, res_diff = None, upper - lower
-        for loc in self.loc_his:
-            if lower <= loc.time - time <= upper:
-                if first:
-                    return loc
-                if abs(loc.time - time) <= res_diff:
-                    res, res_diff = loc, abs(loc.time - time)
-        return res
 
     def get_time_locations(self, start_time, end_time):
         res = []
