@@ -1,0 +1,21 @@
+{
+    "cpEnergyLevel": [
+        4,
+        -1,
+        7,
+        10
+    ],
+    "score":[360, 700],
+    "eventLog": [
+        {
+            "timestamp": 1617194309936,
+            "team": 0,
+            "event": 1,
+            "cp": 0
+        }
+    ],
+    "playerStatus": {
+        "cp": 0,
+        "status": "capturing"
+    }
+}
