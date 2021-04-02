@@ -1,12 +1,28 @@
-const path = require("path");
-const { override, addBabelPlugins, babelInclude } = require("customize-cra");
+module.exports = function override(config, env) {
+  config.module.rules.push({
+    test: /\.js$/,
+    exclude: /node_modules[/\\](?!react-native-vector-icons)/,
+    use: {
+      loader: "babel-loader",
+      options: {
+        // Disable reading babel configuration
+        babelrc: false,
+        configFile: false,
 
-module.exports = override(
-  addBabelPlugins("@babel/plugin-proposal-class-properties"),
-  babelInclude([
-    path.resolve(__dirname, "node_modules/react-native-elements"),
-    path.resolve(__dirname, "node_modules/react-native-vector-icons"),
-    path.resolve(__dirname, "node_modules/react-native-ratings"),
-    path.resolve(__dirname, "src"),
-  ])
-);
+        // The configuration for compilation
+        presets: [
+          ["@babel/preset-env", { useBuiltIns: "usage" }],
+          "@babel/preset-react",
+          "@babel/preset-flow",
+          "@babel/preset-typescript",
+        ],
+        plugins: [
+          "@babel/plugin-proposal-class-properties",
+          "@babel/plugin-proposal-object-rest-spread",
+        ],
+      },
+    },
+  });
+
+  return config;
+};

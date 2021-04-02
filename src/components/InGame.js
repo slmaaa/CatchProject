@@ -2,10 +2,14 @@ import { useEffect, useRef, useState } from "react";
 import { eventLog, playerStatus, score } from "../data_from_server.json";
 import * as React from "react";
 import Geolocation from "react-native-geolocation-service";
-import MapView from "react-native-maps";
 import { getDistance } from "geolib";
 import timestampToDate from "./timestampToDate";
 import printEventLog from "./printEventLog";
+import mapboxgl from "mapbox-gl/dist/mapbox-gl-csp";
+import MapboxWorker from "worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker";
+mapboxgl.workerClass = MapboxWorker;
+mapboxgl.accessToken =
+  "pk.eyJ1IjoiaGVjdG9yY2hjaCIsImEiOiJja205YmhldXUwdHQ1Mm9xbGw4N2RodndhIn0.yX90QKE2jcgG-7V5wOGXeQ";
 
 import { PermissionsAndroid } from "react-native";
 
@@ -38,6 +42,10 @@ const InGame = (props) => {
   const [formattedTime, setFormattedTime] = useState("");
   const [scoreRed, setScoreRed] = useState(300);
   const [scoreBlue, setScoreBlue] = useState(300);
+  const mapContainer = useRef();
+  const [lng, setLng] = useState(-70.9);
+  const [lat, setLat] = useState(42.35);
+  const [zoom, setZoom] = useState(9);
   console.log(printEventLog());
   useEffect(() => {
     const _watchId = Geolocation.watchPosition(
@@ -78,21 +86,25 @@ const InGame = (props) => {
     }
     setScoreRed(score[0]);
     setScoreBlue(score[1]);
+    const map = new mapboxgl.Map({
+      container: mapContainer.current,
+      style: "mapbox://styles/mapbox/streets-v11",
+      center: [lng, lat],
+      zoom: zoom,
+    });
     return () => {
+      map.remove();
       if (_watchId) {
         Geolocation.clearWatch(_watchId);
       }
     };
   }, [location]);
-
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.mapContainer}>
-        <Text>{time}</Text>
-        <Text>{locationText}</Text>
-        <Text>{formattedTime}</Text>
-        <Text>{cpFlag}</Text>
+        <div className="map-container" ref={mapContainer} />
       </View>
+      <map />
       <View style={styles.scoreContainer}>
         <View style={styles.scoreBarContainer}>
           <ProgressBar
@@ -119,6 +131,10 @@ const InGame = (props) => {
       </View>
       <View style={styles.currentEnergyBarContainer}>
         <Text>Energy Bar</Text>
+        <Text>{time}</Text>
+        <Text>{locationText}</Text>
+        <Text>{formattedTime}</Text>
+        <Text>{cpFlag}</Text>
       </View>
       <View></View>
     </SafeAreaView>
@@ -131,6 +147,11 @@ const styles = StyleSheet.create({
     position: "absolute",
     height: Dimensions.get("window").height,
     width: Dimensions.get("window").width,
+  },
+  map_container: {
+    position: "absolute",
+    height: 500,
+    width: 500,
   },
   mapContainer: {
     flex: 0.6,
