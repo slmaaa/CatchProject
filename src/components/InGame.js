@@ -6,6 +6,7 @@ import { getDistance } from "geolib";
 import timestampToDate from "./timestampToDate";
 import printEventLog from "./printEventLog";
 import mapboxgl from "mapbox-gl/dist/mapbox-gl-csp";
+
 import MapboxWorker from "worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker";
 mapboxgl.workerClass = MapboxWorker;
 mapboxgl.accessToken =
@@ -43,9 +44,9 @@ const InGame = (props) => {
   const [scoreRed, setScoreRed] = useState(300);
   const [scoreBlue, setScoreBlue] = useState(300);
   const mapContainer = useRef();
-  const [lng, setLng] = useState(-70.9);
-  const [lat, setLat] = useState(42.35);
-  const [zoom, setZoom] = useState(9);
+  const [lng, setLng] = useState(114.263069);
+  const [lat, setLat] = useState(22.334851);
+  const [zoom, setZoom] = useState(18);
   console.log(printEventLog());
   useEffect(() => {
     const _watchId = Geolocation.watchPosition(
@@ -91,6 +92,15 @@ const InGame = (props) => {
       style: "mapbox://styles/mapbox/streets-v11",
       center: [lng, lat],
       zoom: zoom,
+      scrollZoom: false,
+      dragRotate: false,
+      dragPan: false,
+    });
+
+    map.on("move", () => {
+      setLng(map.getCenter().lng.toFixed(4));
+      setLat(map.getCenter().lat.toFixed(4));
+      setZoom(map.getZoom().toFixed(2));
     });
     return () => {
       map.remove();
