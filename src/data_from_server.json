@@ -5,10 +5,10 @@
         7,
         10
     ],
-    "score":[360, 700],
+    "score":[500, 700],
     "eventLog": [
         {
-            "timestamp": 1617194309936,
+            "timestamp": 1617194609936,
             "team": 0,
             "event": 1,
             "cp": 0

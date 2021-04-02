@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-import { eventLog } from "../data_from_server.json";
-import { playerStatus } from "../data_from_server.json";
+import { eventLog, playerStatus, score } from "../data_from_server.json";
 import * as React from "react";
 import Geolocation from "react-native-geolocation-service";
+import MapView from "react-native-maps";
 import { getDistance } from "geolib";
 import timestampToDate from "./timestampToDate";
 import printEventLog from "./printEventLog";
-import ProgressBar from "react-native-progress/Bar";
+
 import { PermissionsAndroid } from "react-native";
 
 import {
@@ -15,6 +15,7 @@ import {
   Dimensions,
   Vibration,
   ScrollView,
+  ProgressBar,
   SafeAreaView,
   StyleSheet,
 } from "react-native";
@@ -27,6 +28,7 @@ const CP_LOCATION = [
   { latitude: 22.335091, longitude: 114.263291 },
 ];
 const CP_RANGE = 5;
+const SCORE_TARGET = 1000;
 
 const InGame = (props) => {
   const [locationText, setLocationText] = useState("");
@@ -34,6 +36,8 @@ const InGame = (props) => {
   const [cpFlag, setCPFlag] = useState(-1);
   const [time, setTime] = useState(0);
   const [formattedTime, setFormattedTime] = useState("");
+  const [scoreRed, setScoreRed] = useState(300);
+  const [scoreBlue, setScoreBlue] = useState(300);
   console.log(printEventLog());
   useEffect(() => {
     const _watchId = Geolocation.watchPosition(
@@ -72,6 +76,8 @@ const InGame = (props) => {
         }
       }
     }
+    setScoreRed(score[0]);
+    setScoreBlue(score[1]);
     return () => {
       if (_watchId) {
         Geolocation.clearWatch(_watchId);
@@ -87,9 +93,27 @@ const InGame = (props) => {
         <Text>{formattedTime}</Text>
         <Text>{cpFlag}</Text>
       </View>
-      <View style={styles.scoreBarContainer}>
-        <Progress.Bar progress={0.3} width={200} />
+      <View style={styles.scoreContainer}>
+        <View style={styles.scoreBarContainer}>
+          <ProgressBar
+            color="red"
+            trackColor="#F6CECE"
+            progress={scoreRed / SCORE_TARGET}
+            style={styles.scoreBar}
+          />
+          <ProgressBar
+            color="#A9BCF5"
+            trackColor="#2E64FE"
+            progress={(SCORE_TARGET - scoreBlue) / SCORE_TARGET}
+            style={styles.scoreBar}
+          />
+        </View>
+        <View style={styles.score}>
+          <Text style={styles.scoreRed}>{scoreRed}</Text>
+          <Text style={styles.scoreBlue}>{scoreBlue}</Text>
+        </View>
       </View>
+
       <View style={styles.eventLogContainer}>
         <Text>{printEventLog()}</Text>
       </View>
@@ -113,9 +137,30 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "white",
   },
-  scoreBarContainer: {
+  scoreContainer: {
     flex: 0.1,
+  },
+  scoreBarContainer: {
+    flex: 1,
+    flexDirection: "row",
     backgroundColor: "white",
+  },
+  score: {
+    flexDirection: "row",
+  },
+  scoreRed: {
+    flex: 0.5,
+    alignSelf: "flex-start",
+    color: "black",
+  },
+  scoreBlue: {
+    flex: 0.5,
+    textAlign: "end",
+    color: "black",
+  },
+  scoreBar: {
+    flex: 0.5,
+    height: 20,
   },
   eventLogContainer: {
     flex: 0.15,

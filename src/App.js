@@ -5,7 +5,6 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 
 import InGame from "./components/InGame";
-import Map from "./components/Map";
 
 const Stack = createStackNavigator();
 
@@ -19,17 +18,7 @@ const App = (props) => {
           options={{
             headerLeft: null,
             title: null,
-            headerStyle: {
-              backgroundColor: "black",
-            },
-          }}
-        />
-        <Stack.Screen
-          name="Map"
-          component={Map}
-          options={{
-            headerLeft: null,
-            title: null,
+            headerShown: false,
             headerStyle: {
               backgroundColor: "black",
             },
