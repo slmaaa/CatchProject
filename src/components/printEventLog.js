@@ -9,17 +9,16 @@ const timeDiffernece = (timestamp) => {
   return diff == 0 ? "Just now" : diff + "m";
 };
 
-const printEventLog = () => {
+function printEventLog(i = 0, time = false) {
   let s = "";
-  for (let i = 0; i < eventLog.length; ++i) {
-    s += timeDiffernece(eventLog[i].timestamp);
-    eventLog[i].team == 0 ? (s += ": Blue team") : (s += ": Red team");
-    if (eventLog[i].event == 0) s += " is invading";
-    else if (eventLog[i].event == 1) s += " is capturing";
-    else s += " has captured";
-    s += " CP";
-    s += eventLog[i].cp + "\n";
-    return s;
-  }
-};
+  if (time) s += timeDiffernece(eventLog[i].timestamp) + ": ";
+  eventLog[i].team == 0 ? (s += "Blue team") : (s += "Red team");
+  if (eventLog[i].event == 0) s += " is invading";
+  else if (eventLog[i].event == 1) s += " is capturing";
+  else s += " has captured";
+  s += " CP";
+  s += eventLog[i].cp + "\n";
+  return s;
+}
+
 export default printEventLog;

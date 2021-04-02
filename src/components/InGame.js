@@ -18,6 +18,7 @@ import {
   Text,
   View,
   Dimensions,
+  Modal,
   Vibration,
   ScrollView,
   ProgressBar,
@@ -34,20 +35,43 @@ const CP_LOCATION = [
 ];
 const CP_RANGE = 5;
 const SCORE_TARGET = 1000;
-
+const BOUND = new mapboxgl.LngLatBounds(
+  new mapboxgl.LngLat(-73.9876, 40.7661),
+  new mapboxgl.LngLat(-73.9397, 40.8002)
+);
+const ONE = 1;
 const InGame = (props) => {
   const [locationText, setLocationText] = useState("");
   const [location, setLocation] = useState("a");
   const [cpFlag, setCPFlag] = useState(-1);
   const [time, setTime] = useState(0);
   const [formattedTime, setFormattedTime] = useState("");
-  const [scoreRed, setScoreRed] = useState(300);
-  const [scoreBlue, setScoreBlue] = useState(300);
   const mapContainer = useRef();
   const [lng, setLng] = useState(114.263069);
   const [lat, setLat] = useState(22.334851);
   const [zoom, setZoom] = useState(18);
+  const [eventLogPtr, setEventLogPtr] = useState(0);
+  const [modalVisible, setModalVisible] = useState(false);
+
   console.log(printEventLog());
+  useEffect(() => {
+    const map = new mapboxgl.Map({
+      container: mapContainer.current,
+      style: "mapbox://styles/mapbox/streets-v11",
+      center: [lng, lat],
+      zoom: zoom,
+    });
+
+    map.on("move", () => {
+      setLng(map.getCenter().lng.toFixed(4));
+      setLat(map.getCenter().lat.toFixed(4));
+      setZoom(map.getZoom().toFixed(2));
+    });
+    return () => {
+      map.remove();
+    };
+  }, []);
+
   useEffect(() => {
     const _watchId = Geolocation.watchPosition(
       (position) => {
@@ -85,25 +109,8 @@ const InGame = (props) => {
         }
       }
     }
-    setScoreRed(score[0]);
-    setScoreBlue(score[1]);
-    const map = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: "mapbox://styles/mapbox/streets-v11",
-      center: [lng, lat],
-      zoom: zoom,
-      scrollZoom: false,
-      dragRotate: false,
-      dragPan: false,
-    });
 
-    map.on("move", () => {
-      setLng(map.getCenter().lng.toFixed(4));
-      setLat(map.getCenter().lat.toFixed(4));
-      setZoom(map.getZoom().toFixed(2));
-    });
     return () => {
-      map.remove();
       if (_watchId) {
         Geolocation.clearWatch(_watchId);
       }
@@ -111,6 +118,13 @@ const InGame = (props) => {
   }, [location]);
   return (
     <SafeAreaView style={styles.container}>
+      <Modal animationType={"fade"} transparent visible={true}>
+        <View style={styles.notificationContainer}>
+          <Text style={styles.notificationText}>
+            {printEventLog(eventLogPtr)}{" "}
+          </Text>
+        </View>
+      </Modal>
       <View style={styles.mapContainer}>
         <div className="map-container" ref={mapContainer} />
       </View>
@@ -120,24 +134,25 @@ const InGame = (props) => {
           <ProgressBar
             color="red"
             trackColor="#F6CECE"
-            progress={scoreRed / SCORE_TARGET}
+            progress={score[0] / SCORE_TARGET}
             style={styles.scoreBar}
           />
           <ProgressBar
             color="#A9BCF5"
             trackColor="#2E64FE"
-            progress={(SCORE_TARGET - scoreBlue) / SCORE_TARGET}
+            progress={(SCORE_TARGET - score[1]) / SCORE_TARGET}
             style={styles.scoreBar}
           />
         </View>
         <View style={styles.score}>
-          <Text style={styles.scoreRed}>{scoreRed}</Text>
-          <Text style={styles.scoreBlue}>{scoreBlue}</Text>
+          <Text style={styles.scoreRed}>{score[0]}</Text>
+          <Text style={styles.scoreBlue}>{score[1]}</Text>
         </View>
       </View>
 
       <View style={styles.eventLogContainer}>
-        <Text>{printEventLog()}</Text>
+        <Text>{printEventLog(0)}</Text>
+        <Text>{printEventLog(0)}</Text>
       </View>
       <View style={styles.currentEnergyBarContainer}>
         <Text>Energy Bar</Text>
@@ -158,10 +173,18 @@ const styles = StyleSheet.create({
     height: Dimensions.get("window").height,
     width: Dimensions.get("window").width,
   },
-  map_container: {
-    position: "absolute",
-    height: 500,
-    width: 500,
+  notificationContainer: {
+    width: "70%",
+    backgroundColor: "white",
+    borderRadius: 10,
+    opacity: "80%",
+    height: "10%",
+    justifyContent: "center",
+    alignSelf: "center",
+  },
+  notificationText: {
+    color: "black",
+    textAlign: "center",
   },
   mapContainer: {
     flex: 0.6,
