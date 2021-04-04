@@ -9,7 +9,7 @@
     "serve": "webpack serve --config webpack.config.js ",
     "web:start": "react-scripts start",
     "web:build": "react-scripts build",
-    "build": "webpack --mode production",
+    "build": "webpack --mode production --config webpack.config.js",
     "start": "react-app-rewired start",
     "test": "react-app-rewired test",
     "lint": "eslint ."
