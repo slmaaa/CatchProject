@@ -51,6 +51,10 @@ module.exports = {
         test: /\.(jpg|png|woff|woff2|eot|ttf|svg)$/,
         loader: "file-loader",
       },
+      {
+        test: /\.css$/i,
+        use: ["style-loader", "css-loader"],
+      },
     ],
   },
   resolve: {
@@ -58,11 +62,7 @@ module.exports = {
       "react-native$": require.resolve("react-native-web"),
     },
   },
-  plugins: [
-    new HtmlWebpackPlugin({
-      template: path.join(__dirname, "web", "index.html"),
-    }),
-  ],
+  plugins: [new HtmlWebpackPlugin()],
 
   // Development server config
   devServer: {
