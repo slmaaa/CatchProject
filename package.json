@@ -6,13 +6,10 @@
   "scripts": {
     "android": "react-native run-android",
     "ios": "react-native run-ios",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d build",
-    "web": "webpack serve --open --mode=development",
     "serve": "webpack serve --config webpack.config.js ",
     "web:start": "react-scripts start",
     "web:build": "react-scripts build",
-    "build": "react-app-rewired build",
+    "build": "webpack --mode production",
     "start": "react-app-rewired start",
     "test": "react-app-rewired test",
     "lint": "eslint ."
