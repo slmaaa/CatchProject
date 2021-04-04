@@ -75,7 +75,6 @@
     "webpack-cli": "^4.6.0",
     "webpack-dev-server": "^3.11.1"
   },
-  "homepage": "https://slmaaa.github.io/CatchProject",
   "browserslist": {
     "production": [
       ">0.2%",

@@ -1,8 +1,7 @@
 const path = require("path");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
-  mode: "development",
-
   // Path to the entry file, change it according to the path you have
   entry: path.join(__dirname, "src", "index.js"),
 
@@ -59,6 +58,11 @@ module.exports = {
       "react-native$": require.resolve("react-native-web"),
     },
   },
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: path.join(__dirname, "web", "index.html"),
+    }),
+  ],
 
   // Development server config
   devServer: {
