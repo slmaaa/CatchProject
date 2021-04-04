@@ -1,13 +1,14 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const rootDir = path.join(__dirname, "..");
 
 module.exports = {
   // Path to the entry file, change it according to the path you have
-  entry: path.join(__dirname, "src", "index.js"),
+  entry: path.join(rootDir, "src", "index.js"),
 
   // Path for the output files
   output: {
-    path: path.join(__dirname, "dist"),
+    path: path.resolve(rootDir, "dist"),
     filename: "app.bundle.js",
   },
 
@@ -62,11 +63,14 @@ module.exports = {
       "react-native$": require.resolve("react-native-web"),
     },
   },
-  plugins: [new HtmlWebpackPlugin()],
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: path.join(__dirname, "index.html"),
+    }),
+  ],
 
   // Development server config
   devServer: {
-    contentBase: [path.join(__dirname, "public")],
     historyApiFallback: true,
     disableHostCheck: true,
   },
