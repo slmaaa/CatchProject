@@ -1,12 +1,12 @@
-import React, {Component} from 'react';
+import React, { Component } from "react";
 
-import {StyleSheet, View} from 'react-native';
-import {PermissionsAndroid} from 'react-native';
-import MapboxGL from '@react-native-mapbox-gl/maps';
-import Geocoder from 'react-native-geocoding';
-import Geolocation from 'react-native-geolocation-service';
+import { StyleSheet, View } from "react-native";
+import { PermissionsAndroid } from "react-native";
+import MapboxGL from "@react-native-mapbox-gl/maps";
+import Geocoder from "react-native-geocoding";
+import Geolocation from "react-native-geolocation-service";
 MapboxGL.setAccessToken(
-  'pk.eyJ1IjoiaGVjdG9yY2hjaCIsImEiOiJja205YmhldXUwdHQ1Mm9xbGw4N2RodndhIn0.yX90QKE2jcgG-7V5wOGXeQ',
+  "pk.eyJ1IjoiaGVjdG9yY2hjaCIsImEiOiJja205YmhldXUwdHQ1Mm9xbGw4N2RodndhIn0.yX90QKE2jcgG-7V5wOGXeQ"
 );
 
 console.disableYellowBox = true;
@@ -60,9 +60,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   SubContainer: {
-    height: '100%',
-    width: '100%',
-    backgroundColor: 'white',
+    height: "100%",
+    width: "100%",
+    backgroundColor: "white",
   },
   Mapbox: {
     flex: 1,

@@ -1,11 +1,11 @@
-import React, {useState} from 'react';
+import React, { useState } from "react";
 
-import {Text, View, TouchableOpacity, StyleSheet} from 'react-native';
+import { Text, View, TouchableOpacity, StyleSheet } from "react-native";
 
-import * as colorCode from '../src/ColorCode';
-import useInterval from './useInterval';
+import * as colorCode from "../src/ColorCode";
+import useInterval from "./useInterval";
 
-let padToTwo = number => (number <= 9 ? `0${number}` : number);
+let padToTwo = (number) => (number <= 9 ? `0${number}` : number);
 
 function CatchCountdown(props) {
   const [second, setSecond] = useState(5);
@@ -21,7 +21,7 @@ function CatchCountdown(props) {
         props.settingEnd(true);
       }
     },
-    props.end ? null : 1,
+    props.end ? null : 1
   );
 
   return (
@@ -30,7 +30,7 @@ function CatchCountdown(props) {
         <View style={styles.parent}>
           <Text style={styles.warning}>You will be caught by player 3 in </Text>
           <View style={styles.timerContainer}>
-            <Text style={styles.child}>{padToTwo(second) + ' : '}</Text>
+            <Text style={styles.child}>{padToTwo(second) + " : "}</Text>
             <Text style={styles.child}>{padToTwo(milisecond)}</Text>
           </View>
         </View>
@@ -41,31 +41,31 @@ function CatchCountdown(props) {
 const styles = StyleSheet.create({
   container: {},
   parent: {
-    display: 'flex',
-    alignSelf: 'center',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    backgroundColor: 'white',
-    paddingLeft: '8%',
-    paddingRight: '8%',
-    paddingTop: '.5%',
-    paddingBottom: '.5%',
+    display: "flex",
+    alignSelf: "center",
+    flexDirection: "column",
+    justifyContent: "center",
+    backgroundColor: "white",
+    paddingLeft: "8%",
+    paddingRight: "8%",
+    paddingTop: ".5%",
+    paddingBottom: ".5%",
   },
   warning: {
     fontSize: 20,
-    color: 'red',
-    alignSelf: 'center',
+    color: "red",
+    alignSelf: "center",
   },
   timerContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
   },
   child: {
     fontSize: 40,
-    color: 'red',
+    color: "red",
   },
 
   start: {
-    alignSelf: 'center',
+    alignSelf: "center",
   },
 });
 export default CatchCountdown;
