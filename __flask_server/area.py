@@ -8,22 +8,25 @@ class Area:
         self.time = time or round(now(), 2)
 
     def to_dict(self):
-        pass
+        return {"area": "AREA",
+                "time": self.time}
 
     @staticmethod
     def from_dict(_dict):
-        if _dict["area"] is "RECT":
+        if _dict["area"] == "RECT":
             return RectArea.from_dict(_dict)
-        elif _dict["area"] is "CIRCLE":
+        elif _dict["area"] == "CIRCLE":
             return CircleArea.from_dict(_dict)
+        elif _dict["area"] == "AREA":
+            return Area(round(now(), 2))
         else:
             return None
 
     def has_inside(self, loc: Location):
-        pass
+        return False
 
     def has_outside(self, loc: Location):
-        pass
+        return True
 
     def random_location(self):
         pass
@@ -44,7 +47,7 @@ class RectArea(Area):
 
     @staticmethod
     def from_dict(_dict):
-        if _dict["area"] is "RECT":
+        if _dict["area"] == "RECT":
             loc1 = Location.from_dict(_dict["loc1"])
             loc2 = Location.from_dict(_dict["loc2"])
             time = _dict["time"]
@@ -78,7 +81,7 @@ class CircleArea(Area):
 
     @staticmethod
     def from_dict(_dict):
-        if _dict["area"] is "CIRCLE":
+        if _dict["area"] == "CIRCLE":
             center = Location.from_dict(_dict["center"])
             radius = _dict["radius"]
             time = _dict["time"]

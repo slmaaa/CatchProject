@@ -23,18 +23,18 @@ class Checkpoint:
 
 
 class CheckpointMovement:
-    def __init__(self, pid, cid, time=None, is_in=True):
-        self.pid, self.cid = pid, cid
+    def __init__(self, rid, cid, time=None, is_in=True):
+        self.rid, self.cid = rid, cid
         self.time = time or round(time(), 2)
         self.is_in = is_in
 
     def to_dict(self):
-        return {"pid": self.pid,
+        return {"rid": self.rid,
                 "cid": self.cid,
                 "time": self.time,
                 "is_in": self.is_in}
 
     @staticmethod
     def from_dict(_dict):
-        pid, cid, time, is_in = _dict["pid"], _dict["cid"], _dict["time"], _dict["is_in"]
-        return CheckpointMovement(pid, cid, time, is_in)
+        rid, cid, time, is_in = _dict["rid"], _dict["cid"], _dict["time"], _dict["is_in"]
+        return CheckpointMovement(rid, cid, time, is_in)

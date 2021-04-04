@@ -26,8 +26,11 @@ class GameParameters:
 
 
 class Game:
-    def __init__(self, start_time, end_time, parameters: GameParameters,
+    def __init__(self, gid,
+                 start_time, end_time,
+                 parameters: GameParameters,
                  roles: [Role] = None):
+        self.gid = gid
         self.start_time, self.end_time = start_time, end_time
         self.parameters = parameters
         if roles is not None:
@@ -37,12 +40,13 @@ class Game:
 
     def assign_roles(self):
         teaming = []
-        players_per_team = len(self.parameters.players) // len(self.parameters.teams)
+        players_per_team = round(len(self.parameters.players) / len(self.parameters.teams) + 0.5)
         for team_number in range(len(self.parameters.teams)):
             teaming += players_per_team * [self.parameters.teams[team_number]]
         self.roles = []
         for player, team in zip(self.parameters.players, teaming):
-            self.roles.append(Role(player, team))
+            rid = "G%s-P%s" % (self.gid, player.pid)
+            self.roles.append(Role(rid, player, team))
 
     def simulate(self, time=None):
         movement_queue = []
@@ -52,25 +56,25 @@ class Game:
 
         checkpoints = {}
         for checkpoint in self.parameters.checkpoints:
-            checkpoints[checkpoint.pid] = {"name": checkpoint.name,
+            checkpoints[checkpoint.cid] = {"name": checkpoint.name,
                                            "team": None,
                                            "energy": 0,
-                                           "pids": []}
+                                           "rids": []}
         roles = {}
         MAX_ENERGY_PER_STAY = 3
         TIME_PER_ENERGY = 10
         for role in self.roles:
-            roles[role.player.pid] = {"team": role.team,
-                                      "cid": None,
-                                      "contributed": 0,
-                                      "time_effective": 0,
-                                      "is_in": False}
+            roles[role.rid] = {"team": role.team,
+                               "cid": None,
+                               "contributed": 0,
+                               "time_effective": 0,
+                               "is_in": False}
         team_scores = {team: 0 for team in self.parameters.teams}
 
         start_time = self.start_time
         time_now = time or int(now())
         for clock in range(start_time, time_now):
-            for checkpoint in checkpoints:
+            for checkpoint in checkpoints.values():
                 if checkpoint["team"]:
                     team_scores[checkpoint["team"]] += checkpoint["energy"]
 
@@ -78,20 +82,23 @@ class Game:
             while movement_queue:
                 if movement_queue[0].time <= clock:
                     pending_movements.append(movement_queue.pop(0))
+                else:
+                    break
             for movement in pending_movements:
                 if movement.is_in:
-                    if movement.cid != roles[movement.pid]["cid"]:
-                        roles[movement.pid]["contributed"] = 0
-                    roles[movement.pid]["cid"] = movement.cid
-                    roles[movement.pid]["is_in"] = True
+                    if movement.rid != roles[movement.rid]["cid"]:
+                        roles[movement.rid]["contributed"] = 0
+                    roles[movement.rid]["cid"] = movement.cid
+                    roles[movement.rid]["is_in"] = True
+                    checkpoints[movement.cid]["rids"].append(movement.rid)
                 else:
-                    roles[movement.pid]["time_effective"] = 0
-                    roles[movement.pid]["is_in"] = False
-                    checkpoints[movement.cid]["pids"] = [pid for pid in checkpoints[movement.cid]["pids"] if
-                                                         pid != movement.pid]
+                    roles[movement.rid]["time_effective"] = 0
+                    roles[movement.rid]["is_in"] = False
+                    checkpoints[movement.cid]["rids"] = [rid for rid in checkpoints[movement.cid]["rids"] if
+                                                         rid != movement.rid]
 
-            for checkpoint in checkpoints:
-                checkpoint_roles = [roles[pid] for pid in checkpoint["pids"]]
+            for checkpoint in checkpoints.values():
+                checkpoint_roles = [roles[rid] for rid in checkpoint["rids"]]
                 checkpoint_role_teams = [role["team"] for role in checkpoint_roles]
                 capturing_team, capturing_players = None, 0
                 for team in self.parameters.teams:
@@ -103,7 +110,7 @@ class Game:
                         pass
 
                 for role in checkpoint_roles:
-                    if (role["team"] == capturing_team) and (role["contributed"] <= MAX_ENERGY_PER_STAY):
+                    if (role["team"] == capturing_team) and (role["contributed"] < MAX_ENERGY_PER_STAY):
                         role["time_effective"] += 1
                         if role["time_effective"] >= TIME_PER_ENERGY:
                             if checkpoint["team"] is None:
