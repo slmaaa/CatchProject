@@ -1,29 +1,30 @@
-from time import time as now
-
+from checkpoint import Checkpoint
 from player import Player
 from roles import Role
-from checkpoint import Checkpoint
 
 
 class GameParameters:
-    def __init__(self, checkpoints: [Checkpoint] = None, players: [Player] = None,
+    def __init__(self, gpid, checkpoints: [Checkpoint] = None, players: [Player] = None,
                  teams: [str] = None, min_players=8, max_players=20):
+        self.gpid = gpid
         self.checkpoints = checkpoints or []
         self.players = players or []
         self.teams = teams or []
         self.min_players, self.max_players = min_players, max_players
 
     def to_dict(self):
-        return {"checkpoints": [checkpoint.to_dict() for checkpoint in self.checkpoints],
+        return {"gpid": self.gpid,
+                "checkpoints": [checkpoint.to_dict() for checkpoint in self.checkpoints],
                 "players": [player.to_dict() for player in self.players],
                 "min_players": self.min_players, "max_players": self.max_players}
 
     @staticmethod
     def from_dict(_dict):
+        gpid = _dict["gpid"]
         checkpoints = [Checkpoint.from_dict(checkpoint) for checkpoint in _dict["checkpoints"]]
         players = [Player.from_dict(player) for player in _dict["players"]]
         min_players, max_players = _dict["min_players"], _dict["max_players"]
-        return GameParameters(checkpoints, players, min_players, max_players)
+        return GameParameters(gpid, checkpoints, players, min_players, max_players)
 
 
 class Game:
@@ -38,6 +39,12 @@ class Game:
             self.roles = roles
         else:
             self.assign_roles()
+
+    def to_dict(self):
+        return {"gid": self.gid,
+                "start_time": self.start_time, "end_time": self.end_time,
+                "parameters": self.parameters.to_dict(),
+                "roles": [role.to_dict() for role in self.roles]}
 
     def assign_roles(self):
         teaming = []

@@ -1,5 +1,6 @@
-from time import time as now
 from random import random
+from time import time as now
+
 from location import Location
 
 

@@ -1,7 +1,7 @@
 from time import time as now
 
-from game import Game
 from checkpoint import CheckpointMovement
+from game import Game
 
 
 class RoleSnapshot:

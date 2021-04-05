@@ -1,4 +1,3 @@
-from location import Location
 from checkpoint import CheckpointMovement
 from player import Player
 
@@ -18,3 +17,9 @@ class Role:
         team = _dict["team"]
         mv_his = [CheckpointMovement.from_dict(mv) for mv in _dict["mv_his"]]
         return Role(rid, player, team, mv_his)
+
+    def to_dict(self):
+        return {"rid": self.rid,
+                "player": self.player.to_dict(),
+                "team": self.team,
+                "mv_his": [mv.to_dict() for mv in self.mv_his]}
