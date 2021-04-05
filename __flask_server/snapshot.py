@@ -128,6 +128,7 @@ class GameSnapshot:
         self.checkpoint_snapshots = checkpoint_snapshots
         self.role_snapshots = role_snapshots
         self.team_scores = team_scores or {}
+        self.winning_team = None
 
     def to_dict(self):
         return {"gid": self.gid, "time": self.time,
@@ -165,7 +166,11 @@ class GameSnapshot:
         return None
 
     def fast_forward(self, time, movements):
+        if self.winning_team:
+            return False
+
         time = int(time)
+
         for clock in range(self.time, time + 1):
             for checkpoint in self.checkpoint_snapshots:
                 if checkpoint.team is not None:
@@ -187,4 +192,10 @@ class GameSnapshot:
                 checkpoint.update(clock, pending_movements)
 
         self.time = time
+
+        WINNING_SCORE = 500
+        for team, score in self.team_scores.items():
+            if score >= WINNING_SCORE:
+                self.winning_team = team
+                break
         return True
