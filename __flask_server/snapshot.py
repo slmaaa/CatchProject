@@ -165,6 +165,7 @@ class GameSnapshot:
         return None
 
     def fast_forward(self, time, movements):
+        time = int(time)
         for clock in range(self.time, time + 1):
             for checkpoint in self.checkpoint_snapshots:
                 if checkpoint.team is not None:
@@ -186,5 +187,4 @@ class GameSnapshot:
                 checkpoint.update(clock, pending_movements)
 
         self.time = time
-
         return True
