@@ -169,6 +169,8 @@ class GameSnapshot:
         if self.winning_team:
             return False
 
+        movements.sort(key=lambda movement: movement.time)
+
         time = int(time)
 
         for clock in range(self.time, time + 1):
@@ -182,6 +184,7 @@ class GameSnapshot:
                     pending_movements.append(movements.pop(0))
                 else:
                     break
+
             for movement in pending_movements:
                 if movement.is_in:
                     checkpoint = self.cid_get_checkpoint(movement.cid)
