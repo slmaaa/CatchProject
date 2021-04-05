@@ -11,7 +11,7 @@ class Role:
         self.mv_his = mv_his or []
 
     @staticmethod
-    def from_dict(self, _dict):
+    def from_dict(_dict):
         rid = _dict["rid"]
         player = Player.from_dict(_dict["player"])
         team = _dict["team"]

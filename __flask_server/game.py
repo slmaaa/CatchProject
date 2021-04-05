@@ -46,6 +46,14 @@ class Game:
                 "parameters": self.parameters.to_dict(),
                 "roles": [role.to_dict() for role in self.roles]}
 
+    @staticmethod
+    def from_dict(_dict):
+        gid = _dict["gid"]
+        start_time, end_time = _dict["start_time"], _dict["end_time"]
+        parameters = GameParameters.from_dict(_dict["parameters"])
+        roles = [Role.from_dict(role) for role in _dict["roles"]]
+        return Game(gid, start_time, end_time, parameters, roles)
+
     def assign_roles(self):
         teaming = []
         players_per_team = round(len(self.parameters.players) / len(self.parameters.teams) + 0.5)
