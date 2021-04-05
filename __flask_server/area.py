@@ -19,7 +19,7 @@ class Area:
         elif _dict["area"] == "CIRCLE":
             return CircleArea.from_dict(_dict)
         elif _dict["area"] == "AREA":
-            return Area(round(now(), 2))
+            return Area(_dict["time"])
         else:
             return None
 
