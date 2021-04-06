@@ -30,7 +30,6 @@ module.exports = {
 
             // The configuration for compilation
             presets: [
-              ["@babel/preset-env", { useBuiltIns: "usage" }],
               "module:metro-react-native-babel-preset",
               "@babel/preset-flow",
               "@babel/preset-typescript",

@@ -1,3 +1,3 @@
 team: {0:blue, 1:red}
 event: {0: invading, 1:capturing, 2:cpatured}
-succesfulness: {-1: opponent_capturing , 0: not_capturing, 1:capturing}
+succesfulness: {-1: opponent_capturing , 0: draw/not_in_CP, 1:capturing,2:reach_max}
