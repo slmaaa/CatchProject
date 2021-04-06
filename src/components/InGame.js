@@ -6,7 +6,6 @@ import * as React from "react";
 import Geolocation from "react-native-geolocation-service";
 import { getDistance } from "geolib";
 import timestampToDate from "./timestampToDate";
-import printEventLog from "./printEventLog";
 import useInterval from "./useInterval";
 
 import mapboxgl from "mapbox-gl/dist/mapbox-gl-csp";
