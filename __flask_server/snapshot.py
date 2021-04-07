@@ -147,7 +147,7 @@ class GameSnapshot:
     @staticmethod
     def from_game(game: Game):
         gid, time = game.gid, game.start_time
-        checkpoint_snapshots = [CheckpointSnapshot(time, checkpoint.cid, checkpoint.name) \
+        checkpoint_snapshots = [CheckpointSnapshot(time, checkpoint.cid, checkpoint.name)
                                 for checkpoint in game.parameters.checkpoints]
         role_snapshots = [RoleSnapshot(role.rid, role.team) for role in game.roles]
         team_scores = {team: 0 for team in game.parameters.teams}
@@ -169,7 +169,7 @@ class GameSnapshot:
         if self.winning_team:
             return False
 
-        movements.sort(key=lambda movement: movement.time)
+        movements.sort(key=lambda mv: mv.time)
 
         time = int(time)
 
@@ -201,4 +201,5 @@ class GameSnapshot:
             if score >= WINNING_SCORE:
                 self.winning_team = team
                 break
+
         return True

@@ -1,9 +1,8 @@
+from pprint import pprint
+
+from checkpoint import *
 from game import *
 from snapshot import *
-from checkpoint import *
-from area import Area
-
-from pprint import pprint
 
 checkpoints = [Checkpoint("A1", "Alpha 1", Area(1)),
                Checkpoint("B1", "Bravo 1", Area(1)),
@@ -21,7 +20,7 @@ game = Game("G01", 1, 20, game_params)
 movements = [CheckpointMovement(game.roles[0].rid, "A1", 2, True),
              CheckpointMovement(game.roles[0].rid, "A1", 24, False),
              CheckpointMovement(game.roles[2].rid, "A1", 26, True),
-             CheckpointMovement(game.roles[1].rid, "A1", 31, True),]
+             CheckpointMovement(game.roles[1].rid, "A1", 31, True), ]
 
 game_snap = GameSnapshot.from_game(game)
 game_snap.fast_forward(60, movements)
