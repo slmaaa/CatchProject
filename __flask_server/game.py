@@ -62,4 +62,4 @@ class Game:
         self.roles = []
         for player, team in zip(self.parameters.players, teaming):
             rid = "G%s-P%s" % (self.gid, player.pid)
-            self.roles.append(Role(rid, player, team))
+            self.roles.append(Role(rid, self.gid, player, team))

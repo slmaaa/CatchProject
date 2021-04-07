@@ -45,12 +45,14 @@ class CheckpointSnapshot:
     def __init__(self, time, cid, name,
                  team=None, energy=0,
                  capturing_team=None, capturing_players=0,
-                 role_snapshots: [RoleSnapshot] = None):
+                 role_snapshots: [RoleSnapshot] = None,
+                 winning_team=None):
         self.time = time or round(now(), 2)
         self.cid, self.name = cid, name
         self.team, self.energy = team, energy
         self.capturing_team, self.capturing_players = capturing_team, capturing_players
         self.role_snapshots = role_snapshots or []
+        self.winning_team = winning_team or None
 
     def to_dict(self):
         return {"time": self.time,
@@ -58,7 +60,8 @@ class CheckpointSnapshot:
                 "team": self.team, "energy": self.energy,
                 "capturing_team": self.capturing_team,
                 "capturing_players": self.capturing_players,
-                "role_snapshots": [snapshot.to_dict() for snapshot in self.role_snapshots]
+                "role_snapshots": [snapshot.to_dict() for snapshot in self.role_snapshots],
+                "winning_team": self.winning_team
                 }
 
     @staticmethod
@@ -68,9 +71,10 @@ class CheckpointSnapshot:
         team, energy = _dict["team"], _dict["energy"]
         capturing_team, capturing_players = _dict["capturing_team"], _dict["capturing_players"]
         role_snapshots = [RoleSnapshot.from_dict(snapshot) for snapshot in _dict["role_snapshots"]]
+        winning_team = _dict["winning_team"]
         return CheckpointSnapshot(time, cid, name,
                                   team, energy, capturing_team, capturing_players,
-                                  role_snapshots)
+                                  role_snapshots, winning_team)
 
     def update_capture(self):
         role_teams = [snapshot.team for snapshot in self.role_snapshots]
@@ -175,8 +179,9 @@ class GameSnapshot:
 
         for clock in range(self.time, time + 1):
             for checkpoint in self.checkpoint_snapshots:
-                if checkpoint.team is not None:
-                    self.team_scores[checkpoint.team] += checkpoint.energy
+                if clock != self.time:  # Duplicate same second request may add duplicate points
+                    if checkpoint.team is not None:
+                        self.team_scores[checkpoint.team] += checkpoint.energy
 
             pending_movements = []
             while movements:
