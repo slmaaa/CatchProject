@@ -1,22 +1,9 @@
 {
-  "cpEnergyLevel": [4, -1, 7, 10],
-  "score": [750, 700],
-  "eventLog": [
-    {
-      "timestamp": 1617194609936,
-      "team": 0,
-      "event": 1,
-      "cp": 0
-    },
-    {
-      "timestamp": 1617194609936,
-      "team": 0,
-      "event": 1,
-      "cp": 0
-    }
-  ],
+  "cpEnergyLevel": [9, -1, -9, 10],
+  "score": [900, 700],
+  "eventLog": [],
   "playerStatus": {
     "cp": 0,
-    "status": "capturing"
+    "status": 1
   }
 }
