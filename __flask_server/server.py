@@ -9,7 +9,6 @@ app = flask.Flask(__name__)
 app.config["DEBUG"] = True
 
 C_DB = "./store/Checkpoints.json"
-R_DB = "./store/Roles.json"
 GP_DB = "./store/GameParameters.json"
 G_DB = "./store/Games.json"
 GS_DB = "./store/GameSnapshots.json"
@@ -69,6 +68,20 @@ def gp_add_player(gpid):
         return "GameParameter not found", 404
 
 
+@app.route("/gp/<gpid>/leave/<pid>", methods=["DELETE"])
+def gp_remove_player(gpid, pid):
+    try:
+        gpdb = db.pull(GP_DB)
+        gp = GameParameters.from_dict(gpdb[gpid])
+        gp.players = [player for player in gp.players if player.pid != pid]
+        gpdb[gpid] = gp.to_dict()
+
+        db.push(gpdb, GP_DB)
+        return "Player removed"
+    except KeyError:
+        return "GameParameter not found", 404
+
+
 @app.route("/gp/<gpid>/start", methods=["POST"])
 def gp_to_game(gpid):
     try:
@@ -110,6 +123,36 @@ def gp_delete(gpid):
     except KeyError:
         return "GameParameter not found", 404
     db.push(gpdb, GP_DB)
+
+
+# Game
+@app.route("/g", methods=["GET"])
+def g_list():
+    gdb = db.pull(G_DB)
+    return gdb
+
+
+@app.route("/g/<gid>", methods=["GET"])
+def g_read(gid):
+    gdb = db.pull(GS_DB)
+    try:
+        return gdb[gid]
+    except KeyError:
+        return "Game not found", 404
+
+
+@app.route("/g/<gid>/p/<pid>", methods=["GET"])
+def g_get_rid_from_pid(gid, pid):
+    gdb = db.pull(GS_DB)
+    try:
+        g = Game.from_dict(gdb[gid])
+        for role in g.roles:
+            if role.player.pid == pid:
+                return role.to_dict()
+        else:
+            return "Player not found", 404
+    except KeyError:
+        return "Game not found", 404
 
 
 # Game Snapshot
