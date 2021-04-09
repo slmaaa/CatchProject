@@ -15,6 +15,7 @@ const postData = (data) => {
   fetch("https://isdn-2002-309511.df.r.appspot.com/posts", {
     method: "POST", // or 'PUT'
     headers: {
+      Origin: "https://zealous-carson-d68463.netlify.app/",
       "Content-Type": "application/json",
       "Access-Control-Request-Method": "POST",
     },
