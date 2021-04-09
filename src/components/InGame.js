@@ -49,7 +49,7 @@ const defaultPostData = {
   is_in: null,
 };
 
-const InGame = (props) => {
+const InGame = () => {
   const mapContainer = useRef();
 
   const [locationText, setLocationText] = useState("");
