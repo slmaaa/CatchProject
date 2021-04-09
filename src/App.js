@@ -9,7 +9,7 @@ import Demo from "./Demo";
 
 const Stack = createStackNavigator();
 const linking = {
-  config: { Demo: "", InGame: "*" },
+  config: { Demo: "d", InGame: "game" },
 };
 
 const App = () => {
