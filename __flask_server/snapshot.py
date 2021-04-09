@@ -5,24 +5,27 @@ from game import Game
 
 
 class RoleSnapshot:
-    def __init__(self, rid, team,
+    def __init__(self, time, rid, team,
                  cid=None, is_in=False,
                  contributed=0, time_effective=0):
+        self.time = time or round(now(), 2)
         self.rid, self.team = rid, team
         self.cid, self.is_in = cid, is_in
         self.contributed, self.time_effective = contributed, time_effective
 
     def to_dict(self):
-        return {"rid": self.rid, "team": self.team,
+        return {"time": self.time,
+                "rid": self.rid, "team": self.team,
                 "cid": self.cid, "is_in": self.is_in,
                 "contributed": self.contributed, "time_effective": self.time_effective}
 
     @staticmethod
     def from_dict(_dict):
+        time = _dict["time"]
         rid, team = _dict["rid"], _dict["team"]
         cid, is_in = _dict["cid"], _dict["is_in"]
         contributed, time_effective = _dict["contributed"], _dict["time_effective"]
-        return RoleSnapshot(rid, team, cid, is_in, contributed, time_effective)
+        return RoleSnapshot(time, rid, team, cid, is_in, contributed, time_effective)
 
     def apply_movement(self, movement: CheckpointMovement):
         if movement.rid != self.rid:
@@ -35,33 +38,26 @@ class RoleSnapshot:
         else:
             self.time_effective = 0
             self.is_in = False
+        movement.applied = True
+        self.time = movement.time
         return True
 
 
 class CheckpointSnapshot:
-    MAX_ENERGY_PER_STAY = 3
-    TIME_PER_ENERGY = 10
-
     def __init__(self, time, cid, name,
                  team=None, energy=0,
-                 capturing_team=None, capturing_players=0,
-                 role_snapshots: [RoleSnapshot] = None,
-                 winning_team=None):
+                 capturing_team=None, capturing_players=0):
         self.time = time or round(now(), 2)
         self.cid, self.name = cid, name
         self.team, self.energy = team, energy
         self.capturing_team, self.capturing_players = capturing_team, capturing_players
-        self.role_snapshots = role_snapshots or []
-        self.winning_team = winning_team or None
 
     def to_dict(self):
         return {"time": self.time,
                 "cid": self.cid, "name": self.name,
                 "team": self.team, "energy": self.energy,
                 "capturing_team": self.capturing_team,
-                "capturing_players": self.capturing_players,
-                "role_snapshots": [snapshot.to_dict() for snapshot in self.role_snapshots],
-                "winning_team": self.winning_team
+                "capturing_players": self.capturing_players
                 }
 
     @staticmethod
@@ -70,134 +66,145 @@ class CheckpointSnapshot:
         cid, name = _dict["cid"], _dict["name"]
         team, energy = _dict["team"], _dict["energy"]
         capturing_team, capturing_players = _dict["capturing_team"], _dict["capturing_players"]
-        role_snapshots = [RoleSnapshot.from_dict(snapshot) for snapshot in _dict["role_snapshots"]]
-        winning_team = _dict["winning_team"]
         return CheckpointSnapshot(time, cid, name,
-                                  team, energy, capturing_team, capturing_players,
-                                  role_snapshots, winning_team)
-
-    def update_capture(self):
-        role_teams = [snapshot.team for snapshot in self.role_snapshots]
-        teams = tuple(set(role_teams))
-        self.capturing_team, self.capturing_players = None, 0
-        for team in teams:
-            if role_teams.count(team) > self.capturing_players:
-                self.capturing_team, self.capturing_players = team, role_teams.count(team)
-            elif role_teams.count(team) == self.capturing_players:
-                self.capturing_team = None
-            else:
-                pass
-
-        for snapshot in self.role_snapshots:
-            if (snapshot.team == self.capturing_team) \
-                    and (snapshot.contributed < self.MAX_ENERGY_PER_STAY):
-                if snapshot.time_effective >= self.TIME_PER_ENERGY:
-                    if self.energy > 0:
-                        if snapshot.team == self.team:
-                            self.energy += 1
-                        else:
-                            self.energy -= 1
-                    else:
-                        self.team, self.energy = snapshot.team, 1
-                    if self.energy == 0:
-                        self.team = None
-                    snapshot.time_effective -= self.TIME_PER_ENERGY
-                    snapshot.contributed += 1
-
-    def update_role_snapshots(self, time, movements: [CheckpointMovement] = None):
-        movements = movements or []
-        movements = [movement for movement in movements if movement.time <= time and movement.cid == self.cid]
-        for movement in movements:
-            for role in self.role_snapshots:
-                role.apply_movement(movement)
-        self.role_snapshots = [snapshot for snapshot in self.role_snapshots if snapshot.is_in]
-        for snapshot in self.role_snapshots:
-            if (snapshot.contributed < self.MAX_ENERGY_PER_STAY) and (snapshot.team == self.capturing_team):
-                snapshot.time_effective += time - self.time
-        return True
-
-    def update(self, time=None, movements: [CheckpointMovement] = None):
-        time = time or round(now(), 2)
-        self.update_role_snapshots(time, movements)
-        self.update_capture()
-        self.time = time
+                                  team, energy, capturing_team, capturing_players)
 
 
 class GameSnapshot:
-    def __init__(self, gid, time,
+    def __init__(self, time, gid,
                  checkpoint_snapshots: [CheckpointSnapshot] = None,
                  role_snapshots: [RoleSnapshot] = None,
-                 team_scores: dict = None):
-        self.gid, self.time = gid, time
+                 pending_movements: [CheckpointMovement] = None,
+                 team_scores: dict = None,
+                 winning_team=None):
+        self.time, self.gid = time, gid
         self.checkpoint_snapshots = checkpoint_snapshots
         self.role_snapshots = role_snapshots
+        self.pending_movements = pending_movements or []
         self.team_scores = team_scores or {}
-        self.winning_team = None
+        self.winning_team = winning_team or None
 
     def to_dict(self):
-        return {"gid": self.gid, "time": self.time,
+        return {"time": self.time, "gid": self.gid,
                 "checkpoint_snapshots": [snapshot.to_dict() for snapshot in self.checkpoint_snapshots],
                 "role_snapshots": [snapshot.to_dict() for snapshot in self.role_snapshots],
-                "team_scores": self.team_scores}
+                "pending_movements": [movement.to_dict() for movement in self.pending_movements],
+                "team_scores": self.team_scores,
+                "winning_team": self.winning_team}
 
     @staticmethod
     def from_dict(_dict):
-        gid, time = _dict["gid"], _dict["time"]
+        time, gid = _dict["time"], _dict["gid"]
         checkpoint_snapshots = [CheckpointSnapshot.from_dict(_d) for _d in _dict["checkpoint_snapshots"]]
         role_snapshots = [RoleSnapshot.from_dict(_d) for _d in _dict["role_snapshots"]]
+        pending_movements = [CheckpointMovement.from_dict(_d) for _d in _dict["pending_movements"]]
         team_scores = _dict["team_scores"]
-        return GameSnapshot(gid, time, checkpoint_snapshots, role_snapshots, team_scores)
+        winning_team = _dict["winning_team"]
+        return GameSnapshot(time, gid,
+                            checkpoint_snapshots, role_snapshots, pending_movements,
+                            team_scores, winning_team)
 
     @staticmethod
     def from_game(game: Game):
         gid, time = game.gid, game.start_time
         checkpoint_snapshots = [CheckpointSnapshot(time, checkpoint.cid, checkpoint.name)
                                 for checkpoint in game.parameters.checkpoints]
-        role_snapshots = [RoleSnapshot(role.rid, role.team) for role in game.roles]
+        role_snapshots = [RoleSnapshot(time, role.rid, role.team) for role in game.roles]
+        pending_movements = []
         team_scores = {team: 0 for team in game.parameters.teams}
-        return GameSnapshot(gid, time, checkpoint_snapshots, role_snapshots, team_scores)
+        return GameSnapshot(time, gid, checkpoint_snapshots, role_snapshots, pending_movements, team_scores)
 
-    def rid_get_role(self, rid):
+    def rid_get_role(self, rid) -> RoleSnapshot:
         for role in self.role_snapshots:
             if role.rid == rid:
                 return role
-        return None
 
-    def cid_get_checkpoint(self, cid):
+    def cid_get_checkpoint(self, cid) -> CheckpointSnapshot:
         for checkpoint in self.checkpoint_snapshots:
             if checkpoint.cid == cid:
                 return checkpoint
-        return None
 
-    def fast_forward(self, time, movements):
+    @staticmethod
+    def role_is_in_checkpoint(role: RoleSnapshot, checkpoint: CheckpointSnapshot):
+        return role.cid == checkpoint.cid and role.is_in
+
+    @staticmethod
+    def checkpoint_team_add_energy(checkpoint: CheckpointSnapshot, team, energy):
+        if checkpoint.team == team:
+            checkpoint.energy += energy
+        else:
+            if checkpoint.energy >= energy:
+                checkpoint.energy -= energy
+            else:
+                checkpoint.team, checkpoint.energy = team, energy - checkpoint.energy
+        if checkpoint.energy == 0:
+            checkpoint.team = None
+
+    def update_checkpoints_capture_team(self):
+        for checkpoint in self.checkpoint_snapshots:
+            capturing_teams = [role.team for role in self.role_snapshots
+                               if self.role_is_in_checkpoint(role, checkpoint)]
+            if capturing_teams:
+                capturing_team_count = {team: capturing_teams.count(team)
+                                        for team in tuple(set(capturing_teams))}
+                max_capturing_players = max(capturing_team_count.values())
+                max_capturing_teams = [team for team in capturing_team_count if
+                                       capturing_team_count[team] == max_capturing_players]
+                if max_capturing_players == 0:
+                    checkpoint.capturing_team, checkpoint.capturing_players = None, 0
+                elif len(max_capturing_teams) == 1:
+                    checkpoint.capturing_team, checkpoint.capturing_players = \
+                        max_capturing_teams[0], max_capturing_players
+                elif len(max_capturing_teams) > 1:
+                    checkpoint.capturing_team, checkpoint.capturing_players = None, max_capturing_players
+                else:
+                    pass
+
+    MAX_CONTRIBUTION = 3
+    TIME_PER_ENERGY = 10
+
+    def checkpoints_consume_time_effective(self):
+        for checkpoint in self.checkpoint_snapshots:
+            for role in self.role_snapshots:
+                if self.role_is_in_checkpoint(role, checkpoint) and \
+                        checkpoint.capturing_team == role.team and \
+                        role.time_effective >= self.TIME_PER_ENERGY and \
+                        role.contributed < self.MAX_CONTRIBUTION:
+                    role.time_effective -= self.TIME_PER_ENERGY
+                    self.checkpoint_team_add_energy(checkpoint, role.team, 1)
+
+    def update_roles(self, time, movements: [CheckpointMovement] = None):
+        movements = movements or []
+        active_movements = [movement for movement in movements if movement.time <= time and not movement.applied]
+        for movement in active_movements:
+            role = self.rid_get_role(movement.rid)
+            role.apply_movement(movement)
+
+        for checkpoint in self.checkpoint_snapshots:
+            for role in self.role_snapshots:
+                if self.role_is_in_checkpoint(role, checkpoint) and \
+                        role.team == checkpoint.capturing_team and \
+                        role.contributed < self.MAX_CONTRIBUTION:
+                    time_delta = max(0, time - role.time)
+                    role.time_effective += time_delta
+                    role.time = time
+
+    def fast_forward(self, time, movements: [CheckpointMovement] = None):
         if self.winning_team:
             return False
 
+        movements = movements or []
         movements.sort(key=lambda mv: mv.time)
 
-        time = int(time)
-
-        for clock in range(self.time, time + 1):
+        for clock in range(int(self.time), int(time + 1)):
             for checkpoint in self.checkpoint_snapshots:
                 if clock != self.time:  # Duplicate same second request may add duplicate points
                     if checkpoint.team is not None:
                         self.team_scores[checkpoint.team] += checkpoint.energy
 
-            pending_movements = []
-            while movements:
-                if movements[0].time <= clock:
-                    pending_movements.append(movements.pop(0))
-                else:
-                    break
-
-            for movement in pending_movements:
-                if movement.is_in:
-                    checkpoint = self.cid_get_checkpoint(movement.cid)
-                    role = self.rid_get_role(movement.rid)
-                    checkpoint.role_snapshots.append(role)
-
-            for checkpoint in self.checkpoint_snapshots:
-                checkpoint.update(clock, pending_movements)
+            self.update_roles(clock, movements)
+            self.update_checkpoints_capture_team()
+            self.checkpoints_consume_time_effective()
 
         self.time = time
 
