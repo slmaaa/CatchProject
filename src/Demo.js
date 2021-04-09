@@ -1,11 +1,4 @@
-import {
-  SafeAreaView,
-  StyleSheet,
-  View,
-  Pressable,
-  Text,
-  TouchableHighlight,
-} from "react-native";
+import { SafeAreaView, Pressable, Text } from "react-native";
 import * as React from "react";
 import * as demo1 from "./demo1.json";
 import * as demo2 from "./demo2.json";
@@ -34,6 +27,7 @@ const Demo = () => {
     <SafeAreaView>
       <Pressable
         onPressIn={() => {
+          console.log("abc");
           postData(demo1);
         }}
       >
