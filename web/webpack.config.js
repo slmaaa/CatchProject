@@ -20,6 +20,7 @@ module.exports = {
     rules: [
       {
         test: /\.js$|jsx/,
+
         exclude: /node_modules[/\\](?!react-native-vector-icons)/,
         use: {
           loader: "babel-loader",

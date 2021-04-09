@@ -23,7 +23,6 @@ import {
   Dimensions,
   Modal,
   Vibration,
-  ScrollView,
   ProgressBar,
   SafeAreaView,
   StyleSheet,

@@ -1,11 +1,4 @@
-import {
-  SafeAreaView,
-  Text,
-  TextInput,
-  StyleSheet,
-  Button,
-  Linking,
-} from "react-native";
+import { SafeAreaView, StyleSheet, Button } from "react-native";
 import { useState } from "react";
 import * as React from "react";
 import { url } from "./constants";
