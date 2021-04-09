@@ -91,7 +91,7 @@ const InGame = (props) => {
   const [cpEnergyLevel, setCPEnergyLevel] = useState([0, 0, 0, 0]);
   const [playerState, setPlayerState] = useState();
 
-  const post = () => {
+  /*  const post = () => {
     fetch("http://localhost:3001/posting", {
       method: "POST", // or 'PUT'
       body: JSON.stringify(postData), // data can be `string` or {object}!
@@ -102,7 +102,7 @@ const InGame = (props) => {
       .then((res) => res.json())
       .catch((error) => console.error("Error:", error))
       .then((response) => console.log("Success:", response));
-  };
+  };*/
 
   const enegryArray = () => {
     let tempArray = [];

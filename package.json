@@ -80,5 +80,6 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  }
+  },
+  "proxy": "https://isdn-2002-309511.df.r.appspot.com"
 }

@@ -86,7 +86,7 @@ const Config = () => {
             min_players: 4,
             max_players: 18,
           };
-          fetch(url + "/posting", {
+          /*fetch(url + "/posting", {
             method: "POST", // or 'PUT'
             body: JSON.stringify(game), // data can be `string` or {object}!
             headers: new Headers({
@@ -95,7 +95,7 @@ const Config = () => {
           })
             .then((res) => res.json())
             .catch((error) => console.error("Error:", error))
-            .then((response) => console.log("Success:", response));
+            .then((response) => console.log("Success:", response));*/
         }}
       ></Button>
     </SafeAreaView>

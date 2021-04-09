@@ -1,4 +1,5 @@
 import timestampToDate from "./timestampToDate";
+import { url } from "./constants";
 
 const readJSON = (settingData, data, lastGet, currentGet, rid) => {
   let temp = data,
@@ -73,7 +74,7 @@ const readJSON = (settingData, data, lastGet, currentGet, rid) => {
 };
 
 const FetchData = (settingData, getData, lastJSON, setLastJSON, RID) => {
-  fetch("http://localhost:3001/users")
+  fetch("https://isdn-2002-309511.df.r.appspot.com/users")
     .then((response) => response.json())
     .then((json) => {
       if (lastJSON != null) readJSON(settingData, getData, lastJSON, json, RID);

@@ -36,7 +36,7 @@ const Login = () => {
             name: name,
             avatar: null,
           };
-          fetch(url + "/posting", {
+          /*fetch(url + "/posting", {
             method: "POST", // or 'PUT'
             body: JSON.stringify(player), // data can be `string` or {object}!
             headers: new Headers({
@@ -45,7 +45,7 @@ const Login = () => {
           })
             .then((res) => res.json())
             .catch((error) => console.error("Error:", error))
-            .then((response) => console.log("Success:", response));
+            .then((response) => console.log("Success:", response));*/
         }}
       ></Button>
       <Link to="InGame">Start Game</Link>
