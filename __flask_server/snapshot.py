@@ -23,8 +23,8 @@ class RoleSnapshot:
     def from_dict(_dict):
         time = _dict["time"]
         rid, team = _dict["rid"], _dict["team"]
-        cid, is_in = _dict["cid"], _dict["is_in"]
-        contributed, time_effective = _dict["contributed"], _dict["time_effective"]
+        cid, is_in = _dict.get("cid", None), _dict.get("is_in", False)
+        contributed, time_effective = _dict.get("contributed", 0), _dict.get("time_effective", 0)
         return RoleSnapshot(time, rid, team, cid, is_in, contributed, time_effective)
 
     def apply_movement(self, movement: CheckpointMovement):
@@ -64,8 +64,8 @@ class CheckpointSnapshot:
     def from_dict(_dict):
         time = _dict["time"]
         cid, name = _dict["cid"], _dict["name"]
-        team, energy = _dict["team"], _dict["energy"]
-        capturing_team, capturing_players = _dict["capturing_team"], _dict["capturing_players"]
+        team, energy = _dict.get("team", None), _dict.get("energy", 0)
+        capturing_team, capturing_players = _dict.get("capturing_team", None), _dict.get("capturing_players", 0)
         return CheckpointSnapshot(time, cid, name,
                                   team, energy, capturing_team, capturing_players)
 
@@ -78,8 +78,8 @@ class GameSnapshot:
                  team_scores: dict = None,
                  winning_team=None):
         self.time, self.gid = time, gid
-        self.checkpoint_snapshots = checkpoint_snapshots
-        self.role_snapshots = role_snapshots
+        self.checkpoint_snapshots = checkpoint_snapshots or []
+        self.role_snapshots = role_snapshots or []
         self.pending_movements = pending_movements or []
         self.team_scores = team_scores or {}
         self.winning_team = winning_team or None
@@ -95,11 +95,11 @@ class GameSnapshot:
     @staticmethod
     def from_dict(_dict):
         time, gid = _dict["time"], _dict["gid"]
-        checkpoint_snapshots = [CheckpointSnapshot.from_dict(_d) for _d in _dict["checkpoint_snapshots"]]
-        role_snapshots = [RoleSnapshot.from_dict(_d) for _d in _dict["role_snapshots"]]
-        pending_movements = [CheckpointMovement.from_dict(_d) for _d in _dict["pending_movements"]]
-        team_scores = _dict["team_scores"]
-        winning_team = _dict["winning_team"]
+        checkpoint_snapshots = [CheckpointSnapshot.from_dict(_d) for _d in _dict.get("checkpoint_snapshots", [])]
+        role_snapshots = [RoleSnapshot.from_dict(_d) for _d in _dict.get("role_snapshots", [])]
+        pending_movements = [CheckpointMovement.from_dict(_d) for _d in _dict.get("pending_movements", [])]
+        team_scores = _dict.get("team_scores", {})
+        winning_team = _dict.get("winning_team", None)
         return GameSnapshot(time, gid,
                             checkpoint_snapshots, role_snapshots, pending_movements,
                             team_scores, winning_team)

@@ -21,9 +21,9 @@ class GameParameters:
     @staticmethod
     def from_dict(_dict):
         gpid = _dict["gpid"]
-        checkpoints = [Checkpoint.from_dict(checkpoint) for checkpoint in _dict["checkpoints"]]
-        players = [Player.from_dict(player) for player in _dict["players"]]
-        min_players, max_players = _dict["min_players"], _dict["max_players"]
+        checkpoints = [Checkpoint.from_dict(checkpoint) for checkpoint in _dict.get("checkpoints", [])]
+        players = [Player.from_dict(player) for player in _dict.get("players", [])]
+        min_players, max_players = _dict.get("min_players", 8), _dict.get("max_players", 20)
         return GameParameters(gpid, checkpoints, players, min_players, max_players)
 
 

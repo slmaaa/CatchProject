@@ -1,5 +1,5 @@
 from area import *
-
+from time import time as now
 
 class Checkpoint:
     def __init__(self, cid, name, area: Area):
@@ -38,5 +38,7 @@ class CheckpointMovement:
 
     @staticmethod
     def from_dict(_dict):
-        rid, cid, time, is_in, applied = _dict["rid"], _dict["cid"], _dict["time"], _dict["is_in"], _dict["applied"]
+        rid, cid = _dict["rid"], _dict["cid"]
+        time = _dict.get("time", round(now(), 2))
+        is_in, applied = _dict.get("is_in", True), _dict.get("applied", False)
         return CheckpointMovement(rid, cid, time, is_in, applied)
