@@ -1,16 +1,14 @@
 from random import random
-from time import time as now
 
 from location import Location
 
 
 class Area:
-    def __init__(self, time):
-        self.time = time or round(now(), 2)
+    def __init__(self):
+        pass
 
     def to_dict(self):
-        return {"area": "AREA",
-                "time": self.time}
+        return {"area": "AREA"}
 
     @staticmethod
     def from_dict(_dict):
@@ -19,7 +17,7 @@ class Area:
         elif _dict["area"] == "CIRCLE":
             return CircleArea.from_dict(_dict)
         elif _dict["area"] == "AREA":
-            return Area(_dict["time"])
+            return Area()
         else:
             return None
 
@@ -34,8 +32,7 @@ class Area:
 
 
 class RectArea(Area):
-    def __init__(self, loc1: Location, loc2: Location, time=None):
-        super().__init__(time)
+    def __init__(self, loc1: Location, loc2: Location):
         self.loc1, self.loc2 = loc1, loc2
         self.lats = sorted([loc1.lat, loc2.lat])
         self.lngs = sorted([loc1.lng, loc2.lng])
@@ -43,16 +40,14 @@ class RectArea(Area):
     def to_dict(self):
         return {"area": "RECT",
                 "loc1": self.loc1.to_dict(),
-                "loc2": self.loc2.to_dict(),
-                "time": self.time}
+                "loc2": self.loc2.to_dict()}
 
     @staticmethod
     def from_dict(_dict):
         if _dict["area"] == "RECT":
             loc1 = Location.from_dict(_dict["loc1"])
             loc2 = Location.from_dict(_dict["loc2"])
-            time = _dict["time"]
-            return RectArea(loc1, loc2, time)
+            return RectArea(loc1, loc2)
         return None
 
     def has_inside(self, loc: Location):
@@ -70,23 +65,20 @@ class RectArea(Area):
 
 
 class CircleArea(Area):
-    def __init__(self, center: Location, radius, time=None):
-        super().__init__(time)
+    def __init__(self, center: Location, radius):
         self.center, self.radius = center, radius
 
     def to_dict(self):
         return {"area": "CIRCLE",
                 "center": self.center.to_dict(),
-                "radius": self.radius,
-                "time": self.time}
+                "radius": self.radius}
 
     @staticmethod
     def from_dict(_dict):
         if _dict["area"] == "CIRCLE":
             center = Location.from_dict(_dict["center"])
             radius = _dict["radius"]
-            time = _dict["time"]
-            return CircleArea(center, radius, time)
+            return CircleArea(center, radius)
         return None
 
     def has_inside(self, loc: Location):

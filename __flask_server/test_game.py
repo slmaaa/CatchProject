@@ -4,9 +4,9 @@ from checkpoint import *
 from game import *
 from snapshot import *
 
-checkpoints = [Checkpoint("A1", "Alpha 1", Area(1)),
-               Checkpoint("B1", "Bravo 1", Area(1)),
-               Checkpoint("C1", "Charlie 1", Area(1))]
+checkpoints = [Checkpoint("A1", "Alpha 1", Area()),
+               Checkpoint("B1", "Bravo 1", Area()),
+               Checkpoint("C1", "Charlie 1", Area())]
 
 players = [Player("P01", "Amy", "S1L1"),
            Player("P02", "Bob", "S1L1"),
