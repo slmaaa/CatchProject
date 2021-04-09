@@ -7,12 +7,12 @@ import Login from "./components/Login";
 import Config from "./components/Config";
 
 const Stack = createStackNavigator();
-const linking = { config: { Login: "", Ingame: "game", Config: "config" } };
+const linking = { config: { Login: "login", Ingame: "", Config: "config" } };
 
 const App = () => {
   return (
     <NavigationContainer linking={linking}>
-      <Stack.Navigator initialRouteName="Login">
+      <Stack.Navigator initialRouteName="Ingame">
         <Stack.Screen
           name="InGame"
           component={InGame}

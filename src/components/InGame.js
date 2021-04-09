@@ -48,8 +48,24 @@ const defaultPostData = {
   time: 0,
   is_in: null,
 };
+const BLUE = () => (
+  <ProgressBar
+    color="#A9BCF5"
+    trackColor="#2E64FE"
+    indeterminate
+    style={styles.scoreBar}
+  />
+);
+const RED = () => (
+  <ProgressBar
+    color="red"
+    trackColor="#F6CECE"
+    indeterminate
+    style={styles.scoreBar}
+  />
+);
 
-const InGame = () => {
+const InGame = (props) => {
   const mapContainer = useRef();
 
   const [locationText, setLocationText] = useState("");
@@ -69,9 +85,10 @@ const InGame = () => {
   const [getData, setGetData] = useState(defaultGetData);
   const [postData, setPostData] = useState(defaultPostData);
   const [lastJSON, setLastJSON] = useState(null);
-
-  let markers = [],
-    popups = [];
+  const [popup, setPopup] = useState(null);
+  const [marker, setMarker] = useState(null);
+  const [mapState, setMap] = useState(null);
+  const [playerState, setPlayerState] = useState();
 
   const post = () => {
     fetch("http://localhost:3001/posting", {
@@ -126,36 +143,47 @@ const InGame = () => {
       return <Text>Hurry to next CP</Text>;
     }
   };
+  useEffect(() => {
+    setPlayerState(getData.playerStatus.status);
+  });
 
   const renderCaptureBar = () => {
-    const BLUE = () => (
-      <ProgressBar
-        color="#A9BCF5"
-        trackColor="#2E64FE"
-        indeterminate
-        style={styles.scoreBar}
-      />
-    );
-    const RED = () => (
-      <ProgressBar
-        color="red"
-        trackColor="#F6CECE"
-        indeterminate
-        style={styles.scoreBar}
-      />
-    );
+    let color, progress, trackColor;
     if (getData.playerStatus.status == 0) {
-      return <ProgressBar trackColor="grey" style={styles.scoreBar} />;
+      color = "grey";
+      trackColor = "grey";
     } else if (getData.playerStatus.status == -1) {
-      return TEAM === "Red" ? BLUE() : RED();
+      if (TEAM === "Red") {
+        color = "#A9BCF5";
+        trackColor = "#2E64FE";
+      } else {
+        color = "red";
+        trackColor = "#F6CECE";
+      }
     } else if (getData.playerStatus.status == 1) {
-      return TEAM == "Red" ? RED() : BLUE();
+      if (TEAM === "Blue") {
+        color = "#A9BCF5";
+        trackColor = "#2E64FE";
+      } else {
+        color = "red";
+        trackColor = "#F6CECE";
+      }
     } else if (getData.playerStatus.status == 2)
-      return TEAM === "Red" ? (
-        <ProgressBar trackColor="red" style={styles.scoreBar} />
-      ) : (
-        <ProgressBar trackColor="#A9BCF5" style={styles.scoreBar} />
-      );
+      if (TEAM === "RED") {
+        color = "red";
+        trackColor = "red";
+      } else {
+        color = "#A9BCF5";
+        trackColor = "#A9BCF5";
+      }
+    return (
+      <ProgressBar
+        color={color}
+        trackColor={trackColor}
+        indeterminate
+        style={styles.scoreBar}
+      />
+    );
   };
 
   useEffect(() => {
@@ -165,54 +193,24 @@ const InGame = () => {
       center: [lng, lat],
       zoom: zoom,
     });
-    popups[0] = new mapboxgl.Popup({ offset: 25 }).setText(
-      getData.cpEnergyLevel[0] < 0
-        ? "Occuplied by Team Blue by " + getData.cpEnergyLevel[0]
-        : "Occuplied by Team Red by " + getData.cpEnergyLevel[0]
-    );
-
-    // create DOM element for the marker
-    popups[1] = new mapboxgl.Popup({ offset: 25 }).setText(
-      getData.cpEnergyLevel[1] < 0
-        ? "Occuplied by Team Blue by " + getData.cpEnergyLevel[1]
-        : "Occuplied by Team Red by " + getData.cpEnergyLevel[1]
-    );
-
-    popups[2] = new mapboxgl.Popup({ offset: 25 }).setText(
-      getData.cpEnergyLevel[2] < 0
-        ? "Occuplied by Team Blue by " + getData.cpEnergyLevel[2]
-        : "Occuplied by Team Red by " + getData.cpEnergyLevel[2]
-    );
-
-    popups[3] = new mapboxgl.Popup({ offset: 25 }).setText(
-      getData.cpEnergyLevel[3] < 0
-        ? "Occuplied by Team Blue by " + getData.cpEnergyLevel[3]
-        : "Occuplied by Team Red by " + getData.cpEnergyLevel[3]
-    );
-    markers[0] = new mapboxgl.Marker({
-      color: getData.cpEnergyLevel[0] < 0 ? "#A9BCF5" : "#F6CECE",
-    })
-      .setLngLat([114.262832, 22.335083])
-      .setPopup(popups[0])
-      .addTo(map);
-    markers[1] = new mapboxgl.Marker({
-      color: getData.cpEnergyLevel[1] < 0 ? "#A9BCF5" : "#F6CECE",
-    })
-      .setLngLat([114.262834, 22.33459])
-      .setPopup(popups[1])
-      .addTo(map);
-    markers[2] = new mapboxgl.Marker({
-      color: getData.cpEnergyLevel[2] < 0 ? "#A9BCF5" : "#F6CECE",
-    })
-      .setLngLat([114.263299, 22.334605])
-      .setPopup(popups[2])
-      .addTo(map);
-    markers[3] = new mapboxgl.Marker({
-      color: getData.cpEnergyLevel < 0 ? "#A9BCF5" : "#F6CECE",
-    })
-      .setLngLat([114.263291, 22.335091])
-      .setPopup(popups[3])
-      .addTo(map);
+    setMap(map);
+    let popups = [],
+      markers = [];
+    for (let i = 0; i < 4; ++i) {
+      popups[i] = new mapboxgl.Popup({ offset: 25 }).setText(
+        getData.cpEnergyLevel[i] > 0
+          ? "Occuplied by Team Blue by " + getData.cpEnergyLevel[i]
+          : "Occuplied by Team Red by " + getData.cpEnergyLevel[i] * -1
+      );
+      markers[i] = new mapboxgl.Marker({
+        color: getData.cpEnergyLevel[i] > 0 ? "#A9BCF5" : "#F6CECE",
+      })
+        .setLngLat([CP_LOCATION[i].longitude, CP_LOCATION[i].latitude])
+        .setPopup(popups[i])
+        .addTo(map);
+    }
+    setPopup(popups);
+    setMarker(markers);
     map.addControl(
       new mapboxgl.GeolocateControl({
         positionOptions: {
@@ -230,8 +228,28 @@ const InGame = () => {
     return () => {
       map.remove();
     };
-  }, [getData.cpEnergyLevel]);
+  }, []);
 
+  useInterval(() => {
+    let map = mapState;
+    let markers = marker;
+    let popups = popup;
+    if (popup != null && markers != null && map != null) {
+      for (let i = 0; i < 4; ++i) {
+        popups[i] = new mapboxgl.Popup({ offset: 25 }).setText(
+          getData.cpEnergyLevel[i] > 0
+            ? "Occuplied by Team Blue by " + getData.cpEnergyLevel[i]
+            : "Occuplied by Team Red by " + getData.cpEnergyLevel[i] * -1
+        );
+        markers[i] = new mapboxgl.Marker({
+          color: getData.cpEnergyLevel[i] > 0 ? "#A9BCF5" : "#F6CECE",
+        })
+          .setLngLat([CP_LOCATION[i].longitude, CP_LOCATION[i].latitude])
+          .setPopup(popups[i])
+          .addTo(map);
+      }
+    }
+  }, 1000);
 
   useEffect(() => {
     if (getData != null) {
@@ -241,7 +259,7 @@ const InGame = () => {
 
   useInterval(() => {
     FetchData(setGetData, getData, lastJSON, setLastJSON, RID);
-  }, 1000);
+  }, 2000);
 
   useEffect(() => {
     if (getData != null) {
@@ -263,24 +281,6 @@ const InGame = () => {
     }
     return () => {};
   }, [eventLogPtr, lastJSON]);
-
-  useEffect(() => {
-    const map = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: "mapbox://styles/mapbox/streets-v11",
-      center: [lng, lat],
-      zoom: zoom,
-    });
-
-    map.on("move", () => {
-      setLng(map.getCenter().lng.toFixed(4));
-      setLat(map.getCenter().lat.toFixed(4));
-      setZoom(map.getZoom().toFixed(2));
-    });
-    return () => {
-      map.remove();
-    };
-  }, []);
 
   useEffect(() => {
     const _watchId = Geolocation.watchPosition(

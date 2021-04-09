@@ -2,15 +2,24 @@ import timestampToDate from "./timestampToDate";
 
 const readJSON = (settingData, data, lastGet, currentGet, rid) => {
   let temp = data,
+    pos = -1,
+    cid = null,
     notFound = true;
+
+  for (let i = 0; i < currentGet.role_snapshots.length; ++i) {
+    if (
+      rid === currentGet.role_snapshots[i].rid &&
+      currentGet.role_snapshots[i].is_in
+    ) {
+      pos = i;
+      cid = currentGet.role_snapshots[i].cid;
+      break;
+    }
+  }
   for (let i = 0; i < currentGet.checkpoint_snapshots.length; ++i) {
     temp.cpEnergyLevel[i] = currentGet.checkpoint_snapshots[i].energy;
     if (currentGet.checkpoint_snapshots[i].team == "Red")
       temp.cpEnergyLevel[i] *= -1;
-    console.log(
-      lastGet.checkpoint_snapshots[i].team === "None" &&
-        currentGet.checkpoint_snapshots[i].team != "None"
-    );
     if (
       lastGet.checkpoint_snapshots[i].team === "None" &&
       currentGet.checkpoint_snapshots[i].team != "None"
@@ -36,19 +45,11 @@ const readJSON = (settingData, data, lastGet, currentGet, rid) => {
           currentGet.checkpoint_snapshots[i].name
       );
     }
-    if (notFound) {
-      pos = currentGet.checkpoint_snapshots[i].role_snapshots
-        .map(function (e) {
-          return e.rid;
-        })
-        .indexOf(rid);
-      if (pos != -1) {
+    if (notFound && pos != -1) {
+      if (currentGet.checkpoint_snapshots[i].cid === cid) {
         notFound = false;
         temp.playerStatus.cp = i;
-        if (
-          currentGet.checkpoint_snapshots[i].role_snapshots[pos].contributed ==
-          3
-        ) {
+        if (currentGet.role_snapshots[pos].contributed == 3) {
           temp.playerStatus.status = 2;
         } else if (
           currentGet.checkpoint_snapshots[i].capturing_team == "None"
@@ -56,7 +57,7 @@ const readJSON = (settingData, data, lastGet, currentGet, rid) => {
           temp.playerStatus.status = 0;
         } else
           currentGet.checkpoint_snapshots[i].capturing_team ==
-          currentGet.checkpoint_snapshots[i].role_snapshots[pos].team
+          currentGet.role_snapshots[pos].team
             ? (temp.playerStatus.status = 1)
             : (temp.playerStatus.status = -1);
       }

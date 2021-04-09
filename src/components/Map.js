@@ -104,7 +104,7 @@ const InGame = (props) => {
       />
     );
     if (playerStatus.status == 0) {
-      return <ProgressBar trackColor="#F6CECE" style={styles.scoreBar} />;
+      return <ProgressBar trackColor="grey" style={styles.scoreBar} />;
     } else if (playerStatus.status == 1) {
       return TEAM == 0 ? BLUE() : RED();
     } else if (playerStatus.status == 2) {
@@ -136,65 +136,73 @@ const InGame = (props) => {
       zoom: zoom,
     });
     var popup = new mapboxgl.Popup({ offset: 25 }).setText(
-      cpEnergyLevel[0]<0?"Occuplied by Team Blue by "+cpEnergyLevel[0]:"Occuplied by Team Red by "+cpEnergyLevel[0]
-      );
-       
-      // create DOM element for the marker
-      var el = document.createElement('div');
-      el.id = 'marker';
-      var popup1 = new mapboxgl.Popup({ offset: 25 }).setText(
-        cpEnergyLevel[1]<0?"Occuplied by Team Blue by "+cpEnergyLevel[1]:"Occuplied by Team Red by "+cpEnergyLevel[1]
-        );
-         
-        // create DOM element for the marker
-        var el1 = document.createElement('div');
-        el1.id = 'marker';
-        var popup2 = new mapboxgl.Popup({ offset: 25 }).setText(
-          cpEnergyLevel[2]<0?"Occuplied by Team Blue by "+cpEnergyLevel[2]:"Occuplied by Team Red by "+cpEnergyLevel[2]
-          );
-           
-          // create DOM element for the marker
-          var el2 = document.createElement('div');
-          el2.id = 'marker2';
-          var popup3 = new mapboxgl.Popup({ offset: 25 }).setText(
-            cpEnergyLevel[3]<0?"Occuplied by Team Blue by "+cpEnergyLevel[3]:"Occuplied by Team Red by "+cpEnergyLevel[3]
-            );
-             
-            // create DOM element for the marker
-            var el3 = document.createElement('div');
-            el3.id = 'marker3'; 
+      cpEnergyLevel[0] < 0
+        ? "Occuplied by Team Blue by " + cpEnergyLevel[0]
+        : "Occuplied by Team Red by " + cpEnergyLevel[0]
+    );
+
+    // create DOM element for the marker
+    var el = document.createElement("div");
+    el.id = "marker";
+    var popup1 = new mapboxgl.Popup({ offset: 25 }).setText(
+      cpEnergyLevel[1] < 0
+        ? "Occuplied by Team Blue by " + cpEnergyLevel[1]
+        : "Occuplied by Team Red by " + cpEnergyLevel[1]
+    );
+
+    // create DOM element for the marker
+    var el1 = document.createElement("div");
+    el1.id = "marker";
+    var popup2 = new mapboxgl.Popup({ offset: 25 }).setText(
+      cpEnergyLevel[2] < 0
+        ? "Occuplied by Team Blue by " + cpEnergyLevel[2]
+        : "Occuplied by Team Red by " + cpEnergyLevel[2]
+    );
+
+    // create DOM element for the marker
+    var el2 = document.createElement("div");
+    el2.id = "marker2";
+    var popup3 = new mapboxgl.Popup({ offset: 25 }).setText(
+      cpEnergyLevel[3] < 0
+        ? "Occuplied by Team Blue by " + cpEnergyLevel[3]
+        : "Occuplied by Team Red by " + cpEnergyLevel[3]
+    );
+
+    // create DOM element for the marker
+    var el3 = document.createElement("div");
+    el3.id = "marker3";
     var marker = new mapboxgl.Marker({
-      color: cpEnergyLevel[0]<0?"#A9BCF5":"#F6CECE",
-      })
-      .setLngLat([114.262832,22.335083])
+      color: cpEnergyLevel[0] < 0 ? "#A9BCF5" : "#F6CECE",
+    })
+      .setLngLat([114.262832, 22.335083])
       .setPopup(popup)
       .addTo(map);
     var marker2 = new mapboxgl.Marker({
-      color: cpEnergyLevel[1]<0?"#A9BCF5":"#F6CECE",
-      })
-      .setLngLat([114.262834,22.33459])
+      color: cpEnergyLevel[1] < 0 ? "#A9BCF5" : "#F6CECE",
+    })
+      .setLngLat([114.262834, 22.33459])
       .setPopup(popup1)
       .addTo(map);
     var marker3 = new mapboxgl.Marker({
-      color: cpEnergyLevel[2]<0?"#A9BCF5":"#F6CECE",
-      })
-      .setLngLat([114.263299,22.334605])
+      color: cpEnergyLevel[2] < 0 ? "#A9BCF5" : "#F6CECE",
+    })
+      .setLngLat([114.263299, 22.334605])
       .setPopup(popup2)
       .addTo(map);
     var marker4 = new mapboxgl.Marker({
-      color: cpEnergyLevel[3]<0?"#A9BCF5":"#F6CECE",
-      })
-      .setLngLat([114.263291,22.335091])
+      color: cpEnergyLevel[3] < 0 ? "#A9BCF5" : "#F6CECE",
+    })
+      .setLngLat([114.263291, 22.335091])
       .setPopup(popup3)
-      .addTo(map);      
+      .addTo(map);
     map.addControl(
       new mapboxgl.GeolocateControl({
         positionOptions: {
-          enableHighAccuracy: true
+          enableHighAccuracy: true,
         },
-        trackUserLocation: true
+        trackUserLocation: true,
       })
-    )
+    );
 
     map.on("move", () => {
       setLng(map.getCenter().lng.toFixed(4));
