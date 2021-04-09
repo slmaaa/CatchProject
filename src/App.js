@@ -9,7 +9,7 @@ import Demo from "./Demo";
 
 const Stack = createStackNavigator();
 const linking = {
-  config: { Ingame: "ingame", Login: "login", Config: "config", Demo: "404" },
+  config: { Demo: "", InGame: "*" },
 };
 
 const App = () => {
@@ -21,8 +21,6 @@ const App = () => {
         }}
       >
         <Stack.Screen name="InGame" component={InGame} />
-        <Stack.Screen name="Login" component={Login} />
-        <Stack.Screen name="Config" component={Config} />
         <Stack.Screen name="Demo" component={Demo} />
       </Stack.Navigator>
     </NavigationContainer>
