@@ -74,7 +74,7 @@ const readJSON = (settingData, data, lastGet, currentGet, rid) => {
 };
 
 const FetchData = (settingData, getData, lastJSON, setLastJSON, RID) => {
-  fetch("https://isdn-2002-309511.df.r.appspot.com/users")
+  fetch("http://localhost:3000/users")
     .then((response) => response.json())
     .then((json) => {
       if (lastJSON != null) readJSON(settingData, getData, lastJSON, json, RID);

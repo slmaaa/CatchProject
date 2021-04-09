@@ -5,7 +5,7 @@ import * as demo2 from "./demo2.json";
 import * as demo3 from "./demo3.json";
 import * as demo4 from "./demo4.json";
 const postData = (data) => {
-  fetch("https://isdn-2002-309511.df.r.appspot.com/posts", {
+  fetch("http://localhost:3000/posts", {
     method: "POST", // or 'PUT'
     headers: {
       "Content-Type": "application/json",
