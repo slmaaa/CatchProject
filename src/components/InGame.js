@@ -230,7 +230,8 @@ const InGame = () => {
     return () => {
       map.remove();
     };
-  }, []);
+  }, [getData.cpEnergyLevel]);
+
 
   useEffect(() => {
     if (getData != null) {
