@@ -140,7 +140,7 @@ class GameSnapshot:
         if checkpoint.energy == 0:
             checkpoint.team = None
 
-    def update_checkpoints_capture_team(self):
+    def update_checkpoints_capture_team(self, time):
         for checkpoint in self.checkpoint_snapshots:
             capturing_teams = [role.team for role in self.role_snapshots
                                if self.role_is_in_checkpoint(role, checkpoint)]
@@ -159,11 +159,12 @@ class GameSnapshot:
                     checkpoint.capturing_team, checkpoint.capturing_players = None, max_capturing_players
                 else:
                     pass
+            checkpoint.time = time
 
     MAX_CONTRIBUTION = 3
     TIME_PER_ENERGY = 10
 
-    def checkpoints_consume_time_effective(self):
+    def checkpoints_consume_time_effective(self, time):
         for checkpoint in self.checkpoint_snapshots:
             for role in self.role_snapshots:
                 if self.role_is_in_checkpoint(role, checkpoint) and \
@@ -172,6 +173,7 @@ class GameSnapshot:
                         role.contributed < self.MAX_CONTRIBUTION:
                     role.time_effective -= self.TIME_PER_ENERGY
                     self.checkpoint_team_add_energy(checkpoint, role.team, 1)
+            checkpoint.time = time
 
     def update_roles(self, time, movements: [CheckpointMovement] = None):
         movements = movements or []
@@ -203,8 +205,8 @@ class GameSnapshot:
                         self.team_scores[checkpoint.team] += checkpoint.energy
 
             self.update_roles(clock, movements)
-            self.update_checkpoints_capture_team()
-            self.checkpoints_consume_time_effective()
+            self.update_checkpoints_capture_team(clock)
+            self.checkpoints_consume_time_effective(clock)
 
         self.time = time
 
