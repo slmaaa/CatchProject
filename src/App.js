@@ -7,48 +7,19 @@ import Login from "./components/Login";
 import Config from "./components/Config";
 
 const Stack = createStackNavigator();
-const linking = { config: { Login: "login", Ingame: "", Config: "config" } };
+const linking = { config: { Ingame: "", Login: "login", Config: "config" } };
 
 const App = () => {
   return (
     <NavigationContainer linking={linking}>
-      <Stack.Navigator initialRouteName="Ingame">
-        <Stack.Screen
-          name="InGame"
-          component={InGame}
-          options={{
-            headerLeft: null,
-            title: null,
-            headerShown: false,
-            headerStyle: {
-              backgroundColor: "black",
-            },
-          }}
-        />
-        <Stack.Screen
-          name="Login"
-          component={Login}
-          options={{
-            headerLeft: null,
-            title: null,
-            headerShown: false,
-            headerStyle: {
-              backgroundColor: "black",
-            },
-          }}
-        />
-        <Stack.Screen
-          name="Config"
-          component={Config}
-          options={{
-            headerLeft: null,
-            title: null,
-            headerShown: false,
-            headerStyle: {
-              backgroundColor: "black",
-            },
-          }}
-        />
+      <Stack.Navigator
+        screenOptions={{
+          headerShown: false,
+        }}
+      >
+        <Stack.Screen name="InGame" component={InGame} />
+        <Stack.Screen name="Login" component={Login} />
+        <Stack.Screen name="Config" component={Config} />
       </Stack.Navigator>
     </NavigationContainer>
   );

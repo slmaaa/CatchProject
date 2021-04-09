@@ -40,7 +40,7 @@ const readJSON = (settingData, data, lastGet, currentGet, rid) => {
       temp.eventLog.push(
         timestampToDate(currentGet.time) +
           " Team " +
-          currentGet.checkpoint_snapshots[i].team +
+          currentGet.checkpoint_snapshots[i].capturing_team +
           " is capturing " +
           currentGet.checkpoint_snapshots[i].name
       );

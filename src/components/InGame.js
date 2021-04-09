@@ -88,6 +88,7 @@ const InGame = (props) => {
   const [popup, setPopup] = useState(null);
   const [marker, setMarker] = useState(null);
   const [mapState, setMap] = useState(null);
+  const [cpEnergyLevel, setCPEnergyLevel] = useState([0, 0, 0, 0]);
   const [playerState, setPlayerState] = useState();
 
   const post = () => {
@@ -169,7 +170,7 @@ const InGame = (props) => {
         trackColor = "#F6CECE";
       }
     } else if (getData.playerStatus.status == 2)
-      if (TEAM === "RED") {
+      if (TEAM === "Red") {
         color = "red";
         trackColor = "red";
       } else {
@@ -219,37 +220,34 @@ const InGame = (props) => {
         trackUserLocation: true,
       })
     );
-
-    map.on("move", () => {
-      setLng(map.getCenter().lng.toFixed(4));
-      setLat(map.getCenter().lat.toFixed(4));
-      setZoom(map.getZoom().toFixed(2));
-    });
     return () => {
       map.remove();
     };
   }, []);
-
-  useInterval(() => {
+  useEffect(() => {
+    setCPEnergyLevel(getData.cpEnergyLevel);
+  });
+  useEffect(() => {
     let map = mapState;
     let markers = marker;
     let popups = popup;
     if (popup != null && markers != null && map != null) {
       for (let i = 0; i < 4; ++i) {
         popups[i] = new mapboxgl.Popup({ offset: 25 }).setText(
-          getData.cpEnergyLevel[i] > 0
-            ? "Occuplied by Team Blue by " + getData.cpEnergyLevel[i]
-            : "Occuplied by Team Red by " + getData.cpEnergyLevel[i] * -1
+          cpEnergyLevel[i] > 0
+            ? "Occuplied by Team Blue by " + cpEnergyLevel[i]
+            : "Occuplied by Team Red by " + cpEnergyLevel[i] * -1
         );
+        markers[i].remove();
         markers[i] = new mapboxgl.Marker({
-          color: getData.cpEnergyLevel[i] > 0 ? "#A9BCF5" : "#F6CECE",
+          color: cpEnergyLevel[i] > 0 ? "#A9BCF5" : "#F6CECE",
         })
           .setLngLat([CP_LOCATION[i].longitude, CP_LOCATION[i].latitude])
           .setPopup(popups[i])
           .addTo(map);
       }
     }
-  }, 1000);
+  }, [cpEnergyLevel[0], cpEnergyLevel[2], cpEnergyLevel[3], cpEnergyLevel[1]]);
 
   useEffect(() => {
     if (getData != null) {
