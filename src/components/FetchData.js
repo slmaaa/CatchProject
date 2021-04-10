@@ -74,7 +74,7 @@ const readJSON = (settingData, data, lastGet, currentGet, rid) => {
 };
 
 const FetchData = (settingData, getData, lastJSON, setLastJSON, RID) => {
-  fetch("http://localhost:3000/users")
+  fetch(url + "/users")
     .then((response) => response.json())
     .then((json) => {
       if (lastJSON != null) readJSON(settingData, getData, lastJSON, json, RID);

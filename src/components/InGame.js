@@ -7,6 +7,8 @@ import Geolocation from "react-native-geolocation-service";
 import { getDistance } from "geolib";
 import timestampToDate from "./timestampToDate";
 import useInterval from "./useInterval";
+import { testLocation } from "./location_test.json";
+import { url } from "./constants";
 
 import mapboxgl from "mapbox-gl/dist/mapbox-gl-csp";
 
@@ -90,8 +92,8 @@ const InGame = (props) => {
   const [cpEnergyLevel, setCPEnergyLevel] = useState([0, 0, 0, 0]);
   const [playerState, setPlayerState] = useState();
 
-  /*  const post = () => {
-    fetch("http://localhost:3001/posting", {
+  const post = () => {
+    fetch(url + "/posting", {
       method: "POST", // or 'PUT'
       body: JSON.stringify(postData), // data can be `string` or {object}!
       headers: new Headers({
@@ -101,7 +103,7 @@ const InGame = (props) => {
       .then((res) => res.json())
       .catch((error) => console.error("Error:", error))
       .then((response) => console.log("Success:", response));
-  };*/
+  };
 
   const enegryArray = () => {
     let tempArray = [];
@@ -280,7 +282,7 @@ const InGame = (props) => {
   }, [eventLogPtr, lastJSON]);
 
   useEffect(() => {
-    const _watchId = Geolocation.watchPosition(
+    /*const _watchId = Geolocation.watchPosition(
       (position) => {
         setLocation(position.coords);
         setTime(position.timestamp);
@@ -306,7 +308,20 @@ const InGame = (props) => {
         interval: 100000,
         fastestInterval: 100000,
       }
+    );*/
+    setLocation = [testLocation.latitude, testLocation.longitude];
+    let f = new Date().getTime();
+    setTime(f);
+    setFormattedTime(timestampToDate(f));
+    console.log("Location updated at " + f);
+    setLocationText(
+      "Latitude: " +
+        JSON.stringify(testLocation.latitude) +
+        "\n" +
+        "Longitude: " +
+        JSON.stringify(testLocation.longitude)
     );
+    setTime(f);
     var flag = false;
     if (location != null) {
       for (let i = 0; i < NUM_OF_CP; i++) {
@@ -391,6 +406,13 @@ const InGame = (props) => {
 
       <View style={styles.eventLogContainer}>
         <Text>{eventLogText}</Text>
+      </View>
+      <View style={{ flex: 0.1 }}>
+        <Text>
+          {locationText}
+          {"\nCurrent CP:"}
+          {currentCID}
+        </Text>
       </View>
       <View style={styles.playerStatusContainer}>
         <View style={styles.currentEnergyBar}>{enegryBar}</View>

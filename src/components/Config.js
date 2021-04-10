@@ -1,4 +1,4 @@
-import { SafeAreaView, StyleSheet, Button } from "react-native";
+import { SafeAreaView, StyleSheet, Pressable, Text } from "react-native";
 import { useState } from "react";
 import * as React from "react";
 import { url } from "./constants";
@@ -67,30 +67,33 @@ const Config = () => {
       time: 0,
     },
   };
+  const game = {
+    gpid: "G01",
+    checkpoints: [CP1, CP2, CP3, CP4],
+    players: [],
+    min_players: 4,
+    max_players: 18,
+  };
+  fetch("http://keina.astgov.space:5908/gp/G01", {
+    method: "POST", // or 'PUT'
+    body: JSON.stringify(game), // data can be `string` or {object}!
+    headers: new Headers({
+      "Content-Type": "application/json",
+    }),
+  })
+    .then((res) => res.json())
+    .catch((error) => console.error("Error:", error))
+    .then((response) => console.log("Success:", response));
+
   return (
     <SafeAreaView style={styles.container}>
-      <Button
-        title={"Start Game"}
-        onPress={() => {
-          const game = {
-            gpid: "G01",
-            checkpoints: [C1p1, CP2, CP3, CP4],
-            players: [],
-            min_players: 4,
-            max_players: 18,
-          };
-          /*fetch(url + "/posting", {
-            method: "POST", // or 'PUT'
-            body: JSON.stringify(game), // data can be `string` or {object}!
-            headers: new Headers({
-              "Content-Type": "application/json",
-            }),
-          })
-            .then((res) => res.json())
-            .catch((error) => console.error("Error:", error))
-            .then((response) => console.log("Success:", response));*/
+      <Pressable
+        onPressIn={() => {
+          console.log("testing");
         }}
-      ></Button>
+      >
+        <Text>Add game to server</Text>
+      </Pressable>
     </SafeAreaView>
   );
 };

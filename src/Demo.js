@@ -4,8 +4,9 @@ import * as demo1 from "./demo1.json";
 import * as demo2 from "./demo2.json";
 import * as demo3 from "./demo3.json";
 import * as demo4 from "./demo4.json";
+import { url } from "./components/constants";
 const postData = (data) => {
-  fetch("http://localhost:3000/posts", {
+  fetch(url + "/posts", {
     method: "POST", // or 'PUT'
     headers: {
       "Content-Type": "application/json",
@@ -24,34 +25,8 @@ const postData = (data) => {
 const Demo = () => {
   return (
     <SafeAreaView>
-      <Pressable
-        onPressIn={() => {
-          console.log("abc");
-          postData(demo1);
-        }}
-      >
-        <Text>One</Text>
-      </Pressable>
-      <Pressable
-        onPressIn={() => {
-          postData(demo2);
-        }}
-      >
-        <Text>Two</Text>
-      </Pressable>
-      <Pressable
-        onPressIn={() => {
-          postData(demo3);
-        }}
-      >
-        <Text>Three</Text>
-      </Pressable>
-      <Pressable
-        onPressIn={() => {
-          postData(demo4);
-        }}
-      >
-        <Text>Reset</Text>
+      <Pressable onPressIn={() => {}}>
+        <Text>Set location</Text>
       </Pressable>
     </SafeAreaView>
   );
