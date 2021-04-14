@@ -85,7 +85,7 @@ const [marker, setMarker] = useState(null);
             });
             var berlin = mapboxgl.MercatorCoordinate.fromLngLat({
             lng: 114.2655,
-            lat: 22.3354
+            lat: 22.3355
             });
             var kyiv = mapboxgl.MercatorCoordinate.fromLngLat({
             lng: 114.2660,
