@@ -1,0 +1,30 @@
+{
+  "presets": [
+    [
+      "@babel/preset-env",
+    ],"module:metro-react-native-babel-preset","@babel/preset-react"
+  ],
+  "env": {
+    "development": {
+      "plugins": [
+        "transform-object-rest-spread",
+        "transform-react-jsx-source"
+      ]
+    }
+  },
+
+
+  "plugins": [
+    [
+      "module-resolver",
+      {
+        "alias": {
+          "^react-native$": "react-native-web",
+          "react-native-maps": "react-native-web-maps",
+        }
+      }
+    ]
+  ]
+
+
+}

@@ -1,0 +1,9 @@
+{
+  "cpEnergyLevel": [0, 0, 0, 0],
+  "score": [0, 0],
+  "eventLog": [],
+  "playerStatus": {
+    "cp": -1,
+    "status": 0
+  }
+}
