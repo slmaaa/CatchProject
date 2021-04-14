@@ -1,5 +1,5 @@
-import timestampToDate from "./timestampToDate";
-import { url } from "./constants";
+import timestampToDate from "../Helper/timestampToDate";
+import { url } from "../../constants.json";
 
 const readJSON = (settingData, data, lastGet, currentGet, rid) => {
   let temp = data,
@@ -73,7 +73,7 @@ const readJSON = (settingData, data, lastGet, currentGet, rid) => {
   settingData(temp);
 };
 
-const FetchData = (settingData, getData, lastJSON, setLastJSON, RID) => {
+const fetchData = (settingData, getData, lastJSON, setLastJSON, RID) => {
   fetch(url + "/users")
     .then((response) => response.json())
     .then((json) => {
@@ -84,4 +84,4 @@ const FetchData = (settingData, getData, lastJSON, setLastJSON, RID) => {
       console.error(error);
     });
 };
-export default FetchData;
+export default fetchData;

@@ -2,31 +2,51 @@ import * as React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 
-import InGame from "./components/InGame";
+import InGame from "./components/InGame/InGame";
 import Login from "./components/Login";
-import Config from "./components/Config";
-import Map from "./components/Map";
-import Demo from "./Demo";
+import Home from "./components/Home";
+import Flappy from "./components/InGame/FlappyBird/App";
+
+import color from "./constants";
 
 const Stack = createStackNavigator();
-const linking = {
-  config: { InGame: "game", Config: "config", Login: " login " ,Map:"map"},
-};
 
 const App = () => {
   return (
-    <NavigationContainer linking={linking}>
-      <Stack.Navigator
-      //initialRouteName="InGame"
-        screenOptions={{
-          headerShown: false,
-        }}
-      >
-        <Stack.Screen name="InGame" component={InGame} />
-        <Stack.Screen name="Demo" component={Demo} />
-        <Stack.Screen name="Login" component={Login} />
-        <Stack.Screen name="Config" component={Config} />
-        <Stack.Screen name="Map" component={Map} />
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Flappy">
+        <Stack.Screen
+          name="Login"
+          component={Login}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="Home"
+          component={Home}
+          options={{
+            headerLeft: null,
+            title: null,
+            headerStyle: {
+              backgroundColor: color.primary,
+            },
+          }}
+        />
+        <Stack.Screen
+          name="InGame"
+          component={InGame}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="Flappy"
+          component={Flappy}
+          options={{
+            headerShown: false,
+          }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
