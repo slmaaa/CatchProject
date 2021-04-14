@@ -7,8 +7,6 @@ import Geolocation from "react-native-geolocation-service";
 import { getDistance } from "geolib";
 import timestampToDate from "./timestampToDate";
 import useInterval from "./useInterval";
-import { testLocation } from "./location_test.json";
-import { url } from "./constants";
 
 import mapboxgl from "mapbox-gl/dist/mapbox-gl-csp";
 
@@ -25,6 +23,7 @@ import {
   Dimensions,
   Modal,
   Vibration,
+  ScrollView,
   ProgressBar,
   SafeAreaView,
   StyleSheet,
@@ -49,24 +48,8 @@ const defaultPostData = {
   time: 0,
   is_in: null,
 };
-const BLUE = () => (
-  <ProgressBar
-    color="#A9BCF5"
-    trackColor="#2E64FE"
-    indeterminate
-    style={styles.scoreBar}
-  />
-);
-const RED = () => (
-  <ProgressBar
-    color="red"
-    trackColor="#F6CECE"
-    indeterminate
-    style={styles.scoreBar}
-  />
-);
 
-const InGame = (props) => {
+const InGame = () => {
   const mapContainer = useRef();
 
   const [locationText, setLocationText] = useState("");
@@ -86,14 +69,12 @@ const InGame = (props) => {
   const [getData, setGetData] = useState(defaultGetData);
   const [postData, setPostData] = useState(defaultPostData);
   const [lastJSON, setLastJSON] = useState(null);
-  const [popup, setPopup] = useState(null);
-  const [marker, setMarker] = useState(null);
-  const [mapState, setMap] = useState(null);
-  const [cpEnergyLevel, setCPEnergyLevel] = useState([0, 0, 0, 0]);
-  const [playerState, setPlayerState] = useState();
+
+  let markers = [],
+    popups = [];
 
   const post = () => {
-    fetch(url + "/posting", {
+    fetch("http://localhost:3001/posting", {
       method: "POST", // or 'PUT'
       body: JSON.stringify(postData), // data can be `string` or {object}!
       headers: new Headers({
@@ -145,47 +126,36 @@ const InGame = (props) => {
       return <Text>Hurry to next CP</Text>;
     }
   };
-  useEffect(() => {
-    setPlayerState(getData.playerStatus.status);
-  });
 
   const renderCaptureBar = () => {
-    let color, progress, trackColor;
-    if (getData.playerStatus.status == 0) {
-      color = "grey";
-      trackColor = "grey";
-    } else if (getData.playerStatus.status == -1) {
-      if (TEAM === "Red") {
-        color = "#A9BCF5";
-        trackColor = "#2E64FE";
-      } else {
-        color = "red";
-        trackColor = "#F6CECE";
-      }
-    } else if (getData.playerStatus.status == 1) {
-      if (TEAM === "Blue") {
-        color = "#A9BCF5";
-        trackColor = "#2E64FE";
-      } else {
-        color = "red";
-        trackColor = "#F6CECE";
-      }
-    } else if (getData.playerStatus.status == 2)
-      if (TEAM === "Red") {
-        color = "red";
-        trackColor = "red";
-      } else {
-        color = "#A9BCF5";
-        trackColor = "#A9BCF5";
-      }
-    return (
+    const BLUE = () => (
       <ProgressBar
-        color={color}
-        trackColor={trackColor}
+        color="#A9BCF5"
+        trackColor="#2E64FE"
         indeterminate
         style={styles.scoreBar}
       />
     );
+    const RED = () => (
+      <ProgressBar
+        color="red"
+        trackColor="#F6CECE"
+        indeterminate
+        style={styles.scoreBar}
+      />
+    );
+    if (getData.playerStatus.status == 0) {
+      return <ProgressBar trackColor="grey" style={styles.scoreBar} />;
+    } else if (getData.playerStatus.status == -1) {
+      return TEAM === "Red" ? BLUE() : RED();
+    } else if (getData.playerStatus.status == 1) {
+      return TEAM == "Red" ? RED() : BLUE();
+    } else if (getData.playerStatus.status == 2)
+      return TEAM === "Red" ? (
+        <ProgressBar trackColor="red" style={styles.scoreBar} />
+      ) : (
+        <ProgressBar trackColor="#A9BCF5" style={styles.scoreBar} />
+      );
   };
 
   useEffect(() => {
@@ -195,24 +165,54 @@ const InGame = (props) => {
       center: [lng, lat],
       zoom: zoom,
     });
-    setMap(map);
-    let popups = [],
-      markers = [];
-    for (let i = 0; i < 4; ++i) {
-      popups[i] = new mapboxgl.Popup({ offset: 25 }).setText(
-        getData.cpEnergyLevel[i] > 0
-          ? "Occuplied by Team Blue by " + getData.cpEnergyLevel[i]
-          : "Occuplied by Team Red by " + getData.cpEnergyLevel[i] * -1
-      );
-      markers[i] = new mapboxgl.Marker({
-        color: getData.cpEnergyLevel[i] > 0 ? "#A9BCF5" : "#F6CECE",
-      })
-        .setLngLat([CP_LOCATION[i].longitude, CP_LOCATION[i].latitude])
-        .setPopup(popups[i])
-        .addTo(map);
-    }
-    setPopup(popups);
-    setMarker(markers);
+    popups[0] = new mapboxgl.Popup({ offset: 25 }).setText(
+      getData.cpEnergyLevel[0] < 0
+        ? "Occuplied by Team Blue by " + getData.cpEnergyLevel[0]
+        : "Occuplied by Team Red by " + getData.cpEnergyLevel[0]
+    );
+
+    // create DOM element for the marker
+    popups[1] = new mapboxgl.Popup({ offset: 25 }).setText(
+      getData.cpEnergyLevel[1] < 0
+        ? "Occuplied by Team Blue by " + getData.cpEnergyLevel[1]
+        : "Occuplied by Team Red by " + getData.cpEnergyLevel[1]
+    );
+
+    popups[2] = new mapboxgl.Popup({ offset: 25 }).setText(
+      getData.cpEnergyLevel[2] < 0
+        ? "Occuplied by Team Blue by " + getData.cpEnergyLevel[2]
+        : "Occuplied by Team Red by " + getData.cpEnergyLevel[2]
+    );
+
+    popups[3] = new mapboxgl.Popup({ offset: 25 }).setText(
+      getData.cpEnergyLevel[3] < 0
+        ? "Occuplied by Team Blue by " + getData.cpEnergyLevel[3]
+        : "Occuplied by Team Red by " + getData.cpEnergyLevel[3]
+    );
+    markers[0] = new mapboxgl.Marker({
+      color: getData.cpEnergyLevel[0] < 0 ? "#A9BCF5" : "#F6CECE",
+    })
+      .setLngLat([114.262832, 22.335083])
+      .setPopup(popups[0])
+      .addTo(map);
+    markers[1] = new mapboxgl.Marker({
+      color: getData.cpEnergyLevel[1] < 0 ? "#A9BCF5" : "#F6CECE",
+    })
+      .setLngLat([114.262834, 22.33459])
+      .setPopup(popups[1])
+      .addTo(map);
+    markers[2] = new mapboxgl.Marker({
+      color: getData.cpEnergyLevel[2] < 0 ? "#A9BCF5" : "#F6CECE",
+    })
+      .setLngLat([114.263299, 22.334605])
+      .setPopup(popups[2])
+      .addTo(map);
+    markers[3] = new mapboxgl.Marker({
+      color: getData.cpEnergyLevel < 0 ? "#A9BCF5" : "#F6CECE",
+    })
+      .setLngLat([114.263291, 22.335091])
+      .setPopup(popups[3])
+      .addTo(map);
     map.addControl(
       new mapboxgl.GeolocateControl({
         positionOptions: {
@@ -221,34 +221,17 @@ const InGame = (props) => {
         trackUserLocation: true,
       })
     );
+
+    map.on("move", () => {
+      setLng(map.getCenter().lng.toFixed(4));
+      setLat(map.getCenter().lat.toFixed(4));
+      setZoom(map.getZoom().toFixed(2));
+    });
     return () => {
       map.remove();
     };
-  }, []);
-  useEffect(() => {
-    setCPEnergyLevel(getData.cpEnergyLevel);
-  });
-  useEffect(() => {
-    let map = mapState;
-    let markers = marker;
-    let popups = popup;
-    if (popup != null && markers != null && map != null) {
-      for (let i = 0; i < 4; ++i) {
-        popups[i] = new mapboxgl.Popup({ offset: 25 }).setText(
-          cpEnergyLevel[i] > 0
-            ? "Occuplied by Team Blue by " + cpEnergyLevel[i]
-            : "Occuplied by Team Red by " + cpEnergyLevel[i] * -1
-        );
-        markers[i].remove();
-        markers[i] = new mapboxgl.Marker({
-          color: cpEnergyLevel[i] > 0 ? "#A9BCF5" : "#F6CECE",
-        })
-          .setLngLat([CP_LOCATION[i].longitude, CP_LOCATION[i].latitude])
-          .setPopup(popups[i])
-          .addTo(map);
-      }
-    }
-  }, [cpEnergyLevel[0], cpEnergyLevel[2], cpEnergyLevel[3], cpEnergyLevel[1]]);
+  }, [getData.cpEnergyLevel]);
+
 
   useEffect(() => {
     if (getData != null) {
@@ -258,7 +241,7 @@ const InGame = (props) => {
 
   useInterval(() => {
     FetchData(setGetData, getData, lastJSON, setLastJSON, RID);
-  }, 2000);
+  }, 1000);
 
   useEffect(() => {
     if (getData != null) {
@@ -282,7 +265,25 @@ const InGame = (props) => {
   }, [eventLogPtr, lastJSON]);
 
   useEffect(() => {
-    /*const _watchId = Geolocation.watchPosition(
+    const map = new mapboxgl.Map({
+      container: mapContainer.current,
+      style: "mapbox://styles/mapbox/streets-v11",
+      center: [lng, lat],
+      zoom: zoom,
+    });
+
+    map.on("move", () => {
+      setLng(map.getCenter().lng.toFixed(4));
+      setLat(map.getCenter().lat.toFixed(4));
+      setZoom(map.getZoom().toFixed(2));
+    });
+    return () => {
+      map.remove();
+    };
+  }, []);
+
+  useEffect(() => {
+    const _watchId = Geolocation.watchPosition(
       (position) => {
         setLocation(position.coords);
         setTime(position.timestamp);
@@ -308,20 +309,7 @@ const InGame = (props) => {
         interval: 100000,
         fastestInterval: 100000,
       }
-    );*/
-    setLocation = [testLocation.latitude, testLocation.longitude];
-    let f = new Date().getTime();
-    setTime(f);
-    setFormattedTime(timestampToDate(f));
-    console.log("Location updated at " + f);
-    setLocationText(
-      "Latitude: " +
-        JSON.stringify(testLocation.latitude) +
-        "\n" +
-        "Longitude: " +
-        JSON.stringify(testLocation.longitude)
     );
-    setTime(f);
     var flag = false;
     if (location != null) {
       for (let i = 0; i < NUM_OF_CP; i++) {
@@ -406,13 +394,6 @@ const InGame = (props) => {
 
       <View style={styles.eventLogContainer}>
         <Text>{eventLogText}</Text>
-      </View>
-      <View style={{ flex: 0.1 }}>
-        <Text>
-          {locationText}
-          {"\nCurrent CP:"}
-          {currentCID}
-        </Text>
       </View>
       <View style={styles.playerStatusContainer}>
         <View style={styles.currentEnergyBar}>{enegryBar}</View>
