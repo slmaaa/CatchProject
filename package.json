@@ -37,6 +37,7 @@
     "react-native-gesture-handler": "^1.10.3",
     "react-native-modalbox": "^2.0.2",
     "react-native-progress": "^4.1.2",
+    "react-native-progress-button": "^1.0.3",
     "react-native-reanimated": "^2.0.0",
     "react-native-safe-area-context": "^3.2.0",
     "react-native-screens": "^2.18.1",

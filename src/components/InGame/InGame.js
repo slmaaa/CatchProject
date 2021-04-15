@@ -25,6 +25,7 @@ import timestampToDate from "../Helper/timestampToDate";
 import useInterval from "../Helper/useInterval";
 import setEventText from "./setEventText";
 import updateCPFlag from "./updateCPFlag";
+import ActionButtons from "./ActionButtons";
 import { color } from "../../constants.json";
 
 const RID = "GG01-PP02";
@@ -47,15 +48,29 @@ const defaultPostData = {
   is_in: null,
 };
 
-const InGame = () => {
+const InGame = ({ navigation, route }) => {
   const [location, setLocation] = useState(null);
-  let time = 0,
-    locationText = "",
-    currentCID = -1,
-    postData = defaultPostData,
+  const [actionButtonOption, setActionButtonOption] = useState(0);
+  const [coolDown, setCoolDown] = useState(0);
+  const [actionButtonDisable, setActionButtonDisable] = useState(false);
+  let time = 0, //Time in Unix timestamp
+    locationText = "", //Turn location data in text. For testing only
+    currentCID = -1, //Current checkpoint id. -1 if not in any checkpoints
+    postData = defaultPostData, //Data that needed to POST to server
     modalVisible = false,
     notificationText = "",
-    getData = defaultGetData;
+    getData = defaultGetData; //Data GET from server
+
+  const actionButton = ActionButtons(
+    1,
+    1,
+    () => {
+      navigation.navigate("Riddle");
+    },
+    coolDown,
+    actionButtonDisable
+  );
+  // Location wathcher, update location and post when CPFlag changes
   useEffect(() => {
     const _watchId = Geolocation.watchPosition(
       (position) => {
@@ -97,6 +112,26 @@ const InGame = () => {
       }
     };
   }, [location]);
+
+  useEffect(() => {
+    if (route.params?.cd) {
+      if (route.params?.cd == 0) {
+        // add point to cp
+      } else {
+        setCoolDown(route.params.cd);
+      }
+    }
+  }, [route.params?.cd]);
+  useInterval(
+    () => {
+      setCoolDown(coolDown - 1);
+    },
+    coolDown == 0 ? null : 1000
+  );
+  useEffect(() => {
+    if (coolDown != 0) setActionButtonDisable(true);
+    else setActionButtonDisable(false);
+  }, [coolDown]);
   return (
     <>
       <StatusBar barStyle="dark-content" />
@@ -135,13 +170,7 @@ const InGame = () => {
             />
           </MapboxGL.MapView>
         </View>
-        <TouchableHighlight
-          style={styles.actionButton}
-          underlayColor={"#B9F6CA"}
-          onPressIn={() => {}}
-        >
-          <Text style={styles.actionButtonText}>Quiz</Text>
-        </TouchableHighlight>
+        <View style={styles.actionButtonView}>{actionButton}</View>
       </SafeAreaView>
     </>
   );
@@ -176,26 +205,12 @@ const styles = StyleSheet.create({
   map: {
     flex: 1,
   },
-  actionButton: {
+  actionButtonView: {
     position: "absolute",
-    bottom: "8%",
+    bottom: "5%",
+    alignContent: "center",
     left: "25%",
     height: 60,
     width: "50%",
-    justifyContent: "center",
-    borderRadius: 20,
-    backgroundColor: "#00E676",
-    position: "absolute",
-    shadowColor: "#FAFAFA",
-    shadowRadius: 20,
-    borderWidth: 0.5,
-    borderColor: "white",
-  },
-  actionButtonText: {
-    textAlign: "center",
-    textAlignVertical: "center",
-    color: "white",
-    fontFamily: "Poppins-Regular",
-    fontSize: 20,
   },
 });

@@ -6,6 +6,11 @@
     "offWhite": "#FCFCFC",
     "primary": "#5F2EEA",
     "darkGrey": "#6E7191",
-    "justBlack": "#272727"
+    "justBlack": "#272727",
+    "grey": "#9E9E9E",
+    "lightGreen": "#00E676",
+    "orange": "#fa8100",
+    "blueOnBlack": "#99BBFF",
+    "wrongRed": "#E53935"
   }
 }
