@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import auth from "@react-native-firebase/auth";
 
 import {
   SafeAreaView,
@@ -17,7 +18,9 @@ import { color } from "../constants";
 
 import { Icon } from "react-native-elements";
 
-const Login = ({ navigation }) => {
+export default SignUp = ({ navigation }) => {
+  const [email, setEmail] = useState("");
+  const [pw, setPW] = useState();
   return (
     <>
       <StatusBar barStyle="light-content" />
@@ -27,7 +30,7 @@ const Login = ({ navigation }) => {
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={styles.loginView}>
-            <Text style={styles.titleText}>Login</Text>
+            <Text style={styles.titleText}>Sign Up</Text>
             <View style={styles.emailView}>
               <Icon
                 name="email-outline"
@@ -40,9 +43,11 @@ const Login = ({ navigation }) => {
                 <TextInput
                   style={styles.inputText}
                   autoCompleteType={"email"}
+                  clearTextOnFocus={true}
                   keyboardType={"email-address"}
                   placeholder={"example@abcmail.com"}
                   autoCapitalize={"none"}
+                  onChangeText={setEmail}
                 ></TextInput>
               </View>
             </View>
@@ -60,6 +65,7 @@ const Login = ({ navigation }) => {
                   autoCompleteType={"password"}
                   keyboardType={"email-address"}
                   placeholder={"*********"}
+                  onChangeText={setPW}
                   autoCapitalize={"none"}
                 ></TextInput>
               </View>
@@ -67,7 +73,22 @@ const Login = ({ navigation }) => {
             <View style={styles.loginButtonView}>
               <TouchableOpacity
                 onPress={() => {
-                  navigation.navigate("Home");
+                  auth()
+                    .createUserWithEmailAndPassword(email, pw)
+                    .then(() => {
+                      console.log("User account created & signed in!");
+                    })
+                    .catch((error) => {
+                      if (error.code === "auth/email-already-in-use") {
+                        console.log("That email address is already in use!");
+                      }
+
+                      if (error.code === "auth/invalid-email") {
+                        console.log("That email address is invalid!");
+                      }
+
+                      console.error(error);
+                    });
                 }}
               >
                 <View style={styles.loginButton}>
@@ -75,11 +96,6 @@ const Login = ({ navigation }) => {
                 </View>
               </TouchableOpacity>
             </View>
-            <TouchableWithoutFeedback
-              onPress={() => navigation.navigate("SignUp")}
-            >
-              <Text>SignUp?</Text>
-            </TouchableWithoutFeedback>
           </View>
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
@@ -166,5 +182,3 @@ const styles = StyleSheet.create({
     flex: 0.5,
   },
 });
-
-export default Login;
