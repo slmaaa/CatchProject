@@ -7,6 +7,7 @@ import Login from "./components/Login";
 import Home from "./components/Home";
 import Flappy from "./components/InGame/FlappyBird/App";
 import Riddle from "./components/InGame/Riddle";
+import Sudoku from "./components/InGame/Sudoku";
 
 import { color } from "./constants";
 
@@ -14,8 +15,8 @@ const Stack = createStackNavigator();
 
 const App = () => {
   return (
-    <NavigationContainer >
-      <Stack.Navigator initialRouteName="InGame" >
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Sudoku">
         <Stack.Screen
           name="Login"
           component={Login}
@@ -53,6 +54,16 @@ const App = () => {
           component={Riddle}
           options={{
             title: "Riddle Time",
+            headerStyle: {
+              backgroundColor: color.blueOnBlack,
+            },
+          }}
+        />
+        <Stack.Screen
+          name="Sudoku"
+          component={Sudoku}
+          options={{
+            title: "Sudoku Time",
             headerStyle: {
               backgroundColor: color.blueOnBlack,
             },

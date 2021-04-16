@@ -20,7 +20,7 @@ export default updateCPFlag = (
             time: new Date().getTime,
             is_in: true,
           };
-          post(postData);
+          // post(postData);
         }
         newCID = i;
         flag = true;
@@ -35,7 +35,7 @@ export default updateCPFlag = (
           time: new Date().getTime,
           is_in: false,
         };
-        post(postData);
+        //post(postData);
       }
       newCID = -1;
     }

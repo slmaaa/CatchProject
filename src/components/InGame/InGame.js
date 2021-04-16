@@ -47,15 +47,16 @@ const defaultPostData = {
   time: 0,
   is_in: null,
 };
-
 const InGame = ({ navigation, route }) => {
   const [location, setLocation] = useState(null);
   const [actionButtonOption, setActionButtonOption] = useState(0);
-  const [coolDown, setCoolDown] = useState(0);
+  const [coolDown, setCoolDown] = useState([0, 0, 0, 0]);
+  const [currentCoolDown, setCurrentCoolDown] = useState(-1);
   const [actionButtonDisable, setActionButtonDisable] = useState(false);
+  const [cpCompletetionLevel, setCPCompletionLevel] = useState([3]);
+  const [currentCID, setCurrentCID] = useState(-1); //Current checkpoint id. -1 if not in any checkpoints
   let time = 0, //Time in Unix timestamp
     locationText = "", //Turn location data in text. For testing only
-    currentCID = -1, //Current checkpoint id. -1 if not in any checkpoints
     postData = defaultPostData, //Data that needed to POST to server
     modalVisible = false,
     notificationText = "",
@@ -67,8 +68,9 @@ const InGame = ({ navigation, route }) => {
     () => {
       navigation.navigate("Riddle");
     },
-    coolDown,
-    actionButtonDisable
+    coolDown[currentCID],
+    actionButtonDisable,
+    currentCID
   );
   // Location wathcher, update location and post when CPFlag changes
   useEffect(() => {
@@ -97,15 +99,18 @@ const InGame = ({ navigation, route }) => {
         fastestInterval: 100000,
       }
     );
-    currentCID = updateCPFlag(
-      location,
-      currentCID,
-      CP_LOCATION,
-      CP_RANGE,
-      NUM_OF_CP,
-      RID
-    );
-
+    if (location != null) {
+      setCurrentCID(
+        updateCPFlag(
+          location,
+          currentCID,
+          CP_LOCATION,
+          CP_RANGE,
+          NUM_OF_CP,
+          RID
+        )
+      );
+    }
     return () => {
       if (_watchId) {
         Geolocation.clearWatch(_watchId);
@@ -115,23 +120,34 @@ const InGame = ({ navigation, route }) => {
 
   useEffect(() => {
     if (route.params?.cd) {
-      if (route.params?.cd == 0) {
-        // add point to cp
+      if (route.params?.cd == -1) {
+        let newState = cpCompletetionLevel;
+        newState[currentCID] += 1;
+        setCPCompletionLevel(newState);
       } else {
-        setCoolDown(route.params.cd);
+        let newState = coolDown;
+        newState[currentCID] = route.params?.cd;
+        setCoolDown([...newState]);
+        setCurrentCoolDown(currentCID);
       }
     }
   }, [route.params?.cd]);
   useInterval(
     () => {
-      setCoolDown(coolDown - 1);
+      let newState = coolDown;
+      newState[currentCoolDown]--;
+      setCoolDown([...newState]);
+      if (coolDown[currentCoolDown] == 0) setCurrentCoolDown(-1);
     },
-    coolDown == 0 ? null : 1000
+    currentCoolDown == -1 ? null : 1000
   );
   useEffect(() => {
-    if (coolDown != 0) setActionButtonDisable(true);
-    else setActionButtonDisable(false);
-  }, [coolDown]);
+    if (currentCoolDown != currentCID) {
+      setActionButtonDisable(false);
+    } else if (coolDown[currentCID] != 0) {
+      setActionButtonDisable(true);
+    }
+  }, [coolDown, currentCID, currentCoolDown]);
   return (
     <>
       <StatusBar barStyle="dark-content" />
@@ -161,13 +177,16 @@ const InGame = ({ navigation, route }) => {
             logoEnabled={false}
           >
             <MapboxGL.Camera
-              zoomLevel={13}
-              centerCoordinate={[
-                CP_LOCATION[0].longitude,
-                CP_LOCATION[0].latitude,
-              ]}
-              pitch={45}
+              defaultSettings={{
+                zoomLevel: 18,
+                centerCoordinate: [
+                  CP_LOCATION[0].longitude,
+                  CP_LOCATION[0].latitude,
+                ],
+                pitch: 45,
+              }}
             />
+            <MapboxGL.UserLocation />
           </MapboxGL.MapView>
         </View>
         <View style={styles.actionButtonView}>{actionButton}</View>

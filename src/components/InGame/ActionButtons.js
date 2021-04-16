@@ -11,7 +11,8 @@ const ActionButtons = (
   completionLevel,
   handleOnPress,
   cd,
-  disabled
+  disabled,
+  currentCID
 ) => {
   const [buttonText, setButtonText] = useState();
   const s = [
@@ -27,9 +28,10 @@ const ActionButtons = (
     color.orange,
     color.grey,
   ];
-
   useEffect(() => {
-    if (cd == 0) {
+    if (option == 0) {
+      setButtonText(s[0]);
+    } else if (cd == 0) {
       setButtonText(s[option]);
     } else {
       setButtonText("CD: " + cd);

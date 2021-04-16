@@ -53,7 +53,7 @@ export default Riddle = ({ navigation, route }) => {
     state[i] = correct ? color.lightGreen : color.wrongRed;
     setCheckBoxesColor([...state]);
     setTimeout(
-      () => navigation.navigate("InGame", { cd: correct ? 0 : 7 }),
+      () => navigation.navigate("InGame", { cd: correct ? -1 : 7 }),
       2000
     );
   };
