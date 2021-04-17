@@ -25,7 +25,6 @@ const Login = ({ navigation }) => {
   const MMKV = new MMKVStorage.Loader().initialize();
   return (
     <>
-      <StatusBar barStyle="light-content" />
       <KeyboardAvoidingView
         style={styles.container}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
