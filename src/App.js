@@ -56,7 +56,7 @@ const App = () => {
               component={Home}
               options={{
                 headerLeft: null,
-                title: null,
+                title: "Home",
                 headerStyle: {
                   backgroundColor: color.primary,
                 },
@@ -73,7 +73,10 @@ const App = () => {
               name="CreateGame"
               component={CreateGame}
               options={{
-                headerShown: false,
+                title: "Create Game",
+                headerStyle: {
+                  backgroundColor: color.blueOnBlack,
+                },
               }}
             />
             <Stack.Screen
