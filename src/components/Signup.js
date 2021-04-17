@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import auth from "@react-native-firebase/auth";
+import database from "@react-native-firebase/database";
+import MMKVStorage from "react-native-mmkv-storage";
 
 import {
   SafeAreaView,
@@ -19,8 +21,10 @@ import { color } from "../constants";
 import { Icon } from "react-native-elements";
 
 export default SignUp = ({ navigation }) => {
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState();
   const [pw, setPW] = useState();
+  const [username, setUsername] = useState();
+  const MMKV = new MMKVStorage.Loader().initialize();
   return (
     <>
       <StatusBar barStyle="light-content" />
@@ -33,11 +37,32 @@ export default SignUp = ({ navigation }) => {
             <Text style={styles.titleText}>Sign Up</Text>
             <View style={styles.emailView}>
               <Icon
+                name="account"
+                type="material-community"
+                size={30}
+                color={"grey"}
+              />
+              <View style={styles.emailInputView}>
+                <Text style={styles.inputTitle}>Username</Text>
+                <TextInput
+                  style={styles.inputText}
+                  autoCompleteType={"name"}
+                  clearTextOnFocus={true}
+                  keyboardType={"default"}
+                  placeholder={"Username"}
+                  autoCapitalize={"none"}
+                  onChangeText={setUsername}
+                ></TextInput>
+              </View>
+            </View>
+            <View style={styles.emailView}>
+              <Icon
                 name="email-outline"
                 type="material-community"
                 size={30}
                 color={"grey"}
               />
+
               <View style={styles.emailInputView}>
                 <Text style={styles.inputTitle}>Email</Text>
                 <TextInput
@@ -51,6 +76,7 @@ export default SignUp = ({ navigation }) => {
                 ></TextInput>
               </View>
             </View>
+
             <View style={styles.pwView}>
               <Icon
                 name="eye"
@@ -75,7 +101,11 @@ export default SignUp = ({ navigation }) => {
                 onPress={() => {
                   auth()
                     .createUserWithEmailAndPassword(email, pw)
-                    .then(() => {
+                    .then((authData) => {
+                      database()
+                        .ref("users/" + authData.user.uid)
+                        .set({ username: username, email: email });
+                      MMKV.setStringAsync("user.name", username);
                       console.log("User account created & signed in!");
                     })
                     .catch((error) => {
@@ -105,21 +135,18 @@ export default SignUp = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: color.primaryDark,
+    backgroundColor: color.blueOnBlack,
     flex: 1,
     justifyContent: "flex-end",
   },
   loginView: {
+    flex: 1,
     backgroundColor: "white",
     justifyContent: "space-between",
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
     paddingLeft: "15%",
     paddingRight: "15%",
-    paddingBottom: 120,
+    paddingBottom: 80,
     paddingTop: "17%",
-    minHeight: 500,
-    maxHeight: "95%",
   },
   titleText: {
     fontFamily: "Poppins-Bold",

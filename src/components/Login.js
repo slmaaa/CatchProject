@@ -1,7 +1,9 @@
 import React, { useState } from "react";
+import MMKVStorage from "react-native-mmkv-storage";
+import auth from "@react-native-firebase/auth";
+import database from "@react-native-firebase/database";
 
 import {
-  SafeAreaView,
   StyleSheet,
   TextInput,
   View,
@@ -18,6 +20,9 @@ import { color } from "../constants";
 import { Icon } from "react-native-elements";
 
 const Login = ({ navigation }) => {
+  const [email, setEmail] = useState();
+  const [pw, setPW] = useState();
+  const MMKV = new MMKVStorage.Loader().initialize();
   return (
     <>
       <StatusBar barStyle="light-content" />
@@ -43,6 +48,7 @@ const Login = ({ navigation }) => {
                   keyboardType={"email-address"}
                   placeholder={"example@abcmail.com"}
                   autoCapitalize={"none"}
+                  onChangeText={setEmail}
                 ></TextInput>
               </View>
             </View>
@@ -61,13 +67,23 @@ const Login = ({ navigation }) => {
                   keyboardType={"email-address"}
                   placeholder={"*********"}
                   autoCapitalize={"none"}
+                  onChangeText={setPW}
                 ></TextInput>
               </View>
             </View>
             <View style={styles.loginButtonView}>
               <TouchableOpacity
                 onPress={() => {
-                  navigation.navigate("Home");
+                  auth()
+                    .signInWithEmailAndPassword(email, pw)
+                    .then((authData) =>
+                      database()
+                        .ref("users/" + authData.user.uid)
+                        .once("value")
+                    )
+                    .then((value) => {
+                      MMKV.setStringAsync("user.name", value.val().username);
+                    });
                 }}
               >
                 <View style={styles.loginButton}>
