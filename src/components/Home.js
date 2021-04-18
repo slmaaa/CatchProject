@@ -2,6 +2,7 @@
 HomeScreen:
 Shown nearby player location and route player to screens
 */
+<<<<<<< HEAD
 import * as React from "react";
 import { Text, SafeAreaView } from "react-native";
 import MapboxGL from "@react-native-mapbox-gl/maps";
@@ -28,6 +29,38 @@ const Home = () => {
             />
           </MapboxGL.MapView>
         </View>
+=======
+import React, { useState } from "react";
+import { Text, SafeAreaView, Button } from "react-native";
+import MMKVStorage from "react-native-mmkv-storage";
+import auth from "@react-native-firebase/auth";
+
+const Home = ({ navigation }) => {
+  const MMKV = new MMKVStorage.Loader().initialize();
+
+  return (
+    <SafeAreaView>
+      <Text>{"Welcome " + MMKV.getString("user.name")}</Text>
+      <Button
+        title={"Create game room"}
+        onPress={() => {
+          navigation.navigate("CreateGame");
+        }}
+      ></Button>
+      <Button
+        title={"Join game"}
+        onPress={() => {
+          //navigation.navigate("CreateGame");
+        }}
+      ></Button>
+      <Button
+        title={"Logout"}
+        onPress={() => {
+          auth().signOut();
+        }}
+      ></Button>
+    </SafeAreaView>
+>>>>>>> f33b0b91d1ebc09d3d5468e9526f3f82a116ae13
   );
 };
 export default Home;
