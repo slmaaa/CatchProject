@@ -13,7 +13,7 @@ import Sudoku from "./components/InGame/Sudoku";
 import CreateGame from "./components/CreateGame";
 import Waiting from "./components/Waiting";
 import LoadingHome from "./components/LoadingHome";
-
+import setmap from "./components/setmap" 
 import { color } from "./constants";
 
 const Stack = createStackNavigator();
@@ -58,6 +58,17 @@ const App = () => {
               component={LoadingHome}
               options={{
                 headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="setmap"
+              component={setmap}
+              options={{
+                headerLeft: null,
+                title: "Set CheckPoints",
+                headerStyle: {
+                  backgroundColor: color.blueOnBlack,
+                },
               }}
             />
             <Stack.Screen
