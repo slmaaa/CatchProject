@@ -2,26 +2,63 @@ import React, { useState } from "react";
 import { Text, SafeAreaView, StyleSheet, Switch, View } from "react-native";
 import { Input, CheckBox, Button, ThemeProvider } from "react-native-elements";
 import database from "@react-native-firebase/database";
-import auth from "@react-native-firebase/auth";
+import MMKVStorage from "react-native-mmkv-storage";
 
 import { color } from "../constants.json";
 import { getData, storeData } from "./Helper/async";
 
 export default CreateGame = ({ navigation }) => {
+  const MMKV = new MMKVStorage.Loader().initialize();
+
   const [isHost, setIsHost] = useState(false);
   const [usePresetCP, setUsePresetCP] = useState(false);
-  let gameID;
   let customCPs = null;
+  let cps;
+  let game;
   const [gameName, setGameName] = useState("");
   const createGame = () => {
-    database()
-      .ref("games/")
-      .once("value")
-      .then((snapshot) => {
-        let keys = Object.keys(snapshot.val());
-        gameID = Number(keys[snapshot.numChildren() - 1]) + 1;
+    (() => {
+      if (usePresetCP) {
+        database()
+          .ref("defaultUSTCps")
+          .once("value")
+          .then((val) => {
+            cps = val;
+          });
+      } else {
+        cps = customCPs;
+      }
+    })
+      .then(() => {
+        game = {
+          gid: "None",
+          gname: gameName,
+          hostID: MMKV.getString("userID"),
+          hostName: MMKV.getString("userName"),
+          checkpoints: cps,
+          players: [
+            {
+              pid: MMKV.getString("userID"),
+              name: MMKV.getString("userName"),
+              avatar: "None",
+            },
+          ],
+        };
       })
-      .then();
+      .then(() => {
+        const gameID = postGame(game);
+        MMKV.setString("gameID", gameID);
+        database()
+          .ref("users/" + MMKV.getString("userID"))
+          .update({ gameID: gameID });
+      })
+      .then(() => {
+        database()
+          .ref("users/" + MMKV.getString("userID"))
+          .update({ status: "PREPARE_HOST" });
+        MMKV.setString("userStatus", "PREPARE_HOS");
+        navigation.replace("Waiting");
+      });
   };
   return (
     <SafeAreaView style={styles.container}>

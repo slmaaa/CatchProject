@@ -1,7 +1,6 @@
 import React from "react";
 import { SafeAreaView, Text } from "react-native";
 import { Button } from "react-native-elements";
-import auth from "@react-native-firebase/auth";
 import database from "@react-native-firebase/database";
 
 import { color } from "../constants.json";

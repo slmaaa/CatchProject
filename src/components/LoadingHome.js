@@ -21,21 +21,15 @@ export default LoadingHome = ({ navigation }) => {
       .then(() => {
         setLocal();
       })
-      .then()
       .catch((e) => {
         console.log(e);
       });
   }
   async function setLocal() {
     await MMKV.setStringAsync("userID", userID);
-    let a = await MMKV.getStringAsync("userID");
-    console.log(a);
     await MMKV.setStringAsync("userName", userName);
-    let b = await MMKV.getStringAsync("userName");
-    console.log(b);
+    if (userStatus === "OFFLINE") userStatus = "ONLINE";
     await MMKV.setStringAsync("userStatus", userStatus);
-    let c = await MMKV.getStringAsync("userStatus");
-    console.log(c);
     if (gameID != null) {
       MMKV.setString("userGameID", gameID);
     }
