@@ -1,21 +1,23 @@
-import {url} from "../../constants.json"
+import { URL } from "../../constants.json";
 
-async function postData(url = '', data = {}) {
-    fetch('https://example.com/profile', {
-  method: 'POST', // or 'PUT'
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  body: JSON.stringify(data),
-})
-.then(response => response.json())
-.then(data => {
-  console.log('Success:', data);
-})
-.catch((error) => {
-  console.error('Error:', error);
-});
-}
-const postGame = (data) => {
-return await postData(url+"/creategame")
-}
+const postData = async (url, data) => {
+  fetch(url, {
+    method: "POST", // or 'PUT'
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  })
+    .then((response) => response.text())
+    .then((data) => {
+      return data;
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+      return null;
+    });
+};
+
+export const postGame = async (data) => {
+  return await postData(URL + "/creategame", data);
+};

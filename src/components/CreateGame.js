@@ -5,7 +5,7 @@ import database from "@react-native-firebase/database";
 import MMKVStorage from "react-native-mmkv-storage";
 
 import { color } from "../constants.json";
-import { getData, storeData } from "./Helper/async";
+import { postGame } from "./Helper/server";
 
 export default CreateGame = ({ navigation }) => {
   const MMKV = new MMKVStorage.Loader().initialize();
@@ -16,38 +16,47 @@ export default CreateGame = ({ navigation }) => {
   let cps;
   let game;
   const [gameName, setGameName] = useState("");
-  const createGame = () => {
-    (() => {
-      if (usePresetCP) {
-        database()
-          .ref("defaultUSTCps")
-          .once("value")
-          .then((val) => {
-            cps = val;
-          });
-      } else {
-        cps = customCPs;
-      }
-    })
-      .then(() => {
-        game = {
-          gid: "None",
-          gname: gameName,
-          hostID: MMKV.getString("userID"),
-          hostName: MMKV.getString("userName"),
-          checkpoints: cps,
-          players: [
-            {
-              pid: MMKV.getString("userID"),
-              name: MMKV.getString("userName"),
-              avatar: "None",
-            },
-          ],
-        };
-      })
-      .then(() => {
-        const gameID = postGame(game);
+  async function getPresetCP() {
+    if (usePresetCP) {
+      database()
+        .ref("defaultUSTCps")
+        .once("value")
+        .then((val) => {
+          cps = val;
+          console.log("setCP");
+        })
+        .catch((e) => console.log(e));
+    } else {
+      cps = customCPs;
+    }
+    await setGame();
+  }
+  async function setGame() {
+    console.log("setGame");
+    game = {
+      gid: "None",
+      gname: gameName,
+      hostID: MMKV.getString("userID"),
+      hostName: MMKV.getString("userName"),
+      checkpoints: cps,
+      players: [
+        {
+          pid: MMKV.getString("userID"),
+          name: MMKV.getString("userName"),
+          avatar: "None",
+        },
+      ],
+    };
+  }
+  const createGame = async () => {
+    await getPresetCP();
+
+    let gameID;
+    postGame(game)
+      .then((val) => {
+        val = gameID;
         MMKV.setString("gameID", gameID);
+        MMKV.setString("gameName", gameName);
         database()
           .ref("users/" + MMKV.getString("userID"))
           .update({ gameID: gameID });
