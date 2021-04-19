@@ -1,5 +1,5 @@
 {
-  "URL": "http://127.0.0.1:5000/",
+  "URL": "http://192.168.29.243:5000//",
   "color": {
     "primaryDark": "#2A00A2",
     "greyBackgorund": "#EFF0F7",

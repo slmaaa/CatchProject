@@ -13,7 +13,7 @@ import Sudoku from "./components/InGame/Sudoku";
 import CreateGame from "./components/CreateGame";
 import Waiting from "./components/Waiting";
 import LoadingHome from "./components/LoadingHome";
-import setmap from "./components/setmap" 
+import setmap from "./components/setmap";
 import { color } from "./constants";
 
 const Stack = createStackNavigator();
@@ -102,12 +102,12 @@ const App = () => {
             <Stack.Screen
               name="Waiting"
               component={Waiting}
-              options={{
-                title: "Waiting Room",
+              options={({ route }) => ({
+                title: route.params.gameName,
                 headerStyle: {
                   backgroundColor: color.blueOnBlack,
                 },
-              }}
+              })}
             />
             <Stack.Screen
               name="Flappy"

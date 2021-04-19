@@ -19,20 +19,19 @@ export default CreateGame = ({ navigation }) => {
   async function getPresetCP() {
     if (usePresetCP) {
       database()
-        .ref("defaultUSTCps")
+        .ref("defalutUSTCps")
         .once("value")
         .then((val) => {
-          cps = val;
-          console.log("setCP");
+          cps = val.val();
         })
+        .then(() => setGame())
         .catch((e) => console.log(e));
     } else {
       cps = customCPs;
+      setGame();
     }
-    await setGame();
   }
   async function setGame() {
-    console.log("setGame");
     game = {
       gid: "None",
       gname: gameName,
@@ -46,28 +45,32 @@ export default CreateGame = ({ navigation }) => {
           avatar: "None",
         },
       ],
+      teams: ["RED", "BLUE"],
     };
-  }
-  const createGame = async () => {
-    await getPresetCP();
-
     let gameID;
     postGame(game)
       .then((val) => {
-        val = gameID;
+        gameID = val;
         MMKV.setString("gameID", gameID);
         MMKV.setString("gameName", gameName);
         database()
           .ref("users/" + MMKV.getString("userID"))
           .update({ gameID: gameID });
       })
+      .catch((e) => console.log(e))
       .then(() => {
         database()
           .ref("users/" + MMKV.getString("userID"))
           .update({ status: "PREPARE_HOST" });
         MMKV.setString("userStatus", "PREPARE_HOS");
-        navigation.replace("Waiting");
+        navigation.replace("Waiting", { gameName: gameName });
+      })
+      .catch((e) => {
+        console.log(e);
       });
+  }
+  const createGame = async () => {
+    await getPresetCP();
   };
   return (
     <SafeAreaView style={styles.container}>
