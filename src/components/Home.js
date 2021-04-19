@@ -25,6 +25,12 @@ const Home = ({ navigation }) => {
         }}
       ></Button>
       <Button
+        title={"SetMap"}
+        onPress={() => {
+          navigation.navigate("setmap");
+        }}
+      ></Button>
+      <Button
         title={"Logout"}
         onPress={() => {
           auth().signOut();
