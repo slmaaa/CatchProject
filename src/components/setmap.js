@@ -16,50 +16,19 @@ const defaultPostData = {
 };
 const App = () => {
   const [location, setLocation] = useState(null);
-  const [coordinates] = useState([114.2655, 22.3364]);
+  const [coordinates,setcoordinates] = useState([22.3364,114.2655]);
+  // const [curlng,setcurlng] = useState(114.2655);
+  // const [curalt,setcuralt] = useState(22.3364);
   useEffect(() => {
-    const _watchId = Geolocation.watchPosition(
-      (position) => {
-        setLocation(position.coords);
-        time = position.timestamp;
-        if (location != null) {
-          locationText =
-            "Latitude: " +
-            JSON.stringify(location.latitude) +
-            "\n" +
-            "Longitude: " +
-            JSON.stringify(location.longitude);
-        }
-      },
-      (error) => {
-        // See error code charts below.
-        console.log(error.code, error.message);
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 15000,
-        distanceFilter: 1,
-        interval: 100000,
-        fastestInterval: 100000,
-      }
-    );
-    if (location != null) {
-      setCurrentCID(
-        updateCPFlag(
-          location,
-          currentCID,
-          CP_LOCATION,
-          CP_RANGE,
-          NUM_OF_CP,
-          RID
-        )
-      );
-    }
-    return () => {
-      if (_watchId) {
-        Geolocation.clearWatch(_watchId);
-      }
-    };
+    Geolocation.getCurrentPosition(info=>{
+      // setcurlng(info.coords.longitude)
+      // setcuralt(info.coords.altitud)
+
+      console.log(info.coords.altitude)
+      console.log(info.coords.longitude)
+      setcoordinates([info.coords.longitude,info.coords.altitude])
+      
+    })
   }, [location]);
 
   
