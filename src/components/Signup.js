@@ -1,10 +1,8 @@
 import React, { useState } from "react";
 import auth from "@react-native-firebase/auth";
 import database from "@react-native-firebase/database";
-import MMKVStorage from "react-native-mmkv-storage";
 
 import {
-  SafeAreaView,
   StyleSheet,
   TextInput,
   View,
@@ -24,7 +22,6 @@ export default SignUp = ({ navigation }) => {
   const [email, setEmail] = useState();
   const [pw, setPW] = useState();
   const [username, setUsername] = useState();
-  const MMKV = new MMKVStorage.Loader().initialize();
   return (
     <>
       <StatusBar barStyle="light-content" />
@@ -104,8 +101,11 @@ export default SignUp = ({ navigation }) => {
                     .then((authData) => {
                       database()
                         .ref("users/" + authData.user.uid)
-                        .set({ username: username, email: email });
-                      MMKV.setStringAsync("user.name", username);
+                        .set({
+                          username: username,
+                          email: email,
+                          status: "ONLINE",
+                        });
                       console.log("User account created & signed in!");
                     })
                     .catch((error) => {

@@ -1,8 +1,6 @@
 import React, { useState } from "react";
-import MMKVStorage from "react-native-mmkv-storage";
 import auth from "@react-native-firebase/auth";
 import database from "@react-native-firebase/database";
-
 import {
   StyleSheet,
   TextInput,
@@ -16,15 +14,15 @@ import {
 } from "react-native";
 
 import { color } from "../constants";
-
+import { storeData } from "./Helper/async";
 import { Icon } from "react-native-elements";
 
 const Login = ({ navigation }) => {
   const [email, setEmail] = useState();
   const [pw, setPW] = useState();
-  const MMKV = new MMKVStorage.Loader().initialize();
   return (
     <>
+      <StatusBar barStyle="light-content" />
       <KeyboardAvoidingView
         style={styles.container}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -75,13 +73,8 @@ const Login = ({ navigation }) => {
                 onPress={() => {
                   auth()
                     .signInWithEmailAndPassword(email, pw)
-                    .then((authData) =>
-                      database()
-                        .ref("users/" + authData.user.uid)
-                        .once("value")
-                    )
-                    .then((value) => {
-                      MMKV.setStringAsync("user.name", value.val().username);
+                    .catch((e) => {
+                      `Error ${e}`;
                     });
                 }}
               >

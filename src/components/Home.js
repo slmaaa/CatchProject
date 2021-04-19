@@ -2,17 +2,16 @@
 HomeScreen:
 Shown nearby player location and route player to screens
 */
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Text, SafeAreaView, Button } from "react-native";
-import MMKVStorage from "react-native-mmkv-storage";
 import auth from "@react-native-firebase/auth";
+import MMKVStorage from "react-native-mmkv-storage";
+const MMKV = new MMKVStorage.Loader().initialize();
 
 const Home = ({ navigation }) => {
-  const MMKV = new MMKVStorage.Loader().initialize();
-
   return (
     <SafeAreaView>
-      <Text>{"Welcome " + MMKV.getString("user.name")}</Text>
+      <Text>{"Welcome " + MMKV.getString("userName")}</Text>
       <Button
         title={"Create game room"}
         onPress={() => {

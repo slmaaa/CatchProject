@@ -11,6 +11,8 @@ import Flappy from "./components/InGame/FlappyBird/App";
 import Riddle from "./components/InGame/Riddle";
 import Sudoku from "./components/InGame/Sudoku";
 import CreateGame from "./components/CreateGame";
+import Waiting from "./components/Waiting";
+import LoadingHome from "./components/LoadingHome";
 
 import { color } from "./constants";
 
@@ -52,6 +54,13 @@ const App = () => {
         ) : (
           <>
             <Stack.Screen
+              name="LoadingHome"
+              component={LoadingHome}
+              options={{
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
               name="Home"
               component={Home}
               options={{
@@ -74,6 +83,16 @@ const App = () => {
               component={CreateGame}
               options={{
                 title: "Create Game",
+                headerStyle: {
+                  backgroundColor: color.blueOnBlack,
+                },
+              }}
+            />
+            <Stack.Screen
+              name="Waiting"
+              component={Waiting}
+              options={{
+                title: "Waiting Room",
                 headerStyle: {
                   backgroundColor: color.blueOnBlack,
                 },
