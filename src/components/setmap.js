@@ -16,14 +16,13 @@ const defaultPostData = {
 };
 const App = () => {
   const [location, setLocation] = useState(null);
-  const [coordinates,setcoordinates] = useState([22.3364,114.2655]);
+  const [coordinates,setcoordinates] = useState([114.2655,22.3364]);
   // const [curlng,setcurlng] = useState(114.2655);
   // const [curalt,setcuralt] = useState(22.3364);
   useEffect(() => {
     Geolocation.getCurrentPosition(info=>{
       // setcurlng(info.coords.longitude)
       // setcuralt(info.coords.altitud)
-
       console.log(info.coords.altitude)
       console.log(info.coords.longitude)
       setcoordinates([info.coords.longitude,info.coords.altitude])
@@ -38,7 +37,7 @@ const App = () => {
     <View style={styles.page}>
       <View style={styles.container}>
         <MapboxGL.MapView style={styles.map}>
-          <MapboxGL.Camera zoomLevel={15} centerCoordinate={coordinates} />
+          <MapboxGL.Camera zoomLevel={1} centerCoordinate={coordinates} />
           <MapboxGL.PointAnnotation
         key="pointAnnotation"
         id="pointAnnotation"
