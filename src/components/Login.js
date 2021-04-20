@@ -21,6 +21,7 @@ import { Icon } from "react-native-elements";
 const Login = ({ navigation }) => {
   const [email, setEmail] = useState();
   const [pw, setPW] = useState();
+
   return (
     <>
       <StatusBar barStyle="light-content" />
@@ -94,14 +95,6 @@ const Login = ({ navigation }) => {
             >
             <Text>Forgot Password?</Text>
             </TouchableWithoutFeedback>
-            <Button
-              title="Forgot Password?"
-              onPress={() => navigation.navigate("ForgotPassword")}
-              titleStyle={{
-                color: '#039BE5'
-              }}
-              type="clear"
-            />
           </View>
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
@@ -143,12 +136,13 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
   },
   pwView: {
-    backgroundColor: color.offWhite,
+    backgroundColor: color.greyBackgorund,
     borderRadius: 10,
     height: 64,
     flexDirection: "row",
     alignItems: "center",
     paddingLeft: "5%",
+    paddingVertical: 5,
   },
   loginButtonView: {
     height: 64,

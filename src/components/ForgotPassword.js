@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import auth from "@react-native-firebase/auth";
 import database from "@react-native-firebase/database";
+import * as Yup from 'yup';
 
 import {
   StyleSheet,
@@ -19,6 +20,18 @@ import { color } from "../constants";
 import { Icon } from "react-native-elements";
 
 export default ForgotPassword = ({ navigation }) => {
+  handlePasswordReset = async (values, actions) => {
+    const { email } = values
+
+    try {
+      await this.props.firebase.passwordReset(email)
+      console.log('Password reset email sent successfully')
+      this.props.navigation.navigate('Login')
+    } catch (error) {
+      actions.setFieldError('general', error.message)
+    }
+  }
+
   const [email, setEmail] = useState();
   const [pw, setPW] = useState();
   const [username, setUsername] = useState();
@@ -31,27 +44,7 @@ export default ForgotPassword = ({ navigation }) => {
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={styles.loginView}>
-            <Text style={styles.titleText}>Reset Password</Text>
-            <View style={styles.emailView}>
-              <Icon
-                name="account"
-                type="material-community"
-                size={30}
-                color={"grey"}
-              />
-              <View style={styles.emailInputView}>
-                <Text style={styles.inputTitle}>Username</Text>
-                <TextInput
-                  style={styles.inputText}
-                  autoCompleteType={"name"}
-                  clearTextOnFocus={true}
-                  keyboardType={"default"}
-                  placeholder={"Username"}
-                  autoCapitalize={"none"}
-                  onChangeText={setUsername}
-                ></TextInput>
-              </View>
-            </View>
+            <Text style={styles.titleText}>Send Email to Reset Password</Text>
             <View style={styles.emailView}>
               <Icon
                 name="email-outline"
@@ -61,7 +54,7 @@ export default ForgotPassword = ({ navigation }) => {
               />
 
               <View style={styles.emailInputView}>
-                <Text style={styles.inputTitle}>Email</Text>
+                <Text style={styles.inputTitle}>Enter Email</Text>
                 <TextInput
                   style={styles.inputText}
                   autoCompleteType={"email"}
@@ -73,56 +66,14 @@ export default ForgotPassword = ({ navigation }) => {
                 ></TextInput>
               </View>
             </View>
-
-            <View style={styles.pwView}>
-              <Icon
-                name="eye"
-                type="material-community"
-                size={30}
-                color={"grey"}
-              />
-              <View style={styles.pwInputView}>
-                <Text style={styles.inputTitle}>Password</Text>
-                <TextInput
-                  style={styles.inputText}
-                  autoCompleteType={"password"}
-                  keyboardType={"email-address"}
-                  placeholder={"*********"}
-                  onChangeText={setPW}
-                  autoCapitalize={"none"}
-                ></TextInput>
-              </View>
-            </View>
             <View style={styles.loginButtonView}>
               <TouchableOpacity
-                onPress={() => {
-                  auth()
-                    .createUserWithEmailAndPassword(email, pw)
-                    .then((authData) => {
-                      database()
-                        .ref("users/" + authData.user.uid)
-                        .set({
-                          username: username,
-                          email: email,
-                          status: "ONLINE",
-                        });
-                      console.log("User account created & signed in!");
-                    })
-                    .catch((error) => {
-                      if (error.code === "auth/email-already-in-use") {
-                        console.log("That email address is already in use!");
-                      }
-
-                      if (error.code === "auth/invalid-email") {
-                        console.log("That email address is invalid!");
-                      }
-
-                      console.error(error);
-                    });
+                onPress={(values, actions) => {
+                  handlePasswordReset(values, actions)
                 }}
               >
                 <View style={styles.loginButton}>
-                  <Text style={styles.loginButtonText}>Login</Text>
+                  <Text style={styles.loginButtonText}>Send email</Text>
                 </View>
               </TouchableOpacity>
             </View>
