@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import auth from "@react-native-firebase/auth";
-import database from "@react-native-firebase/database";
+
 import {
   StyleSheet,
   TextInput,

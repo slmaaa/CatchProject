@@ -7,7 +7,6 @@ import InGame from "./components/InGame/InGame";
 import Login from "./components/Login";
 import SignUp from "./components/Signup";
 import Home from "./components/Home";
-import Flappy from "./components/InGame/FlappyBird/App";
 import Riddle from "./components/InGame/Riddle";
 import Sudoku from "./components/InGame/Sudoku";
 import CreateGame from "./components/CreateGame";
@@ -108,13 +107,6 @@ const App = () => {
                   backgroundColor: color.blueOnBlack,
                 },
               })}
-            />
-            <Stack.Screen
-              name="Flappy"
-              component={Flappy}
-              options={{
-                headerShown: false,
-              }}
             />
             <Stack.Screen
               name="Riddle"
