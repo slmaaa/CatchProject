@@ -26,3 +26,5 @@ const Home = () => {
             />
           </MapboxGL.MapView>
         </View>
+  );
+};

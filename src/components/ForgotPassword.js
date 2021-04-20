@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import auth from "@react-native-firebase/auth";
+import database from "@react-native-firebase/database";
 
 import {
   StyleSheet,
   TextInput,
   View,
   Text,
-  Button,
   StatusBar,
   TouchableOpacity,
   KeyboardAvoidingView,
@@ -15,12 +15,13 @@ import {
 } from "react-native";
 
 import { color } from "../constants";
-import { storeData } from "./Helper/async";
+
 import { Icon } from "react-native-elements";
 
-const Login = ({ navigation }) => {
+export default ForgotPassword = ({ navigation }) => {
   const [email, setEmail] = useState();
   const [pw, setPW] = useState();
+  const [username, setUsername] = useState();
   return (
     <>
       <StatusBar barStyle="light-content" />
@@ -30,7 +31,27 @@ const Login = ({ navigation }) => {
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={styles.loginView}>
-            <Text style={styles.titleText}>Login</Text>
+            <Text style={styles.titleText}>Reset Password</Text>
+            <View style={styles.emailView}>
+              <Icon
+                name="account"
+                type="material-community"
+                size={30}
+                color={"grey"}
+              />
+              <View style={styles.emailInputView}>
+                <Text style={styles.inputTitle}>Username</Text>
+                <TextInput
+                  style={styles.inputText}
+                  autoCompleteType={"name"}
+                  clearTextOnFocus={true}
+                  keyboardType={"default"}
+                  placeholder={"Username"}
+                  autoCapitalize={"none"}
+                  onChangeText={setUsername}
+                ></TextInput>
+              </View>
+            </View>
             <View style={styles.emailView}>
               <Icon
                 name="email-outline"
@@ -38,11 +59,13 @@ const Login = ({ navigation }) => {
                 size={30}
                 color={"grey"}
               />
+
               <View style={styles.emailInputView}>
                 <Text style={styles.inputTitle}>Email</Text>
                 <TextInput
                   style={styles.inputText}
                   autoCompleteType={"email"}
+                  clearTextOnFocus={true}
                   keyboardType={"email-address"}
                   placeholder={"example@abcmail.com"}
                   autoCapitalize={"none"}
@@ -50,6 +73,7 @@ const Login = ({ navigation }) => {
                 ></TextInput>
               </View>
             </View>
+
             <View style={styles.pwView}>
               <Icon
                 name="eye"
@@ -64,8 +88,8 @@ const Login = ({ navigation }) => {
                   autoCompleteType={"password"}
                   keyboardType={"email-address"}
                   placeholder={"*********"}
-                  autoCapitalize={"none"}
                   onChangeText={setPW}
+                  autoCapitalize={"none"}
                 ></TextInput>
               </View>
             </View>
@@ -73,9 +97,27 @@ const Login = ({ navigation }) => {
               <TouchableOpacity
                 onPress={() => {
                   auth()
-                    .signInWithEmailAndPassword(email, pw)
-                    .catch((e) => {
-                      `Error ${e}`;
+                    .createUserWithEmailAndPassword(email, pw)
+                    .then((authData) => {
+                      database()
+                        .ref("users/" + authData.user.uid)
+                        .set({
+                          username: username,
+                          email: email,
+                          status: "ONLINE",
+                        });
+                      console.log("User account created & signed in!");
+                    })
+                    .catch((error) => {
+                      if (error.code === "auth/email-already-in-use") {
+                        console.log("That email address is already in use!");
+                      }
+
+                      if (error.code === "auth/invalid-email") {
+                        console.log("That email address is invalid!");
+                      }
+
+                      console.error(error);
                     });
                 }}
               >
@@ -84,24 +126,6 @@ const Login = ({ navigation }) => {
                 </View>
               </TouchableOpacity>
             </View>
-            <TouchableWithoutFeedback
-              onPress={() => navigation.navigate("SignUp")}
-            >
-            <Text>Sign Up?</Text>
-            </TouchableWithoutFeedback>
-            <TouchableWithoutFeedback
-              onPress={() => navigation.navigate("ForgotPassword")}
-            >
-            <Text>Forgot Password?</Text>
-            </TouchableWithoutFeedback>
-            <Button
-              title="Forgot Password?"
-              onPress={() => navigation.navigate("ForgotPassword")}
-              titleStyle={{
-                color: '#039BE5'
-              }}
-              type="clear"
-            />
           </View>
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
@@ -111,21 +135,18 @@ const Login = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: color.primaryDark,
+    backgroundColor: color.blueOnBlack,
     flex: 1,
     justifyContent: "flex-end",
   },
   loginView: {
+    flex: 1,
     backgroundColor: "white",
     justifyContent: "space-between",
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
     paddingLeft: "15%",
     paddingRight: "15%",
-    paddingBottom: 120,
+    paddingBottom: 80,
     paddingTop: "17%",
-    minHeight: 500,
-    maxHeight: "95%",
   },
   titleText: {
     fontFamily: "Poppins-Bold",
@@ -188,5 +209,3 @@ const styles = StyleSheet.create({
     flex: 0.5,
   },
 });
-
-export default Login;

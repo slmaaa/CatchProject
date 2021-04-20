@@ -6,6 +6,7 @@ import auth from "@react-native-firebase/auth";
 import InGame from "./components/InGame/InGame";
 import Login from "./components/Login";
 import SignUp from "./components/Signup";
+import ForgotPassword from "./components/ForgotPassword";
 import Home from "./components/Home";
 import Riddle from "./components/InGame/Riddle";
 import Sudoku from "./components/InGame/Sudoku";
@@ -45,6 +46,13 @@ const App = () => {
             <Stack.Screen
               name="SignUp"
               component={SignUp}
+              options={{
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="ForgotPassword"
+              component={ForgotPassword}
               options={{
                 headerShown: false,
               }}
