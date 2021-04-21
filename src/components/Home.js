@@ -9,6 +9,7 @@ import auth from "@react-native-firebase/auth";
 import MMKVStorage from "react-native-mmkv-storage";
 
 import { join } from "./joinGame";
+import { URL } from "../constants.json";
 
 const MMKV = new MMKVStorage.Loader().initialize();
 
@@ -17,6 +18,18 @@ const Home = ({ navigation }) => {
   const [roomID, setRoomID] = useState();
   const userName = MMKV.getString("userName");
   const userID = MMKV.getString("userID");
+  const ws = new WebSocket("ws://192.168.29.243:8765");
+
+  useEffect(() => {
+    ws.onopen = () => {
+      // connection opened
+      console.log("WebSocket Client Connected");
+    };
+    ws.onmessage = (e) => {
+      // a message was received
+      console.log(e.data);
+    };
+  });
 
   return (
     <SafeAreaView>
@@ -62,6 +75,13 @@ const Home = ({ navigation }) => {
           navigation.navigate("InGame");
         }}
       ></Button>
+      <Button
+        title={"websocket test"}
+        onPress={() => {
+          const object = { Type: "Create", Content: "dummy" };
+          ws.send(JSON.stringify(object));
+        }}
+      />
       <Button
         title={"Logout"}
         onPress={() => {
