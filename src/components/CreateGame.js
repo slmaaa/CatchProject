@@ -74,7 +74,11 @@ export default CreateGame = ({ navigation }) => {
   };
   return (
     <SafeAreaView style={styles.container}>
-      <Input placeholder="Game name" onChangeText={setGameName}></Input>
+      <Input
+        placeholder="Game name"
+        onChangeText={setGameName}
+        style={{ color: "white" }}
+      ></Input>
       <View style={styles.switchContainer}>
         <Text style={styles.switchText}>Join as host</Text>
         <Switch
