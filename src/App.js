@@ -26,7 +26,7 @@ export const wsSend = async (data) => {
 const App = () => {
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState();
-
+  MMKV.clearStore();
   ws.onopen = () => {
     // connection opened
     console.log("WebSocket Client Connected");
@@ -138,10 +138,7 @@ const App = () => {
               name="Waiting"
               component={Waiting}
               options={({ route }) => ({
-                title: route.params.gameName,
-                headerStyle: {
-                  backgroundColor: color.blueOnBlack,
-                },
+                headerShown: false,
               })}
             />
             <Stack.Screen
