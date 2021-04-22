@@ -49,13 +49,9 @@
     "react-native-screens": "^2.18.1",
     "react-native-vector-icons": "^8.1.0",
     "react-scripts": "^4.0.3",
-<<<<<<< HEAD
-    "worker-loader": "^3.0.7",
-    "yup": "^0.32.9"
-=======
+    "yup": "^0.32.9",
     "socket.io-client": "^4.0.1",
     "worker-loader": "^3.0.7"
->>>>>>> master
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
