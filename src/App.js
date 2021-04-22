@@ -13,19 +13,55 @@ import CreateGame from "./components/CreateGame";
 import Waiting from "./components/Waiting";
 import LoadingHome from "./components/LoadingHome";
 import setmap from "./components/setmap";
+import MMKVStorage from "react-native-mmkv-storage";
 import { color } from "./constants";
 
+const MMKV = new MMKVStorage.Loader().initialize();
 const Stack = createStackNavigator();
+const ws = new WebSocket("ws://192.168.29.243:8765");
 
+export const wsSend = async (data) => {
+  await ws.send(data);
+};
 const App = () => {
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState();
+
+  ws.onopen = () => {
+    // connection opened
+    console.log("WebSocket Client Connected");
+  };
+  ws.onmessage = (e) => {
+    // a message was received
+    const data = JSON.parse(e.data);
+    switch (data.header) {
+      case "ERROR":
+        console.error(data.content);
+        break;
+      case "CREATED":
+        console.log("Game created");
+        MMKV.setInt("createdGameID", data.content);
+        break;
+      case "JOINED":
+        console.log("Game joined");
+        MMKV.setMap("joinedGame", data.content);
+        break;
+      case "ROOM_INFO":
+        console.log("Recieved room info");
+        MMKV.setMap("roomInfo", data.content);
+        break;
+      default:
+        console.error("Unidentified data");
+    }
+  };
   function onAuthStateChanged(user) {
     setUser(user);
     if (initializing) setInitializing(false);
   }
+
   useEffect(() => {
     const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
+
     return subscriber; // unsubscribe on unmount
   }, []);
 

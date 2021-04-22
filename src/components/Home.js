@@ -6,10 +6,12 @@ import React, { useEffect, useState } from "react";
 import { Text, SafeAreaView, Button } from "react-native";
 import { Overlay, Input } from "react-native-elements";
 import auth from "@react-native-firebase/auth";
+import database from "@react-native-firebase/database";
 import MMKVStorage from "react-native-mmkv-storage";
 
 import { join } from "./joinGame";
 import { URL } from "../constants.json";
+import { wsSend } from "../App";
 
 const MMKV = new MMKVStorage.Loader().initialize();
 
@@ -18,19 +20,38 @@ const Home = ({ navigation }) => {
   const [roomID, setRoomID] = useState();
   const userName = MMKV.getString("userName");
   const userID = MMKV.getString("userID");
-  const ws = new WebSocket("ws://192.168.29.243:8765");
 
-  useEffect(() => {
-    ws.onopen = () => {
-      // connection opened
-      console.log("WebSocket Client Connected");
-    };
-    ws.onmessage = (e) => {
-      // a message was received
-      console.log(e.data);
-    };
-  });
-
+  const handleOnPressJoin = () => {
+    let game;
+    wsSend(
+      JSON.stringify({
+        header: "JOIN",
+        content: {
+          player: {
+            pid: MMKV.getString("userID"),
+            name: MMKV.getString("userName"),
+            avatar: "None",
+          },
+          gid: roomID,
+        },
+      })
+    ).then(() => {
+      let interval = setInterval(() => {
+        game = MMKV.getMap("joinedGame");
+        if (game == null) return;
+        clearInterval(interval);
+        MMKV.setInt("gameID", parseInt(roomID));
+        MMKV.setString("gameName", game.gname);
+        database()
+          .ref("users/" + MMKV.getString("userID"))
+          .update({ gameID: parseInt(roomID), status: "PREPARE" });
+        MMKV.setString("userStatus", "PREPARE");
+        navigation.replace("Waiting", {
+          gameName: game.gname,
+        });
+      }, 100);
+    });
+  };
   return (
     <SafeAreaView>
       <Overlay
@@ -39,16 +60,7 @@ const Home = ({ navigation }) => {
         overlayStyle={{ width: "80%" }}
       >
         <Input placeholder="Enter room ID" onChangeText={setRoomID}></Input>
-        <Button
-          title={"Join"}
-          onPress={() => {
-            join(roomID, userID, userName).then((gameName) => {
-              if (gameName != null) {
-                navigation.navigate("Waiting", { gameName: gameName });
-              }
-            });
-          }}
-        />
+        <Button title={"Join"} onPress={handleOnPressJoin} />
       </Overlay>
       <Text>{"Welcome " + MMKV.getString("userName")}</Text>
       <Button
@@ -75,13 +87,6 @@ const Home = ({ navigation }) => {
           navigation.navigate("InGame");
         }}
       ></Button>
-      <Button
-        title={"websocket test"}
-        onPress={() => {
-          const object = { Type: "Create", Content: "dummy" };
-          ws.send(JSON.stringify(object));
-        }}
-      />
       <Button
         title={"Logout"}
         onPress={() => {
