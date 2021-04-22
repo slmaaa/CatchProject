@@ -5,7 +5,8 @@ import database from "@react-native-firebase/database";
 import MMKVStorage from "react-native-mmkv-storage";
 
 import { color } from "../constants.json";
-import { postGame } from "./Helper/server";
+import { wsSend } from "../App";
+import useInterval from "./Helper/useInterval";
 
 export default CreateGame = ({ navigation }) => {
   const MMKV = new MMKVStorage.Loader().initialize();
@@ -48,22 +49,23 @@ export default CreateGame = ({ navigation }) => {
       teams: ["RED", "BLUE"],
     };
     let gameID;
-    postGame(game)
-      .then((val) => {
-        gameID = val;
-        MMKV.setString("gameID", gameID);
-        MMKV.setString("gameName", gameName);
-        database()
-          .ref("users/" + MMKV.getString("userID"))
-          .update({ gameID: gameID });
-      })
-      .catch((e) => console.log(e))
-      .then(() => {
-        database()
-          .ref("users/" + MMKV.getString("userID"))
-          .update({ status: "PREPARE_HOST" });
-        MMKV.setString("userStatus", "PREPARE_HOS");
-        navigation.replace("Waiting", { gameName: gameName });
+    wsSend(JSON.stringify({ header: "CREATE", content: game }))
+      .then(async () => {
+        let interval = setInterval(() => {
+          gameID = MMKV.getInt("createdGameID");
+          if (gameID == null) return;
+          clearInterval(interval);
+          console.log(gameID);
+          MMKV.setInt("gameID", gameID);
+          MMKV.setString("gameName", gameName);
+          database()
+            .ref("users/" + MMKV.getString("userID"))
+            .update({ gameID: gameID, status: "PREPARE_HOST" });
+          MMKV.setString("userStatus", "PREPARE_HOST");
+          game.gid = gameID;
+          MMKV.setMap("joinedGame", game);
+          navigation.replace("Waiting", { gameName: gameName });
+        }, 100);
       })
       .catch((e) => {
         console.log(e);
@@ -74,7 +76,11 @@ export default CreateGame = ({ navigation }) => {
   };
   return (
     <SafeAreaView style={styles.container}>
-      <Input placeholder="Game name" onChangeText={setGameName}></Input>
+      <Input
+        placeholder="Game name"
+        onChangeText={setGameName}
+        style={{ color: "white" }}
+      ></Input>
       <View style={styles.switchContainer}>
         <Text style={styles.switchText}>Join as host</Text>
         <Switch
