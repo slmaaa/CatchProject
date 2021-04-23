@@ -51,6 +51,9 @@ const App = () => {
         console.log("Recieved room info");
         MMKV.setMap("roomInfo", data.content);
         break;
+      case "GAME_INFO":
+        console.log("Recieved game info");
+        MMKV.setMap("gameInfo", data.content);
       default:
         console.error("Unidentified data");
     }

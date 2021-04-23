@@ -16,6 +16,7 @@ import {
   TouchableHighlight,
 } from "react-native";
 import { Overlay } from "react-native-elements";
+import MMKVStorage from "react-native-mmkv-storage";
 
 import * as defaultGetData from "../../data_from_server.json";
 import fetchData from "../DataExchange/fetchData";
@@ -26,29 +27,16 @@ import useInterval from "../Helper/useInterval";
 import setEventText from "./setEventText";
 import updateCPFlag from "./updateCPFlag";
 import ActionButtons from "./ActionButtons";
+import { wsSend } from "../App";
 import { color } from "../../constants.json";
 
-const RID = "GG01-PP02";
-
-const NUM_OF_CP = 4;
-const CP_LOCATION = [
-  { latitude: 22.335083, longitude: 114.262832 },
-  { latitude: 22.33459, longitude: 114.262834 },
-  { latitude: 22.334605, longitude: 114.263299 },
-  { latitude: 22.335091, longitude: 114.263291 },
-];
 const CP_RANGE = 5;
 const SCORE_TARGET = 1000;
-const TEAM = "Red";
-
-const defaultPostData = {
-  rid: RID,
-  CID: -1,
-  time: 0,
-  is_in: null,
-};
 const InGame = ({ navigation, route }) => {
+  const MMKV = new MMKVStorage.Loader().initialize();
+
   const [location, setLocation] = useState(null);
+  const [actionButton, setActionButton] = useState(null);
   const [actionButtonOption, setActionButtonOption] = useState(0);
   const [coolDown, setCoolDown] = useState([0, 0, 0, 0]);
   const [currentCoolDown, setCurrentCoolDown] = useState(-1);
@@ -61,17 +49,12 @@ const InGame = ({ navigation, route }) => {
     modalVisible = false,
     notificationText = "",
     getData = defaultGetData; //Data GET from server
-
-  const actionButton = ActionButtons(
-    1,
-    1,
-    () => {
-      navigation.navigate("Riddle");
-    },
-    coolDown[currentCID],
-    actionButtonDisable,
-    currentCID
-  );
+  let game,
+    team,
+    checkpointsLocation = [],
+    checkpointsLevel = [],
+    numberOfCheckpoints = 0,
+    gameInfo;
   // Location wathcher, update location and post when CPFlag changes
   useEffect(() => {
     const _watchId = Geolocation.watchPosition(
@@ -103,11 +86,9 @@ const InGame = ({ navigation, route }) => {
       setCurrentCID(
         updateCPFlag(
           location,
-          currentCID,
-          CP_LOCATION,
+          checkpointsLocation,
           CP_RANGE,
-          NUM_OF_CP,
-          RID
+          numberOfCheckpoints
         )
       );
     }
@@ -117,6 +98,48 @@ const InGame = ({ navigation, route }) => {
       }
     };
   }, [location]);
+
+  useInterval(() => {
+    MMKV.getMap("gameInfo");
+  }, 100);
+
+  useEffect(() => {
+    game = MMKV.getMap("joinedGame");
+    team = MMKV.getString("team");
+    game.checkpoints.map((val) => {
+      checkpointsLocation.push({
+        latitude: val.area.center.lat,
+        longitude: val.area.center.lng,
+      });
+    });
+    numberOfCheckpoints = game.checkpoints.length;
+  }, []);
+
+  useEffect(() => {
+    game.status = gameInfo.status;
+    for (let i = 0; i < game.checkpoints, length; i++) {
+      game.checkpoints[i].level = gameInfo.cpsLevel;
+    }
+  }, [gameInfo]);
+
+  useEffect(() => {
+    if (game.status == "END") {
+      //end game
+    }
+  }, [game.status]);
+
+  useEffect(() => {
+    actionButton = ActionButtons(
+      currentCID == -1 ? 0 : "MATH",
+      currentCID == -1 ? 0 : game.checkponts[currentCID].level[team],
+      () => {
+        navigation.navigate("Riddle");
+      },
+      coolDown[currentCID],
+      actionButtonDisable,
+      currentCID
+    );
+  }, [currentCID, game, actionButtonDisable]);
 
   useEffect(() => {
     if (route.params?.cd) {
