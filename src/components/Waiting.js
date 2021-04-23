@@ -7,6 +7,7 @@ import MMKVStorage from "react-native-mmkv-storage";
 import { color } from "../constants.json";
 import { deleteGame, getGame } from "./Helper/server";
 import useInterval from "./Helper/useInterval";
+import { wsSend } from "../App";
 
 export default Waiting = ({ navigation }) => {
   const MMKV = new MMKVStorage.Loader().initialize();
@@ -14,10 +15,9 @@ export default Waiting = ({ navigation }) => {
   const [game, setGame] = useState(MMKV.getMap("joinedGame"));
   const [roomInfo, setRoomInfo] = useState(null);
   const [playerView, setPlayersView] = useState([]);
-  const [status, setStatus] = useState();
   const gameID = MMKV.getString("gameID");
-  const gameName = MMKV.getString("gameName");
   const userID = MMKV.getString("userID");
+  let status;
   let playerList = [];
 
   const deleteRoom = () => {
@@ -44,11 +44,23 @@ export default Waiting = ({ navigation }) => {
 
   useEffect(() => {
     if (roomInfo == null) return;
-    setStatus(roomInfo.status);
+    status = roomInfo.status;
+    let game = MMKV.getMap("joinedGame");
+    game[players] = roomInfo.players;
     let list = [];
-    roomInfo.players.map((value) => list.push(value.name));
+    roomInfo.players.map((value) => {
+      list.push(value.name);
+      if (value.team != None) {
+        if (value.pid == MMKV.getString("userID"))
+          MMKV.setString("team", value.team);
+      }
+    });
     playerList = list;
     setPlayersView(renderPlayersList());
+    if (status == "RUNNING") {
+      navigation.replace("InGame");
+      return;
+    }
   }, [roomInfo]);
 
   const renderPlayersList = () => {
@@ -99,6 +111,16 @@ export default Waiting = ({ navigation }) => {
     return list;
   };
 
+  const renderButton = () => {
+    if (MMKV.getString == "PREPARE_HOST") {
+      return <Button containerstyle={styles.button} title={"Confirm"}></Button>;
+    }
+  };
+
+  const handleOnPressStart = () => {
+    wsSend("header: ");
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.headerContainer}>
@@ -108,7 +130,6 @@ export default Waiting = ({ navigation }) => {
         </Text>
       </View>
       <View style={styles.playersListContainer}>{playerView}</View>
-      <Button containerstyle={styles.button} title={"Confirm"}></Button>
     </SafeAreaView>
   );
 };
