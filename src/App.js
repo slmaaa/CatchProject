@@ -7,26 +7,64 @@ import InGame from "./components/InGame/InGame";
 import Login from "./components/Login";
 import SignUp from "./components/Signup";
 import Home from "./components/Home";
-import Flappy from "./components/InGame/FlappyBird/App";
 import Riddle from "./components/InGame/Riddle";
 import Sudoku from "./components/InGame/Sudoku";
 import CreateGame from "./components/CreateGame";
 import Waiting from "./components/Waiting";
 import LoadingHome from "./components/LoadingHome";
-import setmap from "./components/setmap" 
+import setmap from "./components/setmap";
+import MMKVStorage from "react-native-mmkv-storage";
 import { color } from "./constants";
 
+const MMKV = new MMKVStorage.Loader().initialize();
 const Stack = createStackNavigator();
+const ws = new WebSocket("ws://192.168.29.243:8765");
 
+export const wsSend = async (data) => {
+  await ws.send(data);
+};
 const App = () => {
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState();
+  MMKV.clearStore();
+  ws.onopen = () => {
+    // connection opened
+    console.log("WebSocket Client Connected");
+  };
+  ws.onmessage = (e) => {
+    // a message was received
+    const data = JSON.parse(e.data);
+    switch (data.header) {
+      case "ERROR":
+        console.error(data.content);
+        break;
+      case "CREATED":
+        console.log("Game created");
+        MMKV.setInt("createdGameID", data.content);
+        break;
+      case "JOINED":
+        console.log("Game joined");
+        MMKV.setMap("joinedGame", data.content);
+        break;
+      case "ROOM_INFO":
+        console.log("Recieved room info");
+        MMKV.setMap("roomInfo", data.content);
+        break;
+      case "GAME_INFO":
+        console.log("Recieved game info");
+        MMKV.setMap("gameInfo", data.content);
+      default:
+        console.error("Unidentified data");
+    }
+  };
   function onAuthStateChanged(user) {
     setUser(user);
     if (initializing) setInitializing(false);
   }
+
   useEffect(() => {
     const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
+
     return subscriber; // unsubscribe on unmount
   }, []);
 
@@ -102,19 +140,9 @@ const App = () => {
             <Stack.Screen
               name="Waiting"
               component={Waiting}
-              options={{
-                title: "Waiting Room",
-                headerStyle: {
-                  backgroundColor: color.blueOnBlack,
-                },
-              }}
-            />
-            <Stack.Screen
-              name="Flappy"
-              component={Flappy}
-              options={{
+              options={({ route }) => ({
                 headerShown: false,
-              }}
+              })}
             />
             <Stack.Screen
               name="Riddle"

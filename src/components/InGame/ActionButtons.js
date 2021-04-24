@@ -15,24 +15,23 @@ const ActionButtons = (
   currentCID
 ) => {
   const [buttonText, setButtonText] = useState();
-  const s = [
-    "Hurry to next CP",
-    "Riddle " + completionLevel + "/5",
-    "Sudoku " + completionLevel + "/5",
-    "Flappy Bird " + completionLevel + "/5",
-  ];
-  const buttonColor = [
-    color.grey,
-    color.lightGreen,
-    color.primary,
-    color.orange,
-    color.grey,
-  ];
+  const status = {
+    NOT_IN_CP: "Hurry to next CP",
+    RIDDLE: "Riddle " + completionLevel + "/5",
+    SUDOKU: "Sudoku " + completionLevel + "/5",
+    MATH: "Math" + completionLevel + "/5",
+  };
+  const buttonColor = {
+    NOT_IN_CP: color.grey,
+    RIDDLE: color.lightGreen,
+    SUDOKU: color.primary,
+    MATH: color.orange,
+  };
   useEffect(() => {
-    if (option == 0) {
-      setButtonText(s[0]);
+    if (option == "NOT_IN_CP") {
+      setButtonText(staus[option]);
     } else if (cd == 0) {
-      setButtonText(s[option]);
+      setButtonText(status[option]);
     } else {
       setButtonText("CD: " + cd);
     }
@@ -43,7 +42,7 @@ const ActionButtons = (
       disabled={disabled}
       style={[
         styles.actionButton,
-        { backgroundColor: cd == 0 ? buttonColor[option] : "grey" },
+        { backgroundColor: cd == 0 ? buttonColor[option] : "black" },
       ]}
       onPress={handleOnPress}
     >

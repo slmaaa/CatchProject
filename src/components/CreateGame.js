@@ -5,7 +5,8 @@ import database from "@react-native-firebase/database";
 import MMKVStorage from "react-native-mmkv-storage";
 
 import { color } from "../constants.json";
-import { postGame } from "./Helper/server";
+import { wsSend } from "../App";
+import useInterval from "./Helper/useInterval";
 
 export default CreateGame = ({ navigation }) => {
   const MMKV = new MMKVStorage.Loader().initialize();
@@ -19,20 +20,19 @@ export default CreateGame = ({ navigation }) => {
   async function getPresetCP() {
     if (usePresetCP) {
       database()
-        .ref("defaultUSTCps")
+        .ref("defalutUSTCps")
         .once("value")
         .then((val) => {
-          cps = val;
-          console.log("setCP");
+          cps = val.val();
         })
+        .then(() => setGame())
         .catch((e) => console.log(e));
     } else {
       cps = customCPs;
+      setGame();
     }
-    await setGame();
   }
   async function setGame() {
-    console.log("setGame");
     game = {
       gid: "None",
       gname: gameName,
@@ -46,32 +46,41 @@ export default CreateGame = ({ navigation }) => {
           avatar: "None",
         },
       ],
+      teams: ["RED", "BLUE"],
     };
+    let gameID;
+    wsSend(JSON.stringify({ header: "CREATE", content: game }))
+      .then(async () => {
+        let interval = setInterval(() => {
+          gameID = MMKV.getInt("createdGameID");
+          if (gameID == null) return;
+          clearInterval(interval);
+          console.log(gameID);
+          MMKV.setInt("gameID", gameID);
+          MMKV.setString("gameName", gameName);
+          database()
+            .ref("users/" + MMKV.getString("userID"))
+            .update({ gameID: gameID, status: "PREPARE_HOST" });
+          MMKV.setString("userStatus", "PREPARE_HOST");
+          game.gid = gameID;
+          MMKV.setMap("joinedGame", game);
+          navigation.replace("Waiting", { gameName: gameName });
+        }, 100);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
   }
   const createGame = async () => {
     await getPresetCP();
-
-    let gameID;
-    postGame(game)
-      .then((val) => {
-        val = gameID;
-        MMKV.setString("gameID", gameID);
-        MMKV.setString("gameName", gameName);
-        database()
-          .ref("users/" + MMKV.getString("userID"))
-          .update({ gameID: gameID });
-      })
-      .then(() => {
-        database()
-          .ref("users/" + MMKV.getString("userID"))
-          .update({ status: "PREPARE_HOST" });
-        MMKV.setString("userStatus", "PREPARE_HOS");
-        navigation.replace("Waiting");
-      });
   };
   return (
     <SafeAreaView style={styles.container}>
-      <Input placeholder="Game name" onChangeText={setGameName}></Input>
+      <Input
+        placeholder="Game name"
+        onChangeText={setGameName}
+        style={{ color: "white" }}
+      ></Input>
       <View style={styles.switchContainer}>
         <Text style={styles.switchText}>Join as host</Text>
         <Switch
