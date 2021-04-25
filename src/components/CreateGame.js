@@ -36,6 +36,7 @@ export default CreateGame = ({ navigation }) => {
     game = {
       gid: "None",
       gname: gameName,
+      status: "PREPARE",
       hostID: MMKV.getString("userID"),
       hostName: MMKV.getString("userName"),
       checkpoints: cps,
@@ -48,15 +49,19 @@ export default CreateGame = ({ navigation }) => {
       ],
       teams: ["RED", "BLUE"],
     };
-    let gameID;
+
+    let gameID = null;
     wsSend(JSON.stringify({ header: "CREATE", content: game }))
       .then(async () => {
+        console.log("====================================");
+        console.log(game);
+        console.log("====================================");
         let interval = setInterval(() => {
-          gameID = MMKV.getInt("createdGameID");
+          gameID = MMKV.getString("createdGameID");
           if (gameID == null) return;
           clearInterval(interval);
           console.log(gameID);
-          MMKV.setInt("gameID", gameID);
+          MMKV.setString("gameID", gameID);
           MMKV.setString("gameName", gameName);
           database()
             .ref("users/" + MMKV.getString("userID"))

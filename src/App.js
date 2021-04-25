@@ -33,6 +33,9 @@ const App = () => {
   };
   ws.onmessage = (e) => {
     // a message was received
+    console.log("====================================");
+    console.log(e.data);
+    console.log("====================================");
     const data = JSON.parse(e.data);
     switch (data.header) {
       case "ERROR":
@@ -40,7 +43,7 @@ const App = () => {
         break;
       case "CREATED":
         console.log("Game created");
-        MMKV.setInt("createdGameID", data.content);
+        MMKV.setString("createdGameID", data.content + "");
         break;
       case "JOINED":
         console.log("Game joined");
@@ -53,6 +56,7 @@ const App = () => {
       case "GAME_INFO":
         console.log("Recieved game info");
         MMKV.setMap("gameInfo", data.content);
+        break;
       default:
         console.error("Unidentified data");
     }

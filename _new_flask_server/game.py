@@ -4,28 +4,23 @@ from time import time as now
 
 
 class Game:
-    def __init__(self, gid, gname, hostID, hostName, checkpoints: [Checkpoint] = None, players: [Player] = None,
-                 teams: [str] = None, min_players=6, max_players=20):
+    def __init__(self, gid, gname, status, hostID, hostName, checkpoints: [Checkpoint] = None, players: [Player] = None,
+                 teams: [str] = None, min_players=6, max_players=20, startTime=None, endTime=None, capturedCount=None, unCapturedCount=None, winTeam=None):
         self.gid = gid
         self.gname = gname
         self.hostID = hostID
         self.hostName = hostName
-        self.status = "PREPARE"
+        self.status = status
         self.checkpoints = checkpoints or []
-
         self.players = players or []
         self.teams = teams or []
         self.min_players, self.max_players = min_players, max_players
-        self.startTime = None
-        self.endTime = None
-        self.capturedCount = {}
-        for team in teams:
-            self.capturedCount[team] = 0
-            for cp in self.checkpoints:
-                cp.level[team] = 0
-        self.unCapturedCount = len(self.checkpoints)
-        self.winTeam = None
-        self.keyInfo = {}
+        self.startTime = startTime
+        self.endTime = endTime
+        self.capturedCount = capturedCount
+        self.unCapturedCount = unCapturedCount
+        self.winTeam = winTeam
+        self.keyInfo = None
 
     def to_dict(self):
         return {"gid": self.gid, "gname": self.gname, "status": self.status,
@@ -40,13 +35,13 @@ class Game:
         teaming = []
         players_per_team = round(
             len(self.players) / len(self.teams) + 0.5)
-        for team_number in range(len(self.parameters.teams)):
+        for team_number in range(len(self.teams)):
             teaming += players_per_team * [self.teams[team_number]]
         for player, team in zip(self.players, teaming):
             player.team = team
 
     def start(self):
-        self.startTime = now
+        self.startTime = now()
         self.status = "RUNNING"
 
     def incrementLevel(self, cid, team):
@@ -73,6 +68,36 @@ class Game:
     def from_dict(_dict):
         gid = _dict["gid"]
         gname = _dict["gname"]
+        status = _dict.get(
+            "status", None)
+        hostID = _dict["hostID"]
+        hostName = _dict["hostName"]
+        checkpoints = [Checkpoint.from_dict(cp) for cp in _dict["checkpoints"]]
+        players = [Player.from_dict(player)
+                   for player in _dict.get("players", [])]
+        min_players, max_players = _dict.get(
+            "min_players", 6), _dict.get("max_players", 20)
+        teams = _dict.get(
+            "teams", None)
+        startTime = _dict.get(
+            "startTime", None)
+        endTime = _dict.get(
+            "endTime", None)
+        capturedCount = _dict.get(
+            "capturedCount", None)
+        unCapturedCount = _dict.get(
+            "unCapturedCount", None)
+        winTeam = _dict.get(
+            "winTeam", None)
+        return Game(gid, gname, status, hostID, hostName, checkpoints,
+                    players, teams, min_players, max_players, startTime, endTime, capturedCount, unCapturedCount, winTeam)
+
+    @staticmethod
+    def new_game(_dict):
+        gid = _dict["gid"]
+        gname = _dict["gname"]
+        status = _dict.get(
+            "status", None)
         hostID = _dict["hostID"]
         hostName = _dict["hostName"]
         checkpoints = [Checkpoint.from_dict(cp) for cp in _dict["checkpoints"]]
@@ -81,5 +106,15 @@ class Game:
         min_players, max_players = _dict.get(
             "min_players", 6), _dict.get("max_players", 20)
         teams = _dict["teams"]
-        return Game(gid, gname, hostID, hostName, checkpoints,
-                    players, teams, min_players, max_players)
+        startTime = None
+        endTime = None
+        capturedCount = dict()
+        for team in teams:
+            capturedCount[team] = 0
+            for cp in checkpoints:
+                cp.level[team] = 0
+        unCapturedCount = len(checkpoints)
+        winTeam = _dict.get(
+            "winTeam", None)
+        return Game(gid, gname, status, hostID, hostName, checkpoints,
+                    players, teams, min_players, max_players, startTime, endTime, capturedCount, unCapturedCount, winTeam)

@@ -7,6 +7,7 @@ import MMKVStorage from "react-native-mmkv-storage";
 
 export default LoadingHome = ({ navigation }) => {
   const MMKV = new MMKVStorage.Loader().initialize();
+  MMKV.clearStore();
   let userID, userName, userStatus, gameID;
   async function getDataFromDB() {
     userID = auth().currentUser.uid;
@@ -35,7 +36,7 @@ export default LoadingHome = ({ navigation }) => {
     }
     await MMKV.setStringAsync("userStatus", userStatus);
     if (gameID != null) {
-      MMKV.setInt("userGameID", gameID);
+      MMKV.setString("userGameID", gameID);
     }
     await navigation.replace("Home");
   }
