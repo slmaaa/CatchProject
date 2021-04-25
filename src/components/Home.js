@@ -40,11 +40,11 @@ const Home = ({ navigation }) => {
         game = MMKV.getMap("joinedGame");
         if (game == null) return;
         clearInterval(interval);
-        MMKV.setInt("gameID", parseInt(roomID));
+        MMKV.setString("gameID", roomID);
         MMKV.setString("gameName", game.gname);
         database()
           .ref("users/" + MMKV.getString("userID"))
-          .update({ gameID: parseInt(roomID), status: "PREPARE" });
+          .update({ gameID: roomID, status: "PREPARE" });
         MMKV.setString("userStatus", "PREPARE");
         navigation.replace("Waiting", {
           gameName: game.gname,

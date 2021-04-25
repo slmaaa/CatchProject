@@ -46,11 +46,11 @@ export default Waiting = ({ navigation }) => {
     if (roomInfo == null) return;
     status = roomInfo.status;
     let game = MMKV.getMap("joinedGame");
-    game[players] = roomInfo.players;
+    game.players = roomInfo.players;
     let list = [];
     roomInfo.players.map((value) => {
       list.push(value.name);
-      if (value.team != None) {
+      if (value.team != null) {
         if (value.pid == MMKV.getString("userID"))
           MMKV.setString("team", value.team);
       }
@@ -71,7 +71,7 @@ export default Waiting = ({ navigation }) => {
       list.push(
         <View
           style={{
-            height: "18%",
+            height: 60,
             flexDirection: "row",
             justifyContent: "space-between",
           }}
@@ -94,7 +94,7 @@ export default Waiting = ({ navigation }) => {
       list.push(
         <View
           style={{
-            height: "18%",
+            height: 60,
             flexDirection: "row",
             justifyContent: "space-between",
           }}
@@ -129,19 +129,28 @@ export default Waiting = ({ navigation }) => {
           {`\nRoom ID: ${game.gid}`}
         </Text>
       </View>
-      <View style={styles.playersListContainer}>{playerView}</View>
+      <ScrollView style={styles.playersListContainer}>{playerView}</ScrollView>
+      <Button
+        title={"Confirm"}
+        containerStyle={styles.button}
+        titleStyle={{ color: "white", fontSize: 24 }}
+        buttonStyle={{ backgroundColor: color.brown }}
+        onPress={() => {
+          wsSend(JSON.stringify({ header: "START", content: gameID }));
+        }}
+      ></Button>
     </SafeAreaView>
   );
 };
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "grey",
+    backgroundColor: "white",
     flex: 1,
   },
   headerContainer: {
     marginTop: 30,
     marginBottom: 70,
-    flex: 0.09,
+    height: "10%",
     backgroundColor: "#00000080",
     width: "48%",
     borderTopRightRadius: 50,
@@ -156,11 +165,22 @@ const styles = StyleSheet.create({
     textAlign: "center",
     textAlignVertical: "center",
   },
-  playersListContainer: { flex: 0.6, borderWidth: 1 },
+  playersListContainer: { height: "60%" },
   button: {
-    flex: 0.1,
-    marginTop: 140,
-    marginBottom: 90,
+    height: 50,
+    width: "50%",
+    marginVertical: 50,
+    alignSelf: "center",
+    color: color.brown,
+    borderRadius: 10,
+    shadowColor: "black",
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.37,
+    shadowRadius: 15,
+    elevation: 10,
   },
   leftPlayer: {
     flex: 0.36,
