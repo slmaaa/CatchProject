@@ -10,7 +10,7 @@ import RNLocation, { Location } from 'react-native-location';
 const App = () => {
   const [location, setLocation] = useState(null);
   const [coordinates,setcoordinates] = useState([114.2655,22.3364]);
-  const [addcor,setaddcor]=useState([[114.2355,22.3362,1,3],[114.2655,22.3364,2,4],[114.2855,22.3764,6,7]])
+  const [addcor,setaddcor]=useState([[114.2635,22.3372,5,9],[114.2655,22.3364,14,17],[114.2645,22.3344,10,7]])
   useEffect(()=>{
     //websocketSetup();
     RNLocation.configure({
@@ -120,14 +120,45 @@ const App = () => {
     coordinate = [lan,lat]
     const redteam = addcor[counter][2]
     const blueteam = addcor[counter][3]
+
+    const colorStyles1 = {
+      borderRightColor:"white",
+      borderLeftColor:"red",
+      borderRightWidth: 20-redteam,
+      borderLeftWidth: redteam,
+
+  };
+  const colorStyles2 = {
+    borderRightColor:"white",
+    borderLeftColor:"blue",
+    borderRightWidth: 20-blueteam,
+    borderLeftWidth: blueteam,
+
+
+};
     return(
     
     <MapboxGL.PointAnnotation key={id} coordinate={coordinate}>
+        {/* <View style={{
+                  height: 30, 
+                  width: 30, 
+                  backgroundColor: '#00cccc', 
+                  borderRadius: 50, 
+                  borderColor: '#fff', 
+                  borderWidth: 3
+                }} /> */}
+        <View style={styles.container}>
+          <View style={[styles.rectangle,colorStyles1]} />
+          <View style={[styles.rectangle2,colorStyles2]} />
+        </View>
+       
     </MapboxGL.PointAnnotation>
     
     );
 
   }
+
+  
 
   const setpoints = () => {
     const item = [];
@@ -146,11 +177,12 @@ const App = () => {
     <View style={styles.page}>
       <View style={styles.container}>
         <MapboxGL.MapView style={styles.map}>
-          <MapboxGL.Camera zoomLevel={11} centerCoordinate={coordinates} />
+          <MapboxGL.Camera zoomLevel={13} centerCoordinate={coordinates} />
           <MapboxGL.PointAnnotation
            key="pointAnnotation"
            id="pointAnnotation"
-           coordinate={coordinates}>
+           coordinate={coordinates}>   
+           {/* currentLocation */}
            <View style={{
                   height: 30, 
                   width: 30, 
@@ -188,13 +220,42 @@ const App = () => {
 };
 
 const styles = StyleSheet.create({
+  rectangle: {
+    width: 20,
+    height:  5,
+    // borderTopWidth: 10,
+    // borderRightWidth: 5,
+    // // borderTopRightRadius: 2,
+    // borderRightColor:'transparent',
+    // borderTopLeftRadius: 2,
+    // borderBottomLeftRadius:2,
+    // borderBottomRightRadius:2,
+    
+    // borderRightWidth: 25,
+    
+  },
+  rectangle2: {
+    marginTop:0,
+    width: 20,
+    height:  5,
+    //borderTopWidth: 10,
+    //borderRightWidth: 5,
+    // borderTopRightRadius: 2,
+    //borderRightColor:'transparent',
+    // borderTopLeftRadius: 2,
+     //borderBottomWidth: 10,
+    // borderBottomLeftRadius:2,
+    // borderBottomRightRadius:2,
+    
+    // borderRightWidth: 25,
+  },
   page: {
     flex: 1,
   },
   container: {
     height: '100%',
     width: '100%',
-    backgroundColor: 'blue',
+    backgroundColor: 'blue'
   },
   map: {
     flex: 1,
