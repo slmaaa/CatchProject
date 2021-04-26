@@ -23,9 +23,9 @@ const App = () => {
       },
       // Android only
       androidProvider: "auto",
-      interval: 100, // Milliseconds
-      fastestInterval: 100, // Milliseconds
-      maxWaitTime: 1000, // Milliseconds
+      interval: 10, // Milliseconds
+      fastestInterval: 10, // Milliseconds
+      maxWaitTime: 10, // Milliseconds
       // iOS Only
       activityType: "other",
       allowsBackgroundLocationUpdates: false,
@@ -45,8 +45,9 @@ const App = () => {
             // console.log("locations", locations)
             if(locations !== undefined && locations.length > 0){
               let currentLocation = locations[0];
-              //console.log(currentLocation.longitude) ;
-              //console.log(currentLocation.latitude) ;
+              console.log(currentLocation.longitude) ;
+              console.log(currentLocation.latitude) ;
+              setcoordinates([JSON.stringify(currentLocation.longitude),JSON.stringify(currentLocation.latitude)])  
               // setBlueTeamScore(Math.floor(Math.random() * 100));
               // setRedTeamScore(Math.floor(Math.random() * 100));
             } 
@@ -54,55 +55,55 @@ const App = () => {
         }
       })  
   },[addcor])  
-  useEffect(() => {
-    const _watchId = Geolocation.watchPosition(
+  // useEffect(() => {
+  //   const _watchId = Geolocation.watchPosition(
     
-      (position) => {
-        console.log("hihi")
-        console.log(position)
-        setLocation(position.coords); 
-        //setcoordinates([parseFloat(JSON.stringify(position.coords.longitude)),parseFloat(JSON.stringify(position.coords.latitude))]);
-        time = position.timestamp;
-        if (location != null) {
-          locationText =
-            "Latitude: " +
-            JSON.stringify(location.latitude) +
-            "\n" +
-            "Longitude: " +
-            JSON.stringify(location.longitude);
-          console.log("here is the location ")
+  //     (position) => {
+  //       console.log("hihi")
+  //       console.log(position)
+  //       setLocation(position.coords); 
+  //       //setcoordinates([parseFloat(JSON.stringify(position.coords.longitude)),parseFloat(JSON.stringify(position.coords.latitude))]);
+  //       time = position.timestamp;
+  //       if (location != null) {
+  //         locationText =
+  //           "Latitude: " +
+  //           JSON.stringify(location.latitude) +
+  //           "\n" +
+  //           "Longitude: " +
+  //           JSON.stringify(location.longitude);
+  //         console.log("here is the location ")
           
-          setcoordinates([JSON.stringify(location.longitude),JSON.stringify(location.latitude)])  
-          //console.log(locationText)  
-        }
-      },
-      (error) => {
-        // See error code charts below.
-        console.log(error.code, error.message);
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 15000,
-        distanceFilter: 1,
-        interval: 100000,
-        fastestInterval: 100000,
-      }
-    );
-    return () => {
-      if (_watchId) {
-        Geolocation.clearWatch(_watchId);
-      }
-    };
-  }, [coordinates]); 
+  //         setcoordinates([parseFloar(JSON.stringify(location.longitude)),parseFloat(JSON.stringify(location.latitude))])  
+  //         //console.log(locationText)  
+  //       }
+  //     },
+  //     (error) => {
+  //       // See error code charts below.
+  //       console.log(error.code, error.message);
+  //     },
+  //     {
+  //       enableHighAccuracy: true,
+  //       timeout: 15000,
+  //       distanceFilter: 1,
+  //       interval: 100000,
+  //       fastestInterval: 100000,
+  //     }
+  //   );
+  //   return () => {
+  //     if (_watchId) {
+  //       Geolocation.clearWatch(_watchId);
+  //     }
+  //   };
+  // }, [coordinates]); 
 
-  useEffect(() => {
-    Geolocation.getCurrentPosition(info=>{
-      //console.log(info.coords.latitude)
-      //console.log(info.coords.longitude)
-      setcoordinates([info.coords.longitude,info.coords.altitude])
+  // useEffect(() => {
+  //   Geolocation.getCurrentPosition(info=>{
+  //     //console.log(info.coords.latitude)
+  //     //console.log(info.coords.longitude)
+  //     setcoordinates([info.coords.longitude,info.coords.altitude])
       
-    })
-  }, [location]);
+  //   })
+  // }, [location]);
 
   const addbutton = ()=>{
     Alert.alert("addbutton")
@@ -145,7 +146,7 @@ const App = () => {
     <View style={styles.page}>
       <View style={styles.container}>
         <MapboxGL.MapView style={styles.map}>
-          <MapboxGL.Camera zoomLevel={1} centerCoordinate={coordinates} />
+          <MapboxGL.Camera zoomLevel={11} centerCoordinate={coordinates} />
           <MapboxGL.PointAnnotation
            key="pointAnnotation"
            id="pointAnnotation"
