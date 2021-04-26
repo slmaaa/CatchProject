@@ -13,6 +13,7 @@ import CreateGame from "./components/CreateGame";
 import Waiting from "./components/Waiting";
 import LoadingHome from "./components/LoadingHome";
 import setmap from "./components/setmap";
+import rsetmap from "./components/rsetmap";
 import MMKVStorage from "react-native-mmkv-storage";
 import { color } from "./constants";
 
@@ -108,6 +109,17 @@ const App = () => {
               options={{
                 headerLeft: null,
                 title: "Set CheckPoints",
+                headerStyle: {
+                  backgroundColor: color.blueOnBlack,
+                },
+              }}
+            />
+            <Stack.Screen
+              name="rsetmap"
+              component={rsetmap}
+              options={{
+                headerLeft: null,
+                title: "Real Set CheckPoints",
                 headerStyle: {
                   backgroundColor: color.blueOnBlack,
                 },

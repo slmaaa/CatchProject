@@ -10,7 +10,8 @@ import RNLocation, { Location } from 'react-native-location';
 const App = () => {
   const [location, setLocation] = useState(null);
   const [coordinates,setcoordinates] = useState([114.2655,22.3364]);
-  const [addcor,setaddcor]=useState([[114.2635,22.3372,5,9],[114.2655,22.3364,14,17],[114.2645,22.3344,10,7]])
+//   const [clicor,setclicor] = useState([114.2655,22.3364]);
+  const [addcor,setaddcor]=useState([])
   useEffect(()=>{
     //websocketSetup();
     RNLocation.configure({
@@ -55,63 +56,13 @@ const App = () => {
         }
       })  
   },[addcor])  
-  // useEffect(() => {
-  //   const _watchId = Geolocation.watchPosition(
-    
-  //     (position) => {
-  //       console.log("hihi")
-  //       console.log(position)
-  //       setLocation(position.coords); 
-  //       //setcoordinates([parseFloat(JSON.stringify(position.coords.longitude)),parseFloat(JSON.stringify(position.coords.latitude))]);
-  //       time = position.timestamp;
-  //       if (location != null) {
-  //         locationText =
-  //           "Latitude: " +
-  //           JSON.stringify(location.latitude) +
-  //           "\n" +
-  //           "Longitude: " +
-  //           JSON.stringify(location.longitude);
-  //         console.log("here is the location ")
-          
-  //         setcoordinates([parseFloar(JSON.stringify(location.longitude)),parseFloat(JSON.stringify(location.latitude))])  
-  //         //console.log(locationText)  
-  //       }
-  //     },
-  //     (error) => {
-  //       // See error code charts below.
-  //       console.log(error.code, error.message);
-  //     },
-  //     {
-  //       enableHighAccuracy: true,
-  //       timeout: 15000,
-  //       distanceFilter: 1,
-  //       interval: 100000,
-  //       fastestInterval: 100000,
-  //     }
-  //   );
-  //   return () => {
-  //     if (_watchId) {
-  //       Geolocation.clearWatch(_watchId);
-  //     }
-  //   };
-  // }, [coordinates]); 
-
-  // useEffect(() => {
-  //   Geolocation.getCurrentPosition(info=>{
-  //     //console.log(info.coords.latitude)
-  //     //console.log(info.coords.longitude)
-  //     setcoordinates([info.coords.longitude,info.coords.altitude])
-      
-  //   })
-  // }, [location]);
-
-  // const addbutton = ()=>{
-  //   Alert.alert("addbutton")
-  //   console.log("hihi")
-  // }
-  // const startbutton = ()=>{
-  //   Alert.alert("startbutton")
-  // }
+//   const addbutton = ()=>{
+//     Alert.alert("addbutton")
+//     console.log("hihi")
+//   }
+  const startbutton = ()=>{
+    Alert.alert("startbutton")
+  }
 
   const setpoint = (counter) => {
     const id = counter;
@@ -127,31 +78,18 @@ const App = () => {
       borderRightWidth: 40-redteam,
       borderLeftWidth: redteam,
 
-  };
+    };
   const colorStyles2 = {
     borderRightColor:"white",
     borderLeftColor:"blue",
     borderRightWidth: 40-blueteam,
     borderLeftWidth: blueteam,
-
-
-};
+    };
     return(
     
     <MapboxGL.PointAnnotation key={id} coordinate={coordinate}>
-        {/* <View style={{
-                  height: 30, 
-                  width: 30, 
-                  backgroundColor: '#00cccc', 
-                  borderRadius: 50, 
-                  borderColor: '#fff', 
-                  borderWidth: 3
-                }} /> */}
         <View style={styles.container}>
           <View style={styles.circle} />
-          <View style={[styles.rectangle,colorStyles1]} />
-          <View style={[styles.rectangle2,colorStyles2]} />
-          
         </View>
        
     </MapboxGL.PointAnnotation>
@@ -178,8 +116,37 @@ const App = () => {
   return (
     <View style={styles.page}>
       <View style={styles.container}>
-        <MapboxGL.MapView style={styles.map}>
-          <MapboxGL.Camera zoomLevel={13} centerCoordinate={coordinates} />
+        <MapboxGL.MapView style={styles.map}
+        onPress={(event) => {
+            // const {geometry, properties} = event; 
+            Alert.alert(
+                "Add New point",
+                "Add latitude"+event.geometry.coordinates[0]+ " and longtitude " + event.geometry.coordinates[1]+" to the Map?",
+                [
+                  {
+                    text: "Cancel",
+                    onPress: () => console.log("Cancel Pressed"),
+                    style: "cancel"
+                  },
+                  { text: "OK", onPress: () => setaddcor([...addcor, [event.geometry.coordinates[0],event.geometry.coordinates[1]]]) }
+                ]
+              );
+            //Alert.alert("Add latitude"+event.geometry.coordinates[0]+" and longtitude " + event.geometry.coordinates[1]+" to the Map?")
+            //setaddcor([...addcor, [event.geometry.coordinates[0],event.geometry.coordinates[1]]]);
+
+  
+//    this.setState({ 
+//      latitude: geometry.coordinates[1], 
+//      longitude: geometry.coordinates[0], 
+//      screenPointX: properties.screenPointX, 
+//      screenPointY: properties.screenPointY, 
+//    }); 
+            
+            
+        }
+    }
+    >
+          <MapboxGL.Camera zoomLevel={14} centerCoordinate={coordinates} />
           <MapboxGL.PointAnnotation
            key="pointAnnotation"
            id="pointAnnotation"
@@ -195,10 +162,9 @@ const App = () => {
                 }} />
           </MapboxGL.PointAnnotation>
           {setpoints()}
+          
         </MapboxGL.MapView>
-        <Text style={[styles.button1,styles.buttonText]}>RED Team 35</Text>
-        <Text style={[styles.button2,styles.buttonText]}>BLUE Team 46</Text>
-        {/* <Pressable
+        <Pressable
         style={({pressed}) => [
           {
             backgroundColor: pressed ? 'lightblue' : 'green',
@@ -208,7 +174,7 @@ const App = () => {
         onPress={startbutton}>
         <Text style={styles.buttonText}>Start</Text>
        </Pressable>
-       <Pressable
+       {/* <Pressable
         style={({pressed}) => [
           {
             backgroundColor: pressed ? 'lightblue' : 'blue',
@@ -224,22 +190,12 @@ const App = () => {
 };
 
 const styles = StyleSheet.create({
-  rectangle: {
-    marginTop:0,
-    width: 40,
-    height:  5,
-  },
-  rectangle2: {
-    marginTop:0,
-    width: 40,
-    height:  5,
-  },
   circle: {
     marginTop:0,
     width: 40,
     height: 40,
     borderRadius: 40/2,
-    backgroundColor: 'rgba(52, 52, 52, 0.3)'
+    backgroundColor: 'rgba(52, 52, 52, 0.5)'
  },
   page: {
     flex: 1,
@@ -255,7 +211,6 @@ const styles = StyleSheet.create({
     position:'relative',
   },
   button1: {
-    backgroundColor:'red',
     borderRadius: 30,
     padding: 6,
     height: '10%',
@@ -265,7 +220,7 @@ const styles = StyleSheet.create({
     elevation: 10,
     position:'absolute',
     top: '90%',
-    right: '0%',
+    right: '25%',
   },
   button2: {
     borderRadius: 30,
@@ -277,12 +232,11 @@ const styles = StyleSheet.create({
     elevation: 10,
     position:'absolute',
     top: '90%',
-    left: '0%',
+    right: '50%',
   },
   buttonText: {
     fontSize: 20,
     color: 'white',
-    
   },
 });
 
