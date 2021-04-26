@@ -2,33 +2,141 @@ import React, {useState,useEffect} from 'react';
 import {StyleSheet, View, Pressable, Text, Alert} from 'react-native';
 import MapboxGL from '@react-native-mapbox-gl/maps';
 import mapboxgl from "mapbox-gl/dist/mapbox-gl-csp";
-const RID = "GG01-PP02";
-
 MapboxGL.setAccessToken(
   'pk.eyJ1IjoicmFzaGlkdGhlZGV2ZWxvcGVyIiwiYSI6ImNrYXBncGlwdjBjbG4yd3FqaXl2ams1NHQifQ.jvRoapH6Ae7QHb8Kx4z9FQ',
 );
 import Geolocation from "react-native-geolocation-service";
-const defaultPostData = {
-  rid: RID,
-  CID: -1,
-  time: 0,
-  is_in: null,
-};
+import RNLocation, { Location } from 'react-native-location';
 const App = () => {
   const [location, setLocation] = useState(null);
   const [coordinates,setcoordinates] = useState([114.2655,22.3364]);
-  // const [curlng,setcurlng] = useState(114.2655);
-  // const [curalt,setcuralt] = useState(22.3364);
+  const [addcor,setaddcor]=useState([[114.2355,22.3362,1,3],[114.2655,22.3364,2,4],[114.2855,22.3764,6,7]])
+  useEffect(()=>{
+    //websocketSetup();
+    RNLocation.configure({
+      distanceFilter: 0, //meters
+      desiredAccuracy: {
+        ios: "best",
+        // highAccuracy
+        // balancedPowerAccuracy
+        android: "highAccuracy"
+      },
+      // Android only
+      androidProvider: "auto",
+      interval: 100, // Milliseconds
+      fastestInterval: 100, // Milliseconds
+      maxWaitTime: 1000, // Milliseconds
+      // iOS Only
+      activityType: "other",
+      allowsBackgroundLocationUpdates: false,
+      headingFilter: 1, // Degrees
+      headingOrientation: "portrait",
+      pausesLocationUpdatesAutomatically: false,
+      showsBackgroundLocationIndicator: false,
+    }) 
+    RNLocation.requestPermission({
+      ios: "whenInUse",
+      android: {
+        detail: "fine"
+      }
+    }).then(granted => {
+        if (granted) {
+          let locationSubscription = RNLocation.subscribeToLocationUpdates(locations => {
+            // console.log("locations", locations)
+            if(locations !== undefined && locations.length > 0){
+              let currentLocation = locations[0];
+              //console.log(currentLocation.longitude) ;
+              //console.log(currentLocation.latitude) ;
+              // setBlueTeamScore(Math.floor(Math.random() * 100));
+              // setRedTeamScore(Math.floor(Math.random() * 100));
+            } 
+          })
+        }
+      })  
+  },[addcor])  
+  useEffect(() => {
+    const _watchId = Geolocation.watchPosition(
+    
+      (position) => {
+        console.log("hihi")
+        console.log(position)
+        setLocation(position.coords); 
+        //setcoordinates([parseFloat(JSON.stringify(position.coords.longitude)),parseFloat(JSON.stringify(position.coords.latitude))]);
+        time = position.timestamp;
+        if (location != null) {
+          locationText =
+            "Latitude: " +
+            JSON.stringify(location.latitude) +
+            "\n" +
+            "Longitude: " +
+            JSON.stringify(location.longitude);
+          console.log("here is the location ")
+          
+          setcoordinates([JSON.stringify(location.longitude),JSON.stringify(location.latitude)])  
+          //console.log(locationText)  
+        }
+      },
+      (error) => {
+        // See error code charts below.
+        console.log(error.code, error.message);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        distanceFilter: 1,
+        interval: 100000,
+        fastestInterval: 100000,
+      }
+    );
+    return () => {
+      if (_watchId) {
+        Geolocation.clearWatch(_watchId);
+      }
+    };
+  }, [coordinates]); 
+
   useEffect(() => {
     Geolocation.getCurrentPosition(info=>{
-      // setcurlng(info.coords.longitude)
-      // setcuralt(info.coords.altitud)
-      console.log(info.coords.altitude)
-      console.log(info.coords.longitude)
+      //console.log(info.coords.latitude)
+      //console.log(info.coords.longitude)
       setcoordinates([info.coords.longitude,info.coords.altitude])
       
     })
   }, [location]);
+
+  const addbutton = ()=>{
+    Alert.alert("addbutton")
+    console.log("hihi")
+  }
+  const startbutton = ()=>{
+    Alert.alert("startbutton")
+  }
+
+  const setpoint = (counter) => {
+    const id = counter;
+    const lan = addcor[counter][0];
+    const lat = addcor[counter][1];
+    coordinate = [lan,lat]
+    const redteam = addcor[counter][2]
+    const blueteam = addcor[counter][3]
+    return(
+    
+    <MapboxGL.PointAnnotation key={id} coordinate={coordinate}>
+    </MapboxGL.PointAnnotation>
+    
+    );
+
+  }
+
+  const setpoints = () => {
+    const item = [];
+    for(let i = 0; i<addcor.length; i++){
+      item.push(setpoint(i));
+    }
+    return item;
+
+  }
+
 
   
   
@@ -39,10 +147,10 @@ const App = () => {
         <MapboxGL.MapView style={styles.map}>
           <MapboxGL.Camera zoomLevel={1} centerCoordinate={coordinates} />
           <MapboxGL.PointAnnotation
-        key="pointAnnotation"
-        id="pointAnnotation"
-        coordinate={coordinates}>
-        <View style={{
+           key="pointAnnotation"
+           id="pointAnnotation"
+           coordinate={coordinates}>
+           <View style={{
                   height: 30, 
                   width: 30, 
                   backgroundColor: '#00cccc', 
@@ -50,17 +158,28 @@ const App = () => {
                   borderColor: '#fff', 
                   borderWidth: 3
                 }} />
-      </MapboxGL.PointAnnotation>
+          </MapboxGL.PointAnnotation>
+          {setpoints()}
         </MapboxGL.MapView>
         <Pressable
         style={({pressed}) => [
           {
-            backgroundColor: pressed ? 'lightgreen' : 'green',
+            backgroundColor: pressed ? 'lightblue' : 'green',
           },
-          styles.button,
+          styles.button1,
         ]}
-        onPress={() => Alert.alert('sent things to serve')}>
+        onPress={startbutton}>
         <Text style={styles.buttonText}>Start</Text>
+       </Pressable>
+       <Pressable
+        style={({pressed}) => [
+          {
+            backgroundColor: pressed ? 'lightblue' : 'blue',
+          },
+          styles.button2,
+        ]}
+        onPress={addbutton}>
+        <Text style={styles.buttonText}>Add</Text>
        </Pressable>
       </View>
     </View>
@@ -80,7 +199,7 @@ const styles = StyleSheet.create({
     flex: 1,
     position:'relative',
   },
-  button: {
+  button1: {
     borderRadius: 30,
     padding: 6,
     height: '10%',
@@ -90,7 +209,19 @@ const styles = StyleSheet.create({
     elevation: 10,
     position:'absolute',
     top: '90%',
-    right: '25%',
+    right: '0%',
+  },
+  button2: {
+    borderRadius: 30,
+    padding: 6,
+    height: '10%',
+    width: '50%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 10,
+    position:'absolute',
+    top: '90%',
+    right: '50%',
   },
   buttonText: {
     fontSize: 20,
