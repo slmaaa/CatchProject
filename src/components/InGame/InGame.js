@@ -18,7 +18,6 @@ import {
 import { Overlay } from "react-native-elements";
 import MMKVStorage from "react-native-mmkv-storage";
 
-import * as defaultGetData from "../../data_from_server.json";
 import fetchData from "../DataExchange/fetchData";
 import React from "react";
 import Geolocation from "react-native-geolocation-service";
@@ -27,7 +26,7 @@ import useInterval from "../Helper/useInterval";
 import setEventText from "./setEventText";
 import updateCPFlag from "./updateCPFlag";
 import ActionButtons from "./ActionButtons";
-import { wsSend } from "../App";
+import { wsSend } from "../../App";
 import { color } from "../../constants.json";
 
 const CP_RANGE = 5;
@@ -45,7 +44,6 @@ const InGame = ({ navigation, route }) => {
   const [currentCID, setCurrentCID] = useState(-1); //Current checkpoint id. -1 if not in any checkpoints
   let time = 0, //Time in Unix timestamp
     locationText = "", //Turn location data in text. For testing only
-    postData = defaultPostData, //Data that needed to POST to server
     modalVisible = false,
     notificationText = "",
     getData = defaultGetData; //Data GET from server
@@ -100,7 +98,7 @@ const InGame = ({ navigation, route }) => {
   }, [location]);
 
   useInterval(() => {
-    MMKV.getMap("gameInfo");
+    gameInfo = MMKV.getMap("gameInfo");
   }, 100);
 
   useEffect(() => {
@@ -120,33 +118,39 @@ const InGame = ({ navigation, route }) => {
     for (let i = 0; i < game.checkpoints, length; i++) {
       game.checkpoints[i].level = gameInfo.cpsLevel;
     }
+    console.log(gameInfo);
   }, [gameInfo]);
 
   useEffect(() => {
     if (game.status == "END") {
-      //end game
+      console.log(game.status);
     }
   }, [game.status]);
 
   useEffect(() => {
-    actionButton = ActionButtons(
-      currentCID == -1 ? 0 : "MATH",
-      currentCID == -1 ? 0 : game.checkponts[currentCID].level[team],
-      () => {
-        navigation.navigate("Riddle");
-      },
-      coolDown[currentCID],
-      actionButtonDisable,
-      currentCID
+    setActionButton(
+      ActionButtons(
+        currentCID == -1 ? "NOT_IN_CP" : "MATH",
+        currentCID == -1 ? 0 : game.checkponts[currentCID].level[team],
+        () => {
+          navigation.navigate("Riddle");
+        },
+        coolDown[currentCID],
+        actionButtonDisable,
+        currentCID
+      )
     );
   }, [currentCID, game, actionButtonDisable]);
 
   useEffect(() => {
     if (route.params?.cd) {
       if (route.params?.cd == -1) {
-        let newState = cpCompletetionLevel;
-        newState[currentCID] += 1;
-        setCPCompletionLevel(newState);
+        wsSend(
+          JSON.stringify({
+            header: "ADD",
+            content: { gid: game[gid], team: team, cid: currentCID },
+          })
+        );
       } else {
         let newState = coolDown;
         newState[currentCID] = route.params?.cd;
@@ -155,6 +159,7 @@ const InGame = ({ navigation, route }) => {
       }
     }
   }, [route.params?.cd]);
+
   useInterval(
     () => {
       let newState = coolDown;
