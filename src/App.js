@@ -27,13 +27,16 @@ export const wsSend = async (data) => {
 const App = () => {
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState();
-
+  MMKV.clearStore();
   ws.onopen = () => {
     // connection opened
     console.log("WebSocket Client Connected");
   };
   ws.onmessage = (e) => {
     // a message was received
+    console.log("====================================");
+    console.log(e.data);
+    console.log("====================================");
     const data = JSON.parse(e.data);
     switch (data.header) {
       case "ERROR":
@@ -41,7 +44,7 @@ const App = () => {
         break;
       case "CREATED":
         console.log("Game created");
-        MMKV.setInt("createdGameID", data.content);
+        MMKV.setString("createdGameID", data.content + "");
         break;
       case "JOINED":
         console.log("Game joined");
@@ -50,6 +53,10 @@ const App = () => {
       case "ROOM_INFO":
         console.log("Recieved room info");
         MMKV.setMap("roomInfo", data.content);
+        break;
+      case "GAME_INFO":
+        console.log("Recieved game info");
+        MMKV.setMap("gameInfo", data.content);
         break;
       default:
         console.error("Unidentified data");
@@ -146,10 +153,7 @@ const App = () => {
               name="Waiting"
               component={Waiting}
               options={({ route }) => ({
-                title: route.params.gameName,
-                headerStyle: {
-                  backgroundColor: color.blueOnBlack,
-                },
+                headerShown: false,
               })}
             />
             <Stack.Screen
