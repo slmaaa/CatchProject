@@ -1,6 +1,8 @@
+/* eslint-disable quotes */
 import { useEffect, useRef, useState } from "react";
 import * as Progress from "react-native-progress";
 import MapboxGL from "@react-native-mapbox-gl/maps";
+import GeoJSON from "geojson";
 MapboxGL.setAccessToken(
   "pk.eyJ1IjoiaGVjdG9yY2hjaCIsImEiOiJja205YmhldXUwdHQ1Mm9xbGw4N2RodndhIn0.yX90QKE2jcgG-7V5wOGXeQ"
 );
@@ -10,27 +12,23 @@ import {
   Dimensions,
   Modal,
   Vibration,
+  Image,
   SafeAreaView,
   StatusBar,
   StyleSheet,
   TouchableHighlight,
 } from "react-native";
-import { Overlay } from "react-native-elements";
 import MMKVStorage from "react-native-mmkv-storage";
-
-import fetchData from "../DataExchange/fetchData";
 import React from "react";
 import Geolocation from "react-native-geolocation-service";
-import timestampToDate from "../Helper/timestampToDate";
 import useInterval from "../Helper/useInterval";
 import setEventText from "./setEventText";
 import updateCPFlag from "./updateCPFlag";
 import ActionButtons from "./ActionButtons";
 import { wsSend } from "../../App";
 import { color } from "../../constants.json";
-
 const CP_RANGE = 5;
-const SCORE_TARGET = 1000;
+
 const InGame = ({ navigation, route }) => {
   const MMKV = new MMKVStorage.Loader().initialize();
 
@@ -42,17 +40,39 @@ const InGame = ({ navigation, route }) => {
   const [actionButtonDisable, setActionButtonDisable] = useState(false);
   const [cpCompletetionLevel, setCPCompletionLevel] = useState([3]);
   const [currentCID, setCurrentCID] = useState(-1); //Current checkpoint id. -1 if not in any checkpoints
+  const [zoomLevel, setZoomLevel] = useState(19);
+  const mapRef = useRef();
   let time = 0, //Time in Unix timestamp
     locationText = "", //Turn location data in text. For testing only
     modalVisible = false,
-    notificationText = "",
-    getData = defaultGetData; //Data GET from server
+    notificationText = "";
   let game,
     team,
     checkpointsLocation = [],
     checkpointsLevel = [],
+    checkpoinsMaxLevel = [],
     numberOfCheckpoints = 0,
-    gameInfo;
+    gameInfo,
+    data = [];
+
+  game = MMKV.getMap("joinedGame");
+  team = MMKV.getString("team");
+  game.checkpoints.map((val) => {
+    checkpointsLocation.push({
+      latitude: val.area.center.lat,
+      longitude: val.area.center.lng,
+    });
+    checkpointsLevel.push(val.levl);
+    checkpoinsMaxLevel.push(val.maxLevel);
+    data.push({
+      name: val.name,
+      lat: val.area.center.lat,
+      lng: val.area.center.lng,
+    });
+  });
+  numberOfCheckpoints = game.checkpoints.length;
+
+  const featureCollection = GeoJSON.parse(data, { Point: ["lat", "lng"] });
   // Location wathcher, update location and post when CPFlag changes
   useEffect(() => {
     const _watchId = Geolocation.watchPosition(
@@ -97,25 +117,24 @@ const InGame = ({ navigation, route }) => {
     };
   }, [location]);
 
+  useEffect(() => {
+    if (currentCID !== -1) {
+    }
+  }, [currentCID]);
+  useEffect(() => {
+    mapRef.current.getZoom().then((val) => setZoomLevel(val));
+  });
+
   useInterval(() => {
     gameInfo = MMKV.getMap("gameInfo");
   }, 100);
 
   useEffect(() => {
-    game = MMKV.getMap("joinedGame");
-    team = MMKV.getString("team");
-    game.checkpoints.map((val) => {
-      checkpointsLocation.push({
-        latitude: val.area.center.lat,
-        longitude: val.area.center.lng,
-      });
-    });
-    numberOfCheckpoints = game.checkpoints.length;
-  }, []);
-
-  useEffect(() => {
+    if (gameInfo == null) {
+      return;
+    }
     game.status = gameInfo.status;
-    for (let i = 0; i < game.checkpoints, length; i++) {
+    for (let i = 0; i < game.checkpoints.length; i++) {
       game.checkpoints[i].level = gameInfo.cpsLevel;
     }
     console.log(gameInfo);
@@ -128,27 +147,12 @@ const InGame = ({ navigation, route }) => {
   }, [game.status]);
 
   useEffect(() => {
-    setActionButton(
-      ActionButtons(
-        currentCID == -1 ? "NOT_IN_CP" : "MATH",
-        currentCID == -1 ? 0 : game.checkponts[currentCID].level[team],
-        () => {
-          navigation.navigate("Riddle");
-        },
-        coolDown[currentCID],
-        actionButtonDisable,
-        currentCID
-      )
-    );
-  }, [currentCID, game, actionButtonDisable]);
-
-  useEffect(() => {
     if (route.params?.cd) {
-      if (route.params?.cd == -1) {
+      if (route.params?.cd === -1) {
         wsSend(
           JSON.stringify({
             header: "ADD",
-            content: { gid: game[gid], team: team, cid: currentCID },
+            content: { gid: game.gid, team: team, cid: currentCID },
           })
         );
       } else {
@@ -165,14 +169,14 @@ const InGame = ({ navigation, route }) => {
       let newState = coolDown;
       newState[currentCoolDown]--;
       setCoolDown([...newState]);
-      if (coolDown[currentCoolDown] == 0) setCurrentCoolDown(-1);
+      if (coolDown[currentCoolDown] === 0) setCurrentCoolDown(-1);
     },
-    currentCoolDown == -1 ? null : 1000
+    currentCoolDown === -1 ? null : 1000
   );
   useEffect(() => {
-    if (currentCoolDown != currentCID) {
+    if (currentCoolDown !== currentCID) {
       setActionButtonDisable(false);
-    } else if (coolDown[currentCID] != 0) {
+    } else if (coolDown[currentCID] !== 0) {
       setActionButtonDisable(true);
     }
   }, [coolDown, currentCID, currentCoolDown]);
@@ -180,44 +184,41 @@ const InGame = ({ navigation, route }) => {
     <>
       <StatusBar barStyle="dark-content" />
       <SafeAreaView style={styles.container}>
-        <Modal
-          animationType={"fade"}
-          transparent
-          visible={modalVisible}
-          onShow={() => {
-            setTimeout(() => {
-              modalVisible = false;
-            }, 3000);
-          }}
-          onDismiss={() => {
-            eventLogPtr++;
-            setEventLogText(setEventText(getData.eventLog));
-          }}
-        >
-          <View style={styles.notificationContainer}>
-            <Text style={styles.notificationText}>{notificationText}</Text>
-          </View>
-        </Modal>
         <View style={styles.mapContainer}>
           <MapboxGL.MapView
+            ref={mapRef}
             style={styles.map}
-            styleURL={"mapbox://styles/mapbox/dark-v10"}
-            logoEnabled={false}
+            pitchEnabled={false}
+            rotateEnabled={false}
+            compassEnabled={false}
           >
             <MapboxGL.Camera
               defaultSettings={{
-                zoomLevel: 18,
-                centerCoordinate: [
-                  CP_LOCATION[0].longitude,
-                  CP_LOCATION[0].latitude,
-                ],
+                zoomLevel: zoomLevel,
+                centerCoordinate: [114.263981, 22.339158],
                 pitch: 45,
               }}
             />
             <MapboxGL.UserLocation />
+            <MapboxGL.MarkerView coordinate={[114.263981, 22.339158]}>
+              <Image
+                source={require("../../../assets/img/marker.png")}
+                style={styles.marker}
+              />
+            </MapboxGL.MarkerView>
+            <MapboxGL.ShapeSource id={"cpSource"} shape={featureCollection}>
+              <MapboxGL.CircleLayer
+                id={"test"}
+                minZoomLevel={5}
+                style={{
+                  circleOpacity: 0,
+                  circleStrokeWidth: 2,
+                  circleRadius: 50,
+                }}
+              />
+            </MapboxGL.ShapeSource>
           </MapboxGL.MapView>
         </View>
-        <View style={styles.actionButtonView}>{actionButton}</View>
       </SafeAreaView>
     </>
   );
@@ -259,5 +260,9 @@ const styles = StyleSheet.create({
     left: "25%",
     height: 60,
     width: "50%",
+  },
+  marker: {
+    height: 50,
+    resizeMode: "contain",
   },
 });
