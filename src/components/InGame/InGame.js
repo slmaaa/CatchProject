@@ -1,7 +1,9 @@
 /* eslint-disable quotes */
 import { useEffect, useRef, useState } from "react";
+import { getDistance } from "geolib";
 import * as Progress from "react-native-progress";
 import MapboxGL from "@react-native-mapbox-gl/maps";
+import RNLocation, { Location } from "react-native-location";
 import GeoJSON from "geojson";
 MapboxGL.setAccessToken(
   "pk.eyJ1IjoiaGVjdG9yY2hjaCIsImEiOiJja205YmhldXUwdHQ1Mm9xbGw4N2RodndhIn0.yX90QKE2jcgG-7V5wOGXeQ"
@@ -23,21 +25,18 @@ import React from "react";
 import Geolocation from "react-native-geolocation-service";
 import useInterval from "../Helper/useInterval";
 import setEventText from "./setEventText";
-import updateCPFlag from "./updateCPFlag";
 import ActionButtons from "./ActionButtons";
 import { wsSend } from "../../App";
 import { color } from "../../constants.json";
+import { Button } from "react-native";
 const CP_RANGE = 5;
 
 const InGame = ({ navigation, route }) => {
   const MMKV = new MMKVStorage.Loader().initialize();
 
   const [location, setLocation] = useState(null);
-  const [actionButton, setActionButton] = useState(null);
-  const [actionButtonOption, setActionButtonOption] = useState(0);
   const [coolDown, setCoolDown] = useState([0, 0, 0, 0]);
   const [currentCoolDown, setCurrentCoolDown] = useState(-1);
-  const [actionButtonDisable, setActionButtonDisable] = useState(false);
   const [cpCompletetionLevel, setCPCompletionLevel] = useState([3]);
   const [currentCID, setCurrentCID] = useState(-1); //Current checkpoint id. -1 if not in any checkpoints
   const [zoomLevel, setZoomLevel] = useState(19);
@@ -74,56 +73,96 @@ const InGame = ({ navigation, route }) => {
 
   const featureCollection = GeoJSON.parse(data, { Point: ["lat", "lng"] });
   // Location wathcher, update location and post when CPFlag changes
+
   useEffect(() => {
-    const _watchId = Geolocation.watchPosition(
-      (position) => {
-        setLocation(position.coords);
-        time = position.timestamp;
-        if (location != null) {
-          locationText =
-            "Latitude: " +
-            JSON.stringify(location.latitude) +
-            "\n" +
-            "Longitude: " +
-            JSON.stringify(location.longitude);
-        }
+    let locationSubscription;
+    RNLocation.configure({
+      distanceFilter: 0, //meters
+      desiredAccuracy: {
+        ios: "best",
+        // highAccuracy
+        // balancedPowerAccuracy
+        android: "highAccuracy",
       },
-      (error) => {
-        // See error code charts below.
-        console.log(error.code, error.message);
+      // Android only
+      androidProvider: "auto",
+      interval: 10, // Milliseconds
+      fastestInterval: 10, // Milliseconds
+      maxWaitTime: 10, // Milliseconds
+      // iOS Only
+      activityType: "other",
+      allowsBackgroundLocationUpdates: false,
+      headingFilter: 1, // Degrees
+      headingOrientation: "portrait",
+      pausesLocationUpdatesAutomatically: false,
+      showsBackgroundLocationIndicator: false,
+    });
+    RNLocation.requestPermission({
+      ios: "whenInUse",
+      android: {
+        detail: "fine",
       },
-      {
-        enableHighAccuracy: true,
-        timeout: 15000,
-        distanceFilter: 1,
-        interval: 100000,
-        fastestInterval: 100000,
+    }).then((granted) => {
+      if (granted) {
+        locationSubscription = RNLocation.subscribeToLocationUpdates(
+          (locations) => {
+            // console.log("locations", locations)
+            if (locations !== undefined && locations.length > 0) {
+              setLocation(locations[0]);
+
+              // setBlueTeamScore(Math.floor(Math.random() * 100));
+              // setRedTeamScore(Math.floor(Math.random() * 100));
+            }
+          }
+        );
       }
-    );
-    if (location != null) {
-      setCurrentCID(
-        updateCPFlag(
-          location,
-          checkpointsLocation,
-          CP_RANGE,
-          numberOfCheckpoints
-        )
-      );
-    }
+    });
     return () => {
-      if (_watchId) {
-        Geolocation.clearWatch(_watchId);
-      }
+      locationSubscription();
     };
+  }, []);
+
+  useEffect(() => {
+    if (location !== null) {
+      let flag, newCID;
+      for (let i = 0; i < numberOfCheckpoints; i++) {
+        console.log(
+          getDistance(
+            {
+              latitude: location.latitude,
+              longitude: location.longitude,
+            },
+            checkpointsLocation[i]
+          )
+        );
+        if (
+          getDistance(
+            {
+              latitude: location.latitude,
+              longitude: location.longitude,
+            },
+            checkpointsLocation[i]
+          ) <= CP_RANGE
+        ) {
+          newCID = i;
+          flag = true;
+          break;
+        }
+      }
+      if (!flag) {
+        newCID = -1;
+      }
+      setCurrentCID(newCID);
+    }
   }, [location]);
 
   useEffect(() => {
-    if (currentCID !== -1) {
+    if (currentCID !== -1 && currentCoolDown !== currentCID) {
+      //navigation.navigate("Maths");
+    } else {
+      //navigation.navigate("InGame");
     }
-  }, [currentCID]);
-  useEffect(() => {
-    mapRef.current.getZoom().then((val) => setZoomLevel(val));
-  });
+  }, [currentCID, currentCoolDown]);
 
   useInterval(() => {
     gameInfo = MMKV.getMap("gameInfo");
@@ -173,13 +212,6 @@ const InGame = ({ navigation, route }) => {
     },
     currentCoolDown === -1 ? null : 1000
   );
-  useEffect(() => {
-    if (currentCoolDown !== currentCID) {
-      setActionButtonDisable(false);
-    } else if (coolDown[currentCID] !== 0) {
-      setActionButtonDisable(true);
-    }
-  }, [coolDown, currentCID, currentCoolDown]);
   return (
     <>
       <StatusBar barStyle="dark-content" />

@@ -1,3 +1,4 @@
+/* eslint-disable quotes */
 import React, { useState, useEffect } from "react";
 import {
   SafeAreaView,
@@ -11,26 +12,20 @@ import { color } from "../../constants.json";
 
 const operators = ["*", "+", "-"];
 
-const math_it_up = [
-  {
-    "+": function (x, y) {
-      return x + y;
-    },
+const math_it_up = {
+  "+": function (x, y) {
+    return x + y;
   },
-  {
-    "-": function (x, y) {
-      return x - y;
-    },
-  },
-  {
-    "*": function (x, y) {
-      return x * y;
-    },
-  },
-];
 
-export default Math = ({ navigation, route }) => {
-  const [checked, setChecked] = useState([false, false, false, false]);
+  "-": function (x, y) {
+    return x - y;
+  },
+  "*": function (x, y) {
+    return x * y;
+  },
+};
+
+export default Maths = ({ navigation, route }) => {
   const [disabled, setDisabled] = useState(false);
   const [question, setQuestion] = useState("");
   const [answerInput, setAnswerInput] = useState("");
@@ -40,7 +35,7 @@ export default Math = ({ navigation, route }) => {
 
   const handleOnPressSummit = () => {
     setDisabled(true);
-    let correct = setAnswerInput == answer;
+    let correct = answerInput === answer;
     setSummitButtonColor(correct ? color.lightGreen : color.wrongRed);
     setTimeout(
       () => navigation.navigate("InGame", { cd: correct ? -1 : 7 }),
@@ -55,15 +50,19 @@ export default Math = ({ navigation, route }) => {
     const o1 = operators[Math.floor(Math.random() * 3)];
     const o2 = operators[Math.floor(Math.random() * 3)];
     answer = toString(math_it_up[o2](math_it_up[o1](a, b), c));
-    let first_half = `(${a} ${o1} ${b})`;
+    let first_half = `${a} ${o1} ${b}`;
     if (o2 == "*" && o1 != "*") first_half = "(" + first_half + ")";
-    setQuestion(first_half + ` ${o1} ${b})`);
+    setQuestion(first_half + ` ${o1} ${b}`);
   }, []);
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.questionText}>{riddle.Question}</Text>
-      <Input placeholder="Your answer" onChangeText={setAnswerInput}></Input>
+      <Text style={styles.questionText}>{question}</Text>
+      <Input
+        placeholder="Your answer"
+        onChangeText={setAnswerInput}
+        keyboardType={"number-pad"}
+      />
       <TouchableHighlight
         disabled={disabled}
         style={[styles.summitButton, { backgroundColor: summitButtonColor }]}
