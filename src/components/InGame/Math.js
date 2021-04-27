@@ -52,7 +52,7 @@ export default Maths = ({ navigation, route }) => {
     answer = toString(math_it_up[o2](math_it_up[o1](a, b), c));
     let first_half = `${a} ${o1} ${b}`;
     if (o2 == "*" && o1 != "*") first_half = "(" + first_half + ")";
-    setQuestion(first_half + ` ${o1} ${b}`);
+    setQuestion(first_half + ` ${o1} ${c}`);
   }, []);
 
   return (

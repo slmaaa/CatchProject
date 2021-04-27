@@ -20,36 +20,31 @@ import {
   StyleSheet,
   TouchableHighlight,
 } from "react-native";
+
 import MMKVStorage from "react-native-mmkv-storage";
 import React from "react";
-import Geolocation from "react-native-geolocation-service";
 import useInterval from "../Helper/useInterval";
-import setEventText from "./setEventText";
-import ActionButtons from "./ActionButtons";
 import { wsSend } from "../../App";
 import { color } from "../../constants.json";
-import { Button } from "react-native";
+import { Button } from "react-native-elements";
 const CP_RANGE = 5;
 
 const InGame = ({ navigation, route }) => {
   const MMKV = new MMKVStorage.Loader().initialize();
 
+  const [testLevel, setTestLevel] = useState(0.3);
+  const [testList, setTestList] = useState([]);
   const [location, setLocation] = useState(null);
   const [coolDown, setCoolDown] = useState([0, 0, 0, 0]);
   const [currentCoolDown, setCurrentCoolDown] = useState(-1);
-  const [cpCompletetionLevel, setCPCompletionLevel] = useState([3]);
   const [currentCID, setCurrentCID] = useState(-1); //Current checkpoint id. -1 if not in any checkpoints
   const [zoomLevel, setZoomLevel] = useState(19);
   const mapRef = useRef();
-  let time = 0, //Time in Unix timestamp
-    locationText = "", //Turn location data in text. For testing only
-    modalVisible = false,
-    notificationText = "";
   let game,
     team,
     checkpointsLocation = [],
-    checkpointsLevel = [],
     checkpoinsMaxLevel = [],
+    checkpointsLevel = [],
     numberOfCheckpoints = 0,
     gameInfo,
     data = [];
@@ -61,7 +56,7 @@ const InGame = ({ navigation, route }) => {
       latitude: val.area.center.lat,
       longitude: val.area.center.lng,
     });
-    checkpointsLevel.push(val.levl);
+    checkpointsLevel.push(val.level);
     checkpoinsMaxLevel.push(val.maxLevel);
     data.push({
       name: val.name,
@@ -70,12 +65,27 @@ const InGame = ({ navigation, route }) => {
     });
   });
   numberOfCheckpoints = game.checkpoints.length;
-
-  const featureCollection = GeoJSON.parse(data, { Point: ["lat", "lng"] });
-  // Location wathcher, update location and post when CPFlag changes
-
+  const renderCheckpointsOnMap = () => {
+    let cpRenderList = [];
+    for (let i = 0; i < numberOfCheckpoints; i++) {
+      cpRenderList.push(
+        <MapboxGL.PointAnnotation
+          id={"CP" + i}
+          key={i}
+          coordinate={[
+            checkpointsLocation[i].longitude,
+            checkpointsLocation[i].latitude,
+          ]}
+        >
+          <Progress.Bar progress={testLevel} width={50} />
+        </MapboxGL.PointAnnotation>
+      );
+    }
+    return cpRenderList;
+  };
+  setTestList(renderCheckpointsOnMap());
+  var unsub;
   useEffect(() => {
-    let locationSubscription;
     RNLocation.configure({
       distanceFilter: 0, //meters
       desiredAccuracy: {
@@ -104,37 +114,17 @@ const InGame = ({ navigation, route }) => {
       },
     }).then((granted) => {
       if (granted) {
-        locationSubscription = RNLocation.subscribeToLocationUpdates(
-          (locations) => {
-            // console.log("locations", locations)
-            if (locations !== undefined && locations.length > 0) {
-              setLocation(locations[0]);
-
-              // setBlueTeamScore(Math.floor(Math.random() * 100));
-              // setRedTeamScore(Math.floor(Math.random() * 100));
-            }
+        unsub = RNLocation.subscribeToLocationUpdates((locations) => {
+          // console.log("locations", locations)
+          if (locations !== undefined && locations.length > 0) {
+            setLocation(locations[0]);
           }
-        );
+        });
       }
     });
-    return () => {
-      locationSubscription();
-    };
-  }, []);
-
-  useEffect(() => {
     if (location !== null) {
       let flag, newCID;
       for (let i = 0; i < numberOfCheckpoints; i++) {
-        console.log(
-          getDistance(
-            {
-              latitude: location.latitude,
-              longitude: location.longitude,
-            },
-            checkpointsLocation[i]
-          )
-        );
         if (
           getDistance(
             {
@@ -154,13 +144,16 @@ const InGame = ({ navigation, route }) => {
       }
       setCurrentCID(newCID);
     }
-  }, [location]);
+    return function cleanup() {
+      unsub();
+    };
+  }, []);
 
   useEffect(() => {
     if (currentCID !== -1 && currentCoolDown !== currentCID) {
-      //navigation.navigate("Maths");
+      navigation.navigate("Maths");
     } else {
-      //navigation.navigate("InGame");
+      navigation.navigate("InGame");
     }
   }, [currentCID, currentCoolDown]);
 
@@ -172,18 +165,14 @@ const InGame = ({ navigation, route }) => {
     if (gameInfo == null) {
       return;
     }
+    let cpsLevel = [];
     game.status = gameInfo.status;
     for (let i = 0; i < game.checkpoints.length; i++) {
-      game.checkpoints[i].level = gameInfo.cpsLevel;
+      game.checkpoints[i].level = gameInfo.cpsLevel[i];
+      cpsLevel.push(gameInfo.cpsLevel[i]);
     }
     console.log(gameInfo);
   }, [gameInfo]);
-
-  useEffect(() => {
-    if (game.status == "END") {
-      console.log(game.status);
-    }
-  }, [game.status]);
 
   useEffect(() => {
     if (route.params?.cd) {
@@ -202,7 +191,9 @@ const InGame = ({ navigation, route }) => {
       }
     }
   }, [route.params?.cd]);
-
+  useEffect(() => {
+    setTestList(renderCheckpointsOnMap());
+  }, [testLevel]);
   useInterval(
     () => {
       let newState = coolDown;
@@ -212,6 +203,7 @@ const InGame = ({ navigation, route }) => {
     },
     currentCoolDown === -1 ? null : 1000
   );
+
   return (
     <>
       <StatusBar barStyle="dark-content" />
@@ -228,29 +220,19 @@ const InGame = ({ navigation, route }) => {
               defaultSettings={{
                 zoomLevel: zoomLevel,
                 centerCoordinate: [114.263981, 22.339158],
-                pitch: 45,
               }}
             />
-            <MapboxGL.UserLocation />
-            <MapboxGL.MarkerView coordinate={[114.263981, 22.339158]}>
-              <Image
-                source={require("../../../assets/img/marker.png")}
-                style={styles.marker}
-              />
-            </MapboxGL.MarkerView>
-            <MapboxGL.ShapeSource id={"cpSource"} shape={featureCollection}>
-              <MapboxGL.CircleLayer
-                id={"test"}
-                minZoomLevel={5}
-                style={{
-                  circleOpacity: 0,
-                  circleStrokeWidth: 2,
-                  circleRadius: 50,
-                }}
-              />
-            </MapboxGL.ShapeSource>
+            {renderCheckpointsOnMap()}
           </MapboxGL.MapView>
         </View>
+        <Button
+          title={"test"}
+          onPress={() => {
+            setTestLevel(testLevel + 0.1);
+            console.log(testLevel);
+          }}
+        />
+        <Progress.Bar progress={testLevel} width={50} />
       </SafeAreaView>
     </>
   );
