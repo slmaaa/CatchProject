@@ -27,13 +27,12 @@ import useInterval from "../Helper/useInterval";
 import { wsSend } from "../../App";
 import { color } from "../../constants.json";
 import { Button } from "react-native-elements";
-const CP_RANGE = 5;
+const CP_RANGE = 25;
 
 const InGame = ({ navigation, route }) => {
   const MMKV = new MMKVStorage.Loader().initialize();
 
   const [testLevel, setTestLevel] = useState(0.3);
-  const [testList, setTestList] = useState([]);
   const [location, setLocation] = useState(null);
   const [coolDown, setCoolDown] = useState([0, 0, 0, 0]);
   const [currentCoolDown, setCurrentCoolDown] = useState(-1);
@@ -45,6 +44,7 @@ const InGame = ({ navigation, route }) => {
     checkpointsLocation = [],
     checkpoinsMaxLevel = [],
     checkpointsLevel = [],
+    checkpointsName = [],
     numberOfCheckpoints = 0,
     gameInfo,
     data = [];
@@ -57,6 +57,7 @@ const InGame = ({ navigation, route }) => {
       longitude: val.area.center.lng,
     });
     checkpointsLevel.push(val.level);
+    checkpointsName.push(val.name);
     checkpoinsMaxLevel.push(val.maxLevel);
     data.push({
       name: val.name,
@@ -65,25 +66,41 @@ const InGame = ({ navigation, route }) => {
     });
   });
   numberOfCheckpoints = game.checkpoints.length;
+
   const renderCheckpointsOnMap = () => {
     let cpRenderList = [];
     for (let i = 0; i < numberOfCheckpoints; i++) {
       cpRenderList.push(
-        <MapboxGL.PointAnnotation
-          id={"CP" + i}
-          key={i}
-          coordinate={[
-            checkpointsLocation[i].longitude,
-            checkpointsLocation[i].latitude,
-          ]}
-        >
-          <Progress.Bar progress={testLevel} width={50} />
-        </MapboxGL.PointAnnotation>
+        <>
+          <MapboxGL.MarkerView
+            id={"CP" + i}
+            key={i + "m"}
+            coordinate={[
+              checkpointsLocation[i].longitude,
+              checkpointsLocation[i].latitude,
+            ]}
+          >
+            <View
+              style={{ width: 50, height: 100, backgroundColor: "#FFFFFF00" }}
+            >
+              <Progress.Bar progress={testLevel} width={50} />
+              <Progress.Bar progress={testLevel} width={50} color={"red"} />
+            </View>
+          </MapboxGL.MarkerView>
+          <MapboxGL.PointAnnotation
+            id={"CP" + i}
+            key={i + "p"}
+            coordinate={[
+              checkpointsLocation[i].longitude,
+              checkpointsLocation[i].latitude,
+            ]}
+          />
+        </>
       );
     }
     return cpRenderList;
   };
-  setTestList(renderCheckpointsOnMap());
+
   var unsub;
   useEffect(() => {
     RNLocation.configure({
@@ -122,6 +139,12 @@ const InGame = ({ navigation, route }) => {
         });
       }
     });
+    return function cleanup() {
+      unsub();
+    };
+  }, []);
+
+  useEffect(() => {
     if (location !== null) {
       let flag, newCID;
       for (let i = 0; i < numberOfCheckpoints; i++) {
@@ -144,14 +167,17 @@ const InGame = ({ navigation, route }) => {
       }
       setCurrentCID(newCID);
     }
-    return function cleanup() {
-      unsub();
-    };
-  }, []);
+  }, [location]);
 
   useEffect(() => {
+    console.log(checkpointsName);
     if (currentCID !== -1 && currentCoolDown !== currentCID) {
-      navigation.navigate("Maths");
+      navigation.navigate("Maths", {
+        cpName: checkpointsName[currentCID],
+        gid: game.gid,
+        team: team,
+        cid: currentCID,
+      });
     } else {
       navigation.navigate("InGame");
     }
@@ -191,9 +217,6 @@ const InGame = ({ navigation, route }) => {
       }
     }
   }, [route.params?.cd]);
-  useEffect(() => {
-    setTestList(renderCheckpointsOnMap());
-  }, [testLevel]);
   useInterval(
     () => {
       let newState = coolDown;
@@ -223,16 +246,9 @@ const InGame = ({ navigation, route }) => {
               }}
             />
             {renderCheckpointsOnMap()}
+            <MapboxGL.UserLocation />
           </MapboxGL.MapView>
         </View>
-        <Button
-          title={"test"}
-          onPress={() => {
-            setTestLevel(testLevel + 0.1);
-            console.log(testLevel);
-          }}
-        />
-        <Progress.Bar progress={testLevel} width={50} />
       </SafeAreaView>
     </>
   );
@@ -276,7 +292,8 @@ const styles = StyleSheet.create({
     width: "50%",
   },
   marker: {
-    height: 50,
+    height: 30,
+    width: 30,
     resizeMode: "contain",
   },
 });
