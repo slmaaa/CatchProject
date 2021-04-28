@@ -1,100 +1,162 @@
+/* eslint-disable quotes */
 import React, { useState, useEffect } from "react";
+import * as Progress from "react-native-progress";
 import {
   SafeAreaView,
   Text,
   StyleSheet,
+  View,
   TouchableHighlight,
 } from "react-native";
-import { Input } from "react-native-elements";
+import { Input, Button } from "react-native-elements";
 import * as riddle from "./RiddleTestDB/1.json";
 import { color } from "../../constants.json";
+import { wsSend } from "../../App";
 
-const operators = ['*',"+",'-'];
-var math_it_up = {
-    '+': function (x, y) { return x + y },
-    '-': function (x, y) { return x - y },
-    '*': function (x, y) {return x*y},
-}​​​​​​​;
+import useInterval from "../Helper/useInterval";
 
-export default Riddle = ({ navigation, route }) => {
-  const [checked, setChecked] = useState([false, false, false, false]);
+const operators = ["*", "+", "-"];
+
+const math_it_up = {
+  "+": function (x, y) {
+    return x + y;
+  },
+
+  "-": function (x, y) {
+    return x - y;
+  },
+  "*": function (x, y) {
+    return x * y;
+  },
+};
+
+const COOLDOWN = 20;
+
+export default Maths = ({ navigation, route }) => {
   const [disabled, setDisabled] = useState(false);
-  const [question,setQuestion] = useState("");
+  const [question, setQuestion] = useState("");
   const [answerInput, setAnswerInput] = useState("");
-  const [summitButtonColor, setSummitButtonColor] = useState("blue");
+  const [coolDown, setCoolDown] = useState(-1);
 
-    let answer;
+  let answer;
+  const { cpName, gid, team, cid } = route.params;
 
   const handleOnPressSummit = () => {
     setDisabled(true);
-    correct = setAnswerInput == answer;
-    setSummitButtonColor(correct ? color.lightGreen : color.wrongRed);
-    setTimeout(
-      () => navigation.navigate("InGame", { cd: correct ? -1 : 7 }),
-      2000
-    );
+    let correct = answerInput === answer;
+    if (!correct) {
+      setCoolDown(COOLDOWN);
+    } else {
+      wsSend(
+        JSON.stringify({
+          header: "ADD",
+          content: { gid: gid, team: team, cid: cid },
+        })
+      );
+    }
   };
 
-  useEffect(()=>{
-      const a =Math.floor(Math.random()*900+100);
-      const b = Math.floor(Math.random()*100+1);
-      const c = Math.floor(Math.random()*100+1);
-      const o1 = operators[Math.floor(Math.random()*3)];
-      const o2 = operators[Math.floor(Math.random()*3)];
-      answer = toString(math_it_up[o2](math_it_up[o1](a,b),c));
-      let first_half = `(${a} ${o1} ${b})`;
-      if (o2=='*' && o1 !='*')  first_half = '('+first_half+')';
-      setQuestion(first_half+` ${o1} ${b})` );
-  },[])
+  useInterval(
+    () => {
+      setCoolDown(coolDown - 1);
+      if (coolDown === 0) {
+        setDisabled(false);
+      }
+    },
+    coolDown !== -1 ? 1000 : null
+  );
+
+  useEffect(() => {
+    let a, b, c, o1, o2;
+    do {
+      a = Math.floor(Math.random() * 100 + 1);
+      b = Math.floor(Math.random() * 100 + 1);
+      c = Math.floor(Math.random() * 100 + 1);
+      o1 = operators[Math.floor(Math.random() * 3)];
+      o2 = operators[Math.floor(Math.random() * 3)];
+      answer = math_it_up[o2](math_it_up[o1](a, b), c);
+    } while (answer >= 2000);
+    answer = answer.toString();
+    let first_half = `${a} ${o1} ${b}`;
+    if (o2 == "*" && o1 != "*") first_half = "(" + first_half + ")";
+    setQuestion(first_half + ` ${o1} ${c}`);
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.questionText}>{riddle.Question}</Text>
-      <Input placeholder="Your answer" onChangeText={setAnswerInput}></Input>
-      <TouchableHighlight
-        disabled={disabled}
-        style={[styles.summitButton,{backgroundColor:summitButtonColor}]}
-        onPress={handleOnPressSummit}
-      >
-        <Text style={styles.summitButtonText}>Summit</Text>
-      </TouchableHighlight>
+      <Text style={styles.checkpointName}>{cpName}</Text>
+      <Text style={styles.questionText}>{question}</Text>
+
+      {coolDown !== -1 && (
+        <View style={{ flex: 0.3 }}>
+          <Text style={styles.wrongText}>Wrong anwser. Try again in</Text>
+          <Progress.Circle
+            progress={coolDown / COOLDOWN}
+            size={120}
+            thickness={10}
+            formatText={(progress) => {
+              return coolDown + "s";
+            }}
+            color={"red"}
+            showsText={true}
+            style={{ alignSelf: "center" }}
+          />
+        </View>
+      )}
+      {coolDown === -1 && (
+        <>
+          <Input
+            placeholder="Your answer"
+            onChangeText={setAnswerInput}
+            keyboardType={"number-pad"}
+          />
+          <Button
+            containerStyle={styles.summitButton}
+            buttonStyle={{ backgroundColor: color.brown }}
+            title={"Summit"}
+            onPress={handleOnPressSummit}
+            disabled={disabled}
+          />
+        </>
+      )}
     </SafeAreaView>
   );
 };
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "black",
+    backgroundColor: color.offWhite,
+    padding: 30,
     flex: 1,
   },
-  questionText: {
-    fontFamily: "Poppins-Medium",
+  checkpointName: {
+    flex: 0.1,
+    fontSize: 21,
     textAlign: "left",
-    fontSize: 14,
-    color: color.blueOnBlack,
-    padding: 10,
+    fontWeight: "700",
+    textAlignVertical: "center",
+  },
+  questionText: {
+    flex: 0.3,
+    textAlign: "center",
+    fontSize: 28,
+    fontWeight: "700",
+    color: "black",
   },
   checkBox: {
     borderColor: color.darkGrey,
     padding: 10,
-  },
-  choiceText: {
-    fontFamily: "Poppins-Medium",
-    textAlign: "left",
-    fontSize: 14,
-    color: color.offWhite,
+    flex: 0.2,
   },
   summitButton: {
-    position: "absolute",
-    bottom: "5%",
+    flex: 0.25,
+    alignSelf: "center",
     alignContent: "center",
-    left: "25%",
-    height: 60,
-    width: "50%",
-    borderRadius: 20,
-    borderWidth: 0.8,
-    borderColor: "white",
-    alignItems: "center",
-    justifyContent: "center",
+    width: "48%",
+  },
+  wrongText: {
+    textAlign: "center",
+    fontSize: 18,
+    color: "red",
   },
   summitButtonText: {
     textAlign: "center",

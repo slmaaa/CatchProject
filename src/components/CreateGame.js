@@ -1,3 +1,4 @@
+/* eslint-disable quotes */
 import React, { useState } from "react";
 import { Text, SafeAreaView, StyleSheet, Switch, View } from "react-native";
 import { Input, CheckBox, Button, ThemeProvider } from "react-native-elements";
@@ -85,7 +86,7 @@ export default CreateGame = ({ navigation }) => {
         placeholder="Game name"
         onChangeText={setGameName}
         style={{ color: "white" }}
-      ></Input>
+      />
       <View style={styles.switchContainer}>
         <Text style={styles.switchText}>Join as host</Text>
         <Switch
@@ -111,7 +112,7 @@ export default CreateGame = ({ navigation }) => {
         title="Checkpoints setup"
         disabled={usePresetCP}
         type={"outline"}
-      ></Button>
+      />
       <Button
         containerStyle={{ margin: 10 }}
         titleStyle={{ color: color.lightGreen }}
@@ -122,7 +123,7 @@ export default CreateGame = ({ navigation }) => {
         onPress={createGame}
         title="Create"
         type={"outline"}
-      ></Button>
+      />
     </SafeAreaView>
   );
 };

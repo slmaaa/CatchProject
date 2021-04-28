@@ -1,7 +1,9 @@
+/* eslint-disable quotes */
 import React, { useState, useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import auth from "@react-native-firebase/auth";
+import MMKVStorage from "react-native-mmkv-storage";
 
 import InGame from "./components/InGame/InGame";
 import Login from "./components/Login";
@@ -14,7 +16,8 @@ import CreateGame from "./components/CreateGame";
 import Waiting from "./components/Waiting";
 import LoadingHome from "./components/LoadingHome";
 import setmap from "./components/setmap";
-import MMKVStorage from "react-native-mmkv-storage";
+import Maths from "./components/InGame/Math";
+import rsetmap from "./components/rsetmap";
 import { color } from "./constants";
 
 const MMKV = new MMKVStorage.Loader().initialize();
@@ -122,6 +125,17 @@ const App = () => {
               }}
             />
             <Stack.Screen
+              name="rsetmap"
+              component={rsetmap}
+              options={{
+                headerLeft: null,
+                title: "Real Set CheckPoints",
+                headerStyle: {
+                  backgroundColor: color.blueOnBlack,
+                },
+              }}
+            />
+            <Stack.Screen
               name="Home"
               component={Home}
               options={{
@@ -152,7 +166,14 @@ const App = () => {
             <Stack.Screen
               name="Waiting"
               component={Waiting}
-              options={({ route }) => ({
+              options={() => ({
+                headerShown: false,
+              })}
+            />
+            <Stack.Screen
+              name="Maths"
+              component={Maths}
+              options={() => ({
                 headerShown: false,
               })}
             />
