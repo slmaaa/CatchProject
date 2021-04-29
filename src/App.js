@@ -18,7 +18,7 @@ import setmap from "./components/setmap";
 import Maths from "./components/InGame/Math";
 import rsetmap from "./components/rsetmap";
 import { color } from "./constants";
-
+[];
 const MMKV = new MMKVStorage.Loader().initialize();
 const Stack = createStackNavigator();
 const ws = new WebSocket("ws://192.168.29.243:8765");

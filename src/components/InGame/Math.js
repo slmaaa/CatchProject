@@ -1,15 +1,8 @@
 /* eslint-disable quotes */
 import React, { useState, useEffect } from "react";
 import * as Progress from "react-native-progress";
-import {
-  SafeAreaView,
-  Text,
-  StyleSheet,
-  View,
-  TouchableHighlight,
-} from "react-native";
+import { SafeAreaView, Text, StyleSheet, View } from "react-native";
 import { Input, Button } from "react-native-elements";
-import * as riddle from "./RiddleTestDB/1.json";
 import { color } from "../../constants.json";
 import { wsSend } from "../../App";
 
@@ -37,8 +30,8 @@ export default Maths = ({ navigation, route }) => {
   const [question, setQuestion] = useState("");
   const [answerInput, setAnswerInput] = useState("");
   const [coolDown, setCoolDown] = useState(-1);
+  const [answer, setAnswer] = useState();
 
-  let answer;
   const { cpName, gid, team, cid } = route.params;
 
   const handleOnPressSummit = () => {
@@ -67,19 +60,19 @@ export default Maths = ({ navigation, route }) => {
   );
 
   useEffect(() => {
-    let a, b, c, o1, o2;
+    let a, b, c, o1, o2, ans;
     do {
       a = Math.floor(Math.random() * 100 + 1);
       b = Math.floor(Math.random() * 100 + 1);
       c = Math.floor(Math.random() * 100 + 1);
       o1 = operators[Math.floor(Math.random() * 3)];
       o2 = operators[Math.floor(Math.random() * 3)];
-      answer = math_it_up[o2](math_it_up[o1](a, b), c);
-    } while (answer >= 2000);
-    answer = answer.toString();
+      ans = math_it_up[o2](math_it_up[o1](a, b), c);
+    } while (ans >= 1000);
+    setAnswer(ans.toString());
     let first_half = `${a} ${o1} ${b}`;
-    if (o2 == "*" && o1 != "*") first_half = "(" + first_half + ")";
-    setQuestion(first_half + ` ${o1} ${c}`);
+    if (o2 === "*" && o1 !== "*") first_half = "(" + first_half + ")";
+    setQuestion(first_half + ` ${o2} ${c}`);
   }, []);
 
   return (
