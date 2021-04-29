@@ -17,6 +17,7 @@ import LoadingHome from "./components/LoadingHome";
 import setmap from "./components/setmap";
 import Maths from "./components/InGame/Math";
 import rsetmap from "./components/rsetmap";
+import history from "./components/history";
 import { color } from "./constants";
 [];
 const MMKV = new MMKVStorage.Loader().initialize();
@@ -122,6 +123,17 @@ const App = () => {
               options={{
                 headerLeft: null,
                 title: "Real Set CheckPoints",
+                headerStyle: {
+                  backgroundColor: color.blueOnBlack,
+                },
+              }}
+            />
+            <Stack.Screen
+              name="history"
+              component={history}
+              options={{
+                headerLeft: null,
+                title: "History",
                 headerStyle: {
                   backgroundColor: color.blueOnBlack,
                 },
