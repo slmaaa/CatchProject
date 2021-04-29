@@ -88,6 +88,12 @@ const Home = ({ navigation }) => {
         }}
       ></Button>
       <Button
+        title={"Run History"}
+        onPress={() => {
+          navigation.navigate("history");
+        }}
+      ></Button>
+      <Button
         title={"InGame Test"}
         onPress={() => {
           navigation.navigate("InGame");

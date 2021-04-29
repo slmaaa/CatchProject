@@ -2,10 +2,13 @@ import React, {useState,useEffect} from 'react';
 import {StyleSheet, View, Pressable, Text, Alert} from 'react-native';
 import MapboxGL from '@react-native-mapbox-gl/maps';
 import mapboxgl from "mapbox-gl/dist/mapbox-gl-csp";
+import * as Progress from "react-native-progress";
 MapboxGL.setAccessToken(
   'pk.eyJ1IjoicmFzaGlkdGhlZGV2ZWxvcGVyIiwiYSI6ImNrYXBncGlwdjBjbG4yd3FqaXl2ams1NHQifQ.jvRoapH6Ae7QHb8Kx4z9FQ',
 );
+const MAPBOX_TOKEN = 'pk.eyJ1IjoicmFzaGlkdGhlZGV2ZWxvcGVyIiwiYSI6ImNrYXBncGlwdjBjbG4yd3FqaXl2ams1NHQifQ.jvRoapH6Ae7QHb8Kx4z9FQ'
 import Geolocation from "react-native-geolocation-service";
+import Geocoder from 'react-native-geocoding';
 import RNLocation, { Location } from 'react-native-location';
 const App = () => {
   const [location, setLocation] = useState(null);
@@ -23,9 +26,9 @@ const App = () => {
       },
       // Android only
       androidProvider: "auto",
-      interval: 10, // Milliseconds
-      fastestInterval: 10, // Milliseconds
-      maxWaitTime: 10, // Milliseconds
+      interval: 1000, // Milliseconds
+      fastestInterval: 1000, // Milliseconds
+      maxWaitTime: 1000, // Milliseconds
       // iOS Only
       activityType: "other",
       allowsBackgroundLocationUpdates: false,
@@ -105,13 +108,15 @@ const App = () => {
   //   })
   // }, [location]);
 
-  // const addbutton = ()=>{
-  //   Alert.alert("addbutton")
-  //   console.log("hihi")
-  // }
-  // const startbutton = ()=>{
-  //   Alert.alert("startbutton")
-  // }
+  const addbutton = ()=>{
+    setaddcor([...addcor,[114.2656,22.3360,8,20]])
+    Alert.alert("addbutton")
+    console.log("hihi")
+  }
+  const startbutton = ()=>{
+    addcor.splice(index, 3);
+    Alert.alert("startbutton")
+  }
 
   const setpoint = (counter) => {
     const id = counter;
@@ -120,38 +125,36 @@ const App = () => {
     coordinate = [lan,lat]
     const redteam = addcor[counter][2]
     const blueteam = addcor[counter][3]
+    
 
-    const colorStyles1 = {
-      borderRightColor:"white",
-      borderLeftColor:"red",
-      borderRightWidth: 40-redteam,
-      borderLeftWidth: redteam,
+//     const colorStyles1 = {
+//       borderRightColor:"white",
+//       borderLeftColor:"red",
+//       borderRightWidth: 40-redteam,
+//       borderLeftWidth: redteam,
 
-  };
-  const colorStyles2 = {
-    borderRightColor:"white",
-    borderLeftColor:"blue",
-    borderRightWidth: 40-blueteam,
-    borderLeftWidth: blueteam,
+//   };
+//   const colorStyles2 = {
+//     borderRightColor:"white",
+//     borderLeftColor:"blue",
+//     borderRightWidth: 40-blueteam,
+//     borderLeftWidth: blueteam,
 
 
-};
+// };
     return(
     
     <MapboxGL.PointAnnotation key={id} coordinate={coordinate}>
-        {/* <View style={{
-                  height: 30, 
-                  width: 30, 
-                  backgroundColor: '#00cccc', 
-                  borderRadius: 50, 
-                  borderColor: '#fff', 
-                  borderWidth: 3
-                }} /> */}
         <View style={styles.container}>
           <View style={styles.circle} />
-          <View style={[styles.rectangle,colorStyles1]} />
-          <View style={[styles.rectangle2,colorStyles2]} />
-          
+          {/* <View style={[styles.rectangle,colorStyles1]} />
+          <View style={[styles.rectangle2,colorStyles2]} /> */}
+          <View
+              style={{ width: 50, height: 100, backgroundColor: "#FFFFFF00" }}
+            >
+              <Progress.Bar progress={redteam} width={50} />
+              <Progress.Bar progress={blueteam} width={50} color={"red"} />
+            </View>
         </View>
        
     </MapboxGL.PointAnnotation>
@@ -196,9 +199,9 @@ const App = () => {
           </MapboxGL.PointAnnotation>
           {setpoints()}
         </MapboxGL.MapView>
-        <Text style={[styles.button1,styles.buttonText]}>RED Team 35</Text>
-        <Text style={[styles.button2,styles.buttonText]}>BLUE Team 46</Text>
-        {/* <Pressable
+        {/* <Text style={[styles.button1,styles.buttonText]}>RED Team 35</Text>
+        <Text style={[styles.button2,styles.buttonText]}>BLUE Team 46</Text> */}
+        <Pressable
         style={({pressed}) => [
           {
             backgroundColor: pressed ? 'lightblue' : 'green',
@@ -217,7 +220,7 @@ const App = () => {
         ]}
         onPress={addbutton}>
         <Text style={styles.buttonText}>Add</Text>
-       </Pressable> */}
+       </Pressable>
       </View>
     </View>
   );
