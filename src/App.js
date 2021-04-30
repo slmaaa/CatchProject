@@ -19,7 +19,7 @@ import Maths from "./components/InGame/Math";
 import rsetmap from "./components/rsetmap";
 import history from "./components/history";
 import { color } from "./constants";
-
+[];
 const MMKV = new MMKVStorage.Loader().initialize();
 const Stack = createStackNavigator();
 const ws = new WebSocket("ws://192.168.29.243:8765");
@@ -47,7 +47,7 @@ const App = () => {
         break;
       case "CREATED":
         console.log("Game created");
-        MMKV.setString("createdGameID", data.content + "");
+        MMKV.setMap("joinedGame", data.content);
         break;
       case "JOINED":
         console.log("Game joined");

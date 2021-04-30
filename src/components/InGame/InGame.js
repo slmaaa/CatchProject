@@ -31,68 +31,58 @@ const CP_RANGE = 25;
 
 const InGame = ({ navigation, route }) => {
   const MMKV = new MMKVStorage.Loader().initialize();
+  const [initializing, setInitializing] = useState(true);
 
-  const [testLevel, setTestLevel] = useState(0.3);
+  const gameInfo = useRef();
   const [location, setLocation] = useState(null);
-  const [coolDown, setCoolDown] = useState([0, 0, 0, 0]);
-  const [currentCoolDown, setCurrentCoolDown] = useState(-1);
   const [currentCID, setCurrentCID] = useState(-1); //Current checkpoint id. -1 if not in any checkpoints
-  const [zoomLevel, setZoomLevel] = useState(19);
   const mapRef = useRef();
-  let game,
-    team,
-    checkpointsLocation = [],
-    checkpoinsMaxLevel = [],
-    checkpointsLevel = [],
-    checkpointsName = [],
-    numberOfCheckpoints = 0,
-    gameInfo,
-    data = [];
-
-  game = MMKV.getMap("joinedGame");
-  team = MMKV.getString("team");
-  game.checkpoints.map((val) => {
-    checkpointsLocation.push({
-      latitude: val.area.center.lat,
-      longitude: val.area.center.lng,
-    });
-    checkpointsLevel.push(val.level);
-    checkpointsName.push(val.name);
-    checkpoinsMaxLevel.push(val.maxLevel);
-    data.push({
-      name: val.name,
-      lat: val.area.center.lat,
-      lng: val.area.center.lng,
-    });
+  const gameRef = useRef({
+    game: null,
+    team: null,
+    checkpointsLocation: null,
+    numberOfCheckpoints: null,
   });
-  numberOfCheckpoints = game.checkpoints.length;
 
   const renderCheckpointsOnMap = () => {
     let cpRenderList = [];
-    for (let i = 0; i < numberOfCheckpoints; i++) {
+    for (let i = 0; i < gameRef.current.numberOfCheckpoints; i++) {
       cpRenderList.push(
         <>
           <MapboxGL.MarkerView
             id={"CP" + i}
             key={i + "m"}
             coordinate={[
-              checkpointsLocation[i].longitude,
-              checkpointsLocation[i].latitude,
+              gameRef.current.checkpointsLocation[i].longitude,
+              gameRef.current.checkpointsLocation[i].latitude,
             ]}
           >
             <View
               style={{ width: 50, height: 100, backgroundColor: "#FFFFFF00" }}
             >
-              <Progress.Bar progress={testLevel} width={50} />
-              <Progress.Bar progress={testLevel} width={50} color={"red"} />
+              <Progress.Bar
+                progress={
+                  gameRef.current.game.checkpoints[i].level.BLUE /
+                  gameRef.current.game.checkpoints[i].maxLevel
+                }
+                width={50}
+              />
+              <Progress.Bar
+                progress={
+                  gameRef.current.game.checkpoints[i].level.RED /
+                  gameRef.current.game.checkpoints[i].maxLevel
+                }
+                width={50}
+                color={"red"}
+              />
             </View>
           </MapboxGL.MarkerView>
           <MapboxGL.PointAnnotation
             id={"CP" + i}
             key={i + "p"}
             coordinate={[
-              checkpointsLocation[i].longitude,
-              checkpointsLocation[i].latitude,
+              gameRef.current.checkpointsLocation[i].longitude,
+              gameRef.current.checkpointsLocation[i].latitude,
             ]}
           />
         </>
@@ -100,9 +90,27 @@ const InGame = ({ navigation, route }) => {
     }
     return cpRenderList;
   };
-
-  var unsub;
   useEffect(() => {
+    if (!initializing) return;
+    const game = MMKV.getMap("joinedGame");
+    gameRef.current.game = game;
+    gameRef.current.team = MMKV.getString("team");
+    let coolDowns = [],
+      checkpointsLocation = [];
+    game.checkpoints.map((val) => {
+      checkpointsLocation.push({
+        latitude: val.area.center.lat,
+        longitude: val.area.center.lng,
+      });
+      coolDowns.push(-1);
+    });
+    gameRef.current.checkpointsLocation = checkpointsLocation;
+    gameRef.current.numberOfCheckpoints = game.checkpoints.length;
+    MMKV.setArray("cpCooldowns", coolDowns);
+    setInitializing(false);
+  }, []);
+  useEffect(() => {
+    let unsub;
     RNLocation.configure({
       distanceFilter: 0, //meters
       desiredAccuracy: {
@@ -147,14 +155,14 @@ const InGame = ({ navigation, route }) => {
   useEffect(() => {
     if (location !== null) {
       let flag, newCID;
-      for (let i = 0; i < numberOfCheckpoints; i++) {
+      for (let i = 0; i < gameRef.current.numberOfCheckpoints; i++) {
         if (
           getDistance(
             {
               latitude: location.latitude,
               longitude: location.longitude,
             },
-            checkpointsLocation[i]
+            gameRef.current.checkpointsLocation[i]
           ) <= CP_RANGE
         ) {
           newCID = i;
@@ -170,88 +178,71 @@ const InGame = ({ navigation, route }) => {
   }, [location]);
 
   useEffect(() => {
-    console.log(checkpointsName);
-    if (currentCID !== -1 && currentCoolDown !== currentCID) {
+    if (currentCID !== -1) {
       navigation.navigate("Maths", {
-        cpName: checkpointsName[currentCID],
-        gid: game.gid,
-        team: team,
+        cpName: gameRef.current.game.checkpoints[currentCID].name,
+        gid: gameRef.current.game.gid,
+        team: gameRef.current.team,
         cid: currentCID,
       });
-    } else {
-      navigation.navigate("InGame");
     }
-  }, [currentCID, currentCoolDown]);
+  }, [currentCID]);
 
   useInterval(() => {
-    gameInfo = MMKV.getMap("gameInfo");
+    gameInfo.current = MMKV.getMap("gameInfo");
   }, 100);
 
   useEffect(() => {
-    if (gameInfo == null) {
+    if (gameInfo.current == null) {
       return;
     }
-    let cpsLevel = [];
-    game.status = gameInfo.status;
-    for (let i = 0; i < game.checkpoints.length; i++) {
-      game.checkpoints[i].level = gameInfo.cpsLevel[i];
-      cpsLevel.push(gameInfo.cpsLevel[i]);
+    gameRef.current.game.status = gameInfo.current.status;
+    for (let i = 0; i < gameRef.current.numberOfCheckpoints; i++) {
+      gameRef.current.game.checkpoints[i].level = gameInfo.current.cpsLevel[i];
     }
-    console.log(gameInfo);
-  }, [gameInfo]);
+    MMKV.setMap("joinedGame", gameRef.current.game);
+  }, [gameInfo.current]);
 
-  useEffect(() => {
-    if (route.params?.cd) {
-      if (route.params?.cd === -1) {
-        wsSend(
-          JSON.stringify({
-            header: "ADD",
-            content: { gid: game.gid, team: team, cid: currentCID },
-          })
-        );
-      } else {
-        let newState = coolDown;
-        newState[currentCID] = route.params?.cd;
-        setCoolDown([...newState]);
-        setCurrentCoolDown(currentCID);
-      }
-    }
-  }, [route.params?.cd]);
-  useInterval(
-    () => {
-      let newState = coolDown;
-      newState[currentCoolDown]--;
-      setCoolDown([...newState]);
-      if (coolDown[currentCoolDown] === 0) setCurrentCoolDown(-1);
-    },
-    currentCoolDown === -1 ? null : 1000
-  );
-
-  return (
-    <>
-      <StatusBar barStyle="dark-content" />
-      <SafeAreaView style={styles.container}>
-        <View style={styles.mapContainer}>
-          <MapboxGL.MapView
-            ref={mapRef}
-            style={styles.map}
-            pitchEnabled={false}
-            rotateEnabled={false}
-            compassEnabled={false}
-          >
-            <MapboxGL.Camera
-              defaultSettings={{
-                zoomLevel: zoomLevel,
-                centerCoordinate: [114.263981, 22.339158],
-              }}
-            />
-            {renderCheckpointsOnMap()}
-            <MapboxGL.UserLocation />
-          </MapboxGL.MapView>
-        </View>
-      </SafeAreaView>
-    </>
-  );
+  if (initializing) return null;
+  else
+    return (
+      <>
+        <StatusBar barStyle="dark-content" />
+        <SafeAreaView style={styles.container}>
+          <View style={styles.mapContainer}>
+            <MapboxGL.MapView
+              ref={mapRef}
+              style={styles.map}
+              pitchEnabled={false}
+              rotateEnabled={false}
+              compassEnabled={false}
+            >
+              <MapboxGL.Camera
+                defaultSettings={{
+                  zoomLevel: 17,
+                  centerCoordinate: [114.263981, 22.339158],
+                }}
+              />
+              {renderCheckpointsOnMap()}
+              <MapboxGL.UserLocation />
+            </MapboxGL.MapView>
+          </View>
+          <Button
+            title={"test"}
+            onPress={() => {
+              if (currentCID !== -1) {
+                navigation.navigate("Maths", {
+                  cpName: gameRef.current.game.checkpoints[currentCID].name,
+                  gid: gameRef.current.game.gid,
+                  team: gameRef.current.team,
+                  cid: currentCID,
+                });
+              }
+            }}
+          />
+        </SafeAreaView>
+      </>
+    );
 };
 
 export default InGame;
