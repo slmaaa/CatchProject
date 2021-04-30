@@ -1,5 +1,17 @@
 import React, {useState,useEffect} from 'react';
-import {StyleSheet, View, Pressable, Text, Alert, Modal,TouchableHighlight,Button} from 'react-native';
+import {StyleSheet,
+    View, 
+    Pressable, 
+    Text, 
+    Alert, 
+    Modal,
+    TouchableHighlight,
+    Button,
+    FlatList,
+    ActivityIndicator,
+    Image,
+    TextInput
+} from 'react-native';
 import MapboxGL from '@react-native-mapbox-gl/maps';
 import mapboxgl from "mapbox-gl/dist/mapbox-gl-csp";
 const accessToken = 'pk.eyJ1IjoicmFzaGlkdGhlZGV2ZWxvcGVyIiwiYSI6ImNrYXBncGlwdjBjbG4yd3FqaXl2ams1NHQifQ.jvRoapH6Ae7QHb8Kx4z9FQ';
@@ -13,14 +25,29 @@ import MapboxDirectionsFactory from '@mapbox/mapbox-sdk/services/directions';
 import { add } from 'react-native-reanimated';
 import { getDistance } from 'geolib';
 import Icon from 'react-native-vector-icons/FontAwesome5';
+import Icon2 from 'react-native-vector-icons/MaterialCommunityIcons';
+import Icon3 from 'react-native-vector-icons/MaterialIcons';
+import Icon4 from 'react-native-vector-icons/Ionicons';
+import * as Progress from "react-native-progress";
+const data = [
+    { id: '1', title: 'First item' },
+    { id: '2', title: 'Second item' },
+    { id: '3', title: 'Third item' },
+    { id: '4', title: 'Fourth item' },
+    { id: '5', title: 'Fourth item' },
+    { id: '6', title: 'Fourth item' },
+    { id: '7', title: 'Fourth item' },
+    { id: '8', title: 'Fourth item' },
+    { id: '9', title: 'Fourth item' },
+  ];
 const App = () => {
-    const startingPoint = [114.2635,22.3372];
-    const destinationPoint = [114.2655,22.3364];
-    const [route, setRoute] = useState(null);
+  const [route, setRoute] = useState(null);
   const[ModalOpen, setModalOpen] = useState(false);
-  const [location, setLocation] = useState(null);
   const [coordinates,setcoordinates] = useState([114.2655,22.3364]);
-  const [addcor,setaddcor]=useState([[114.2635,22.3372],[114.2655,22.3364],[114.2645,22.3344]])
+  const [addcor,setaddcor]=useState([{coordinates: [114.2635,22.3372]},{coordinates: [114.2655,22.3364]},{coordinates: [114.2645,22.3344]}]) //from serve
+
+  var timespend = 26; // time of the game from serve
+  var distance = 0;
   const startbutton = ()=>{
     Alert.alert("startbutton")
   }  
@@ -29,11 +56,7 @@ const App = () => {
   })
   const fetchRoute = async () => {
     const reqOptions = {
-      waypoints: [
-        {coordinates: addcor[0]},
-        {coordinates: addcor[1]},
-        {coordinates: addcor[2]},
-      ],
+      waypoints: addcor,
       profile: 'driving-traffic',
       geometries: 'geojson',
     };
@@ -44,53 +67,81 @@ const App = () => {
   };
 
   const modalslideone = () =>{
-      var distance = 0
       for(let i = 0; i < addcor.length-1; i++){
-          distance = distance + getDistance(addcor[i],addcor[i+1])
+          distance = distance + getDistance(addcor[i].coordinates,addcor[i+1].coordinates)
       }
+      distance = distance/1000;
+      var speed = 0;
+      speed = parseInt(timespend / distance);
       return(
-        <View style={styles.slide1}>
-        <Icon name="running" size={30} color="#900" />
-        <Text style={styles.text}>{distance}</Text>
-        <Text style={styles.text}>Average speed</Text>
-        <Text style={styles.text}>Time used</Text>
+      <View style={styles.slide1}>
+        <Icon name="running" size={50} color="yellow"/>
+        <Text style={styles.text2}>Total Distance:</Text>
+        <Text style={styles.text}>{distance} km</Text>
+        <Text style={styles.text}>  </Text>
+        <Icon3 name="speed" size={50} color="orange" />
+        <Text style={styles.text2}>Average speed:</Text>
+        <Text style={styles.text}>{speed} mins / km</Text>
+        <Text style={styles.text}>  </Text>
+        <Icon2 name="timer-outline" size={50} color="green" />
+        <Text style={styles.text2}>Time used</Text>
+        <Text style={styles.text}>{timespend} minutes</Text>
       </View>
       )
   }
   const modalslidetwo = () =>{
+    var calburn = parseFloat(distance/1.632 * 100).toFixed(2);
+    var fatburn = parseFloat(calburn/3500*453.592).toFixed(2);
     return(
       <View style={styles.slide1}>
-      <Text style={styles.text}>Calories burns</Text>
-      <Text style={styles.text}>Fat burns</Text>
+      <Icon name="fire" size={50} color="red"/>
+      <Text style={styles.text2}>Calories burns</Text>
+      <Text style={styles.text}>{calburn} cal</Text>
+      <Text style={styles.text}>  </Text>
+      <Text style={styles.text}>  </Text>
+      <Icon4 name="body" size={50} color="red"/>
+      <Text style={styles.text2}>Fat burns</Text>
+      <Text style={styles.text}>{fatburn} grams</Text>
     </View>
     )
 }
 const modalslidethree = () =>{
     return(
       <View style={styles.slide1}>
-      <Text style={styles.text}>Teammates</Text>
-      <Text style={styles.text}>Opponents</Text>
+      <Text style={styles.text}>Make a new Friend?</Text>
+      <FlatList
+      showsVerticalScrollIndicator={false}
+      showsHorizontalScrollIndicator={false}
+        data={data}
+        keyExtractor={item => item.first}
+        renderItem={() => (
+          <View style={styles.listItemfd}>
+            <Image
+              //source={{ uri: item.picture.thumbnail }}
+              style={styles.coverImagefd}
+            />
+            <View style={styles.metaInfofd}>
+              <Text style={styles.titlefd}>{data.title}</Text>
+            </View>
+          </View>
+        )}
+      />
     </View>
     )
 }
-
   const modal = () =>{
       return(
-
          <Modal visible={ModalOpen} animationType='fade' transparent={true}>
              <TouchableHighlight style={styles.centeredView} onPress={() => setModalOpen(false)}>
-          <Swiper style={styles.wrapper} showsButtons={true} >
-              {modalslideone()}
-              {modalslidetwo()}
-              {modalslidethree()}
-        
-      </Swiper>
-             </TouchableHighlight>
-           
+                <Swiper style={styles.wrapper} showsButtons={true} >
+                {modalslideone()}
+                {modalslidetwo()}
+                {modalslidethree()}     
+                </Swiper>
+             </TouchableHighlight> 
         </Modal> 
       )
   }
-
   const detailbutton = () =>{
       return(
           <Pressable
@@ -105,10 +156,6 @@ const modalslidethree = () =>{
         </Pressable>
       )
   }
-//   const route = ()=>{
-//       return
-//   }
-
   return (
     <View style={styles.page}>
       <View style={styles.container}>
@@ -117,7 +164,7 @@ const modalslidethree = () =>{
           {
           route && (
            <MapboxGL.ShapeSource id='shapeSource' shape={route}>
-              <MapboxGL.LineLayer id='lineLayer' style={{lineWidth: 5, lineJoin: 'bevel', lineColor: '#ff0000'}} />
+              <MapboxGL.LineLayer id='lineLayer' style={{lineWidth: 5, lineJoin: 'bevel', lineColor: 'green'}} />
             </MapboxGL.ShapeSource>
           )
         }
@@ -155,6 +202,11 @@ const styles = StyleSheet.create({
       fontSize: 30,
       fontWeight: 'bold'
     },
+    text2: {
+        color: '#fff',
+        fontSize: 25,
+        fontWeight: 'bold'
+      },
     centeredView: {
         flex: 1,
         justifyContent: "center",
@@ -225,6 +277,40 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
     
   },
+  containerfd: {
+    marginTop: 20,  
+    flex: 1,
+    backgroundColor: '#f8f8f8',
+    alignItems: 'center'
+  },
+  textfd: {
+    fontSize: 20,
+    color: '#101010',
+    marginTop: 60,
+    fontWeight: '700'
+  },
+  listItemfd: {
+    marginTop: 20,
+    paddingVertical: 20,
+    paddingHorizontal: 20,
+    backgroundColor: '#fff',
+    flexDirection: 'row',
+    borderRadius: 35
+    
+  },
+  coverImagefd: {
+    width: 50,
+    height: 50,
+    borderRadius: 35
+  },
+  metaInfofd: {
+    marginLeft: 10
+  },
+  titlefd: {
+    fontSize: 18,
+    width: 200,
+    padding: 10
+  }
 });
 
 export default App;
