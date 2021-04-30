@@ -47,7 +47,7 @@ const App = () => {
         break;
       case "CREATED":
         console.log("Game created");
-        MMKV.setString("createdGameID", data.content + "");
+        MMKV.setMap("joinedGame", data.content);
         break;
       case "JOINED":
         console.log("Game joined");

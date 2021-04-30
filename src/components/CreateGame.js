@@ -51,25 +51,25 @@ export default CreateGame = ({ navigation }) => {
       teams: ["RED", "BLUE"],
     };
 
-    let gameID = null;
+    let createdGame = null;
     wsSend(JSON.stringify({ header: "CREATE", content: game }))
       .then(async () => {
         console.log("====================================");
         console.log(game);
         console.log("====================================");
         let interval = setInterval(() => {
-          gameID = MMKV.getString("createdGameID");
-          if (gameID == null) return;
+          createdGame = MMKV.getMap("joinedGame");
+          if (createdGame == null) return;
           clearInterval(interval);
-          console.log(gameID);
-          MMKV.setString("gameID", gameID);
+          MMKV.setString("gameID", createdGame.gid.toString());
           MMKV.setString("gameName", gameName);
           database()
             .ref("users/" + MMKV.getString("userID"))
-            .update({ gameID: gameID, status: "PREPARE_HOST" });
+            .update({
+              gameID: createdGame.gid.toString(),
+              status: "PREPARE_HOST",
+            });
           MMKV.setString("userStatus", "PREPARE_HOST");
-          game.gid = gameID;
-          MMKV.setMap("joinedGame", game);
           navigation.replace("Waiting", { gameName: gameName });
         }, 100);
       })
