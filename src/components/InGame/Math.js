@@ -1,100 +1,200 @@
-import React, { useState, useEffect } from "react";
-import {
-  SafeAreaView,
-  Text,
-  StyleSheet,
-  TouchableHighlight,
-} from "react-native";
-import { Input } from "react-native-elements";
-import * as riddle from "./RiddleTestDB/1.json";
+/* eslint-disable quotes */
+import React, { useState, useEffect, useRef } from "react";
+import * as Progress from "react-native-progress";
+import { SafeAreaView, Text, StyleSheet, View, Alert } from "react-native";
+import { StackActions } from "@react-navigation/native";
+import { Input, Button } from "react-native-elements";
+import MMKVStorage from "react-native-mmkv-storage";
+
 import { color } from "../../constants.json";
+import { wsSend } from "../../App";
 
-const operators = ['*',"+",'-'];
-var math_it_up = {
-    '+': function (x, y) { return x + y },
-    '-': function (x, y) { return x - y },
-    '*': function (x, y) {return x*y},
-}​​​​​​​;
+import useInterval from "../Helper/useInterval";
 
-export default Riddle = ({ navigation, route }) => {
-  const [checked, setChecked] = useState([false, false, false, false]);
+const operators = ["*", "+", "-"];
+
+const math_it_up = {
+  "+": function (x, y) {
+    return x + y;
+  },
+
+  "-": function (x, y) {
+    return x - y;
+  },
+  "*": function (x, y) {
+    return x * y;
+  },
+};
+
+const COOLDOWN = 20;
+
+export default Maths = ({ navigation, route }) => {
+  const MMKV = new MMKVStorage.Loader().initialize();
+  const { cpName, gid, team, cid } = route.params;
+  const cooldowns = useRef(MMKV.getArray("cpCooldowns"));
+  const correct = useRef(false);
   const [disabled, setDisabled] = useState(false);
-  const [question,setQuestion] = useState("");
+  const [question, setQuestion] = useState("");
   const [answerInput, setAnswerInput] = useState("");
-  const [summitButtonColor, setSummitButtonColor] = useState("blue");
-
-    let answer;
-
+  const [cooldown, setCooldown] = useState(cooldowns.current[cid]);
+  const [answer, setAnswer] = useState();
+  const [level, setLevel] = useState(0);
   const handleOnPressSummit = () => {
     setDisabled(true);
-    correct = setAnswerInput == answer;
-    setSummitButtonColor(correct ? color.lightGreen : color.wrongRed);
-    setTimeout(
-      () => navigation.navigate("InGame", { cd: correct ? -1 : 7 }),
-      2000
-    );
+    if (answerInput !== answer) {
+      setCooldown(COOLDOWN);
+      setup();
+    } else {
+      setLevel(MMKV.getMap("joinedGame").checkpoints[cid].level[team]);
+      correct.current = true;
+      wsSend(
+        JSON.stringify({
+          header: "ADD",
+          content: { gid: gid.toString(), team: team, cid: cid },
+        })
+      )
+        .then(() => {
+          setTimeout(() => {
+            setLevel(MMKV.getMap("joinedGame").checkpoints[cid].level[team]);
+          }, 1000);
+        })
+        .then(() => {
+          setTimeout(() => {
+            navigation.pop();
+          }, 2000);
+        });
+    }
   };
 
-  useEffect(()=>{
-      const a =Math.floor(Math.random()*900+100);
-      const b = Math.floor(Math.random()*100+1);
-      const c = Math.floor(Math.random()*100+1);
-      const o1 = operators[Math.floor(Math.random()*3)];
-      const o2 = operators[Math.floor(Math.random()*3)];
-      answer = toString(math_it_up[o2](math_it_up[o1](a,b),c));
-      let first_half = `(${a} ${o1} ${b})`;
-      if (o2=='*' && o1 !='*')  first_half = '('+first_half+')';
-      setQuestion(first_half+` ${o1} ${b})` );
-  },[])
+  useInterval(
+    () => {
+      setCooldown((cooldowns.current[cid] = cooldown - 1));
+      if (cooldown === 0) {
+        setDisabled(false);
+      }
+    },
+    cooldown !== -1 ? 1000 : null
+  );
+
+  useEffect(
+    () =>
+      navigation.addListener("beforeRemove", (e) => {
+        MMKV.setArray("cpCooldowns", cooldowns.current);
+      }),
+    [navigation]
+  );
+  const setup = () => {
+    let a, b, c, o1, o2, ans;
+    do {
+      a = Math.floor(Math.random() * 100 + 1);
+      b = Math.floor(Math.random() * 100 + 1);
+      c = Math.floor(Math.random() * 100 + 1);
+      o1 = operators[Math.floor(Math.random() * 3)];
+      o2 = operators[Math.floor(Math.random() * 3)];
+      ans = math_it_up[o2](math_it_up[o1](a, b), c);
+    } while (ans >= 1000 || ans <= 0);
+    setAnswer(ans.toString());
+    let first_half = `${a} ${o1} ${b}`;
+    if (o2 === "*" && o1 !== "*") first_half = "(" + first_half + ")";
+    setQuestion(first_half + ` ${o2} ${c}`);
+  };
+
+  useEffect(() => {
+    setup();
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.questionText}>{riddle.Question}</Text>
-      <Input placeholder="Your answer" onChangeText={setAnswerInput}></Input>
-      <TouchableHighlight
-        disabled={disabled}
-        style={[styles.summitButton,{backgroundColor:summitButtonColor}]}
-        onPress={handleOnPressSummit}
-      >
-        <Text style={styles.summitButtonText}>Summit</Text>
-      </TouchableHighlight>
+      <Text style={styles.checkpointName}>{cpName}</Text>
+
+      {cooldown !== -1 && (
+        <View style={{ flex: 0.8 }}>
+          <Text style={styles.wrongText}>Wrong anwser. Try again in</Text>
+          <Progress.Circle
+            progress={cooldown / COOLDOWN}
+            size={120}
+            thickness={10}
+            formatText={(progress) => {
+              return cooldown + "s";
+            }}
+            color={"red"}
+            showsText={true}
+            style={{ alignSelf: "center" }}
+          />
+        </View>
+      )}
+      {cooldown === -1 && !correct.current && (
+        <View style={{ flex: 0.8 }}>
+          <Text style={styles.questionText}>{question}</Text>
+          <Input
+            placeholder="Your answer"
+            onChangeText={setAnswerInput}
+            keyboardType={"number-pad"}
+          />
+          <Button
+            containerStyle={styles.summitButton}
+            buttonStyle={{ backgroundColor: color.brown }}
+            title={"Summit"}
+            onPress={handleOnPressSummit}
+            disabled={disabled}
+          />
+        </View>
+      )}
+      {correct.current && (
+        <View style={{ flex: 0.8 }}>
+          <Text style={styles.correctText}>Correct!</Text>
+          <Progress.Bar
+            progress={
+              level / MMKV.getMap("joinedGame").checkpoints[cid].maxLevel
+            }
+            color={team === "RED" ? "red" : "blue"}
+            width={200}
+            height={30}
+            style={{ alignSelf: "center" }}
+          />
+        </View>
+      )}
     </SafeAreaView>
   );
 };
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "black",
+    backgroundColor: color.offWhite,
+    padding: 30,
     flex: 1,
   },
+  checkpointName: {
+    flex: 0.2,
+    fontSize: 21,
+    textAlign: "left",
+    fontWeight: "700",
+    textAlignVertical: "center",
+  },
   questionText: {
-    fontFamily: "Poppins-Medium",
-    textAlign: "left",
-    fontSize: 14,
-    color: color.blueOnBlack,
-    padding: 10,
-  },
-  checkBox: {
-    borderColor: color.darkGrey,
-    padding: 10,
-  },
-  choiceText: {
-    fontFamily: "Poppins-Medium",
-    textAlign: "left",
-    fontSize: 14,
-    color: color.offWhite,
+    flex: 0.3,
+    textAlign: "center",
+    fontSize: 28,
+    fontWeight: "700",
+    color: "black",
   },
   summitButton: {
-    position: "absolute",
-    bottom: "5%",
+    flex: 0.7,
+    alignSelf: "center",
     alignContent: "center",
-    left: "25%",
-    height: 60,
-    width: "50%",
-    borderRadius: 20,
-    borderWidth: 0.8,
-    borderColor: "white",
-    alignItems: "center",
-    justifyContent: "center",
+    width: "48%",
+  },
+  wrongText: {
+    textAlign: "center",
+    fontSize: 18,
+    color: "red",
+    flex: 0.3,
+  },
+  correctText: {
+    textAlign: "center",
+    fontSize: 36,
+    color: "black",
+    fontWeight: "700",
+    flex: 0.3,
   },
   summitButtonText: {
     textAlign: "center",
