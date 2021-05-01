@@ -2,13 +2,10 @@ import React, {useState,useEffect} from 'react';
 import {StyleSheet, View, Pressable, Text, Alert} from 'react-native';
 import MapboxGL from '@react-native-mapbox-gl/maps';
 import mapboxgl from "mapbox-gl/dist/mapbox-gl-csp";
-import * as Progress from "react-native-progress";
 MapboxGL.setAccessToken(
   'pk.eyJ1IjoicmFzaGlkdGhlZGV2ZWxvcGVyIiwiYSI6ImNrYXBncGlwdjBjbG4yd3FqaXl2ams1NHQifQ.jvRoapH6Ae7QHb8Kx4z9FQ',
 );
-const MAPBOX_TOKEN = 'pk.eyJ1IjoicmFzaGlkdGhlZGV2ZWxvcGVyIiwiYSI6ImNrYXBncGlwdjBjbG4yd3FqaXl2ams1NHQifQ.jvRoapH6Ae7QHb8Kx4z9FQ'
 import Geolocation from "react-native-geolocation-service";
-import Geocoder from 'react-native-geocoding';
 import RNLocation, { Location } from 'react-native-location';
 const App = () => {
   const [location, setLocation] = useState(null);
@@ -26,9 +23,9 @@ const App = () => {
       },
       // Android only
       androidProvider: "auto",
-      interval: 1000, // Milliseconds
-      fastestInterval: 1000, // Milliseconds
-      maxWaitTime: 1000, // Milliseconds
+      interval: 10, // Milliseconds
+      fastestInterval: 10, // Milliseconds
+      maxWaitTime: 10, // Milliseconds
       // iOS Only
       activityType: "other",
       allowsBackgroundLocationUpdates: false,
@@ -109,12 +106,10 @@ const App = () => {
   // }, [location]);
 
   const addbutton = ()=>{
-    setaddcor([...addcor,[114.2656,22.3360,8,20]])
     Alert.alert("addbutton")
     console.log("hihi")
   }
   const startbutton = ()=>{
-    addcor.splice(index, 3);
     Alert.alert("startbutton")
   }
 
@@ -125,36 +120,36 @@ const App = () => {
     coordinate = [lan,lat]
     const redteam = addcor[counter][2]
     const blueteam = addcor[counter][3]
-    
 
-//     const colorStyles1 = {
-//       borderRightColor:"white",
-//       borderLeftColor:"red",
-//       borderRightWidth: 40-redteam,
-//       borderLeftWidth: redteam,
+    const colorStyles1 = {
+      borderRightColor:"white",
+      borderLeftColor:"red",
+      borderRightWidth: 20-redteam,
+      borderLeftWidth: redteam,
 
-//   };
-//   const colorStyles2 = {
-//     borderRightColor:"white",
-//     borderLeftColor:"blue",
-//     borderRightWidth: 40-blueteam,
-//     borderLeftWidth: blueteam,
+  };
+  const colorStyles2 = {
+    borderRightColor:"white",
+    borderLeftColor:"blue",
+    borderRightWidth: 20-blueteam,
+    borderLeftWidth: blueteam,
 
 
-// };
+};
     return(
     
     <MapboxGL.PointAnnotation key={id} coordinate={coordinate}>
+        {/* <View style={{
+                  height: 30, 
+                  width: 30, 
+                  backgroundColor: '#00cccc', 
+                  borderRadius: 50, 
+                  borderColor: '#fff', 
+                  borderWidth: 3
+                }} /> */}
         <View style={styles.container}>
-          <View style={styles.circle} />
-          {/* <View style={[styles.rectangle,colorStyles1]} />
-          <View style={[styles.rectangle2,colorStyles2]} /> */}
-          <View
-              style={{ width: 50, height: 100, backgroundColor: "#FFFFFF00" }}
-            >
-              <Progress.Bar progress={redteam} width={50} />
-              <Progress.Bar progress={blueteam} width={50} color={"red"} />
-            </View>
+          <View style={[styles.rectangle,colorStyles1]} />
+          <View style={[styles.rectangle2,colorStyles2]} />
         </View>
        
     </MapboxGL.PointAnnotation>
@@ -199,8 +194,6 @@ const App = () => {
           </MapboxGL.PointAnnotation>
           {setpoints()}
         </MapboxGL.MapView>
-        {/* <Text style={[styles.button1,styles.buttonText]}>RED Team 35</Text>
-        <Text style={[styles.button2,styles.buttonText]}>BLUE Team 46</Text> */}
         <Pressable
         style={({pressed}) => [
           {
@@ -228,37 +221,47 @@ const App = () => {
 
 const styles = StyleSheet.create({
   rectangle: {
-    marginTop:0,
-    width: 40,
+    width: 20,
     height:  5,
+    // borderTopWidth: 10,
+    // borderRightWidth: 5,
+    // // borderTopRightRadius: 2,
+    // borderRightColor:'transparent',
+    // borderTopLeftRadius: 2,
+    // borderBottomLeftRadius:2,
+    // borderBottomRightRadius:2,
+    
+    // borderRightWidth: 25,
+    
   },
   rectangle2: {
     marginTop:0,
-    width: 40,
+    width: 20,
     height:  5,
+    //borderTopWidth: 10,
+    //borderRightWidth: 5,
+    // borderTopRightRadius: 2,
+    //borderRightColor:'transparent',
+    // borderTopLeftRadius: 2,
+     //borderBottomWidth: 10,
+    // borderBottomLeftRadius:2,
+    // borderBottomRightRadius:2,
+    
+    // borderRightWidth: 25,
   },
-  circle: {
-    marginTop:0,
-    width: 40,
-    height: 40,
-    borderRadius: 40/2,
-    backgroundColor: 'rgba(52, 52, 52, 0.3)'
- },
   page: {
     flex: 1,
   },
   container: {
-    width: "100%",
-    height: "100%",
-    // borderRadius: 50/2,
-    backgroundColor: 'rgba(52, 52, 52, 0)'
+    height: '100%',
+    width: '100%',
+    backgroundColor: 'blue'
   },
   map: {
     flex: 1,
     position:'relative',
   },
   button1: {
-    backgroundColor:'red',
     borderRadius: 30,
     padding: 6,
     height: '10%',
@@ -280,12 +283,11 @@ const styles = StyleSheet.create({
     elevation: 10,
     position:'absolute',
     top: '90%',
-    left: '0%',
+    right: '50%',
   },
   buttonText: {
     fontSize: 20,
     color: 'white',
-    
   },
 });
 
