@@ -1,4 +1,3 @@
-/* eslint-disable quotes */
 import React, { useState, useEffect } from "react";
 import { SafeAreaView, Text, ScrollView, StyleSheet, View } from "react-native";
 import { Button } from "react-native-elements";
@@ -52,25 +51,32 @@ export default Waiting = ({ navigation }) => {
     roomInfo.players.map((value) => {
       list.push(value.name);
       if (value.team != null) {
-        if (value.pid === MMKV.getString("userID"))
+        if (value.pid == MMKV.getString("userID"))
           MMKV.setString("team", value.team);
       }
     });
     playerList = list;
     setPlayersView(renderPlayersList());
-    if (status === "RUNNING") {
+    if (status == "RUNNING") {
       navigation.replace("InGame");
       return;
     }
   }, [roomInfo]);
 
   const renderPlayersList = () => {
-    if (playerList.length === 0) return;
+    if (playerList.length == 0) return;
     let list = [],
       i;
     for (i = 0; i + 1 < playerList.length; i += 2) {
       list.push(
-        <View style={styles.playerListRowConatiner} key={i % 2}>
+        <View
+          style={{
+            height: 60,
+            flexDirection: "row",
+            justifyContent: "space-between",
+          }}
+          key={i % 2}
+        >
           <View style={styles.leftPlayer} key={i}>
             <Text style={styles.headerText} key={i}>
               {playerList[i]}
@@ -86,7 +92,14 @@ export default Waiting = ({ navigation }) => {
     }
     if (i < playerList.length) {
       list.push(
-        <View style={styles.playerListRowConatiner} key={i % 2}>
+        <View
+          style={{
+            height: 60,
+            flexDirection: "row",
+            justifyContent: "space-between",
+          }}
+          key={i % 2}
+        >
           <View style={styles.leftPlayer} key={i}>
             <Text style={styles.headerText} key={i}>
               {playerList[i]}
@@ -131,7 +144,7 @@ export default Waiting = ({ navigation }) => {
 };
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: color.offWhite,
+    backgroundColor: "white",
     flex: 1,
   },
   headerContainer: {
@@ -167,12 +180,7 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.37,
     shadowRadius: 15,
-    elevation: 5,
-  },
-  playerListRowConatiner: {
-    height: 60,
-    flexDirection: "row",
-    justifyContent: "space-between",
+    elevation: 10,
   },
   leftPlayer: {
     flex: 0.36,

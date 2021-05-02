@@ -1,7 +1,7 @@
 module.exports = {
   root: true,
-  extends: ["@react-native-community", "plugin:react-hooks/recommended"],
+  extends: '@react-native-community',
   rules: {
-    "prettier/prettier": 0,
+    'prettier/prettier': 0,
   },
 };

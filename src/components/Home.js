@@ -82,12 +82,6 @@ const Home = ({ navigation }) => {
         }}
       ></Button>
       <Button
-        title={"Real SetMap Test"}
-        onPress={() => {
-          navigation.navigate("rsetmap");
-        }}
-      ></Button>
-      <Button
         title={"InGame Test"}
         onPress={() => {
           navigation.navigate("InGame");
