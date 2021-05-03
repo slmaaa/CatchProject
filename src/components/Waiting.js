@@ -52,8 +52,10 @@ export default Waiting = ({ navigation }) => {
     roomInfo.players.map((value) => {
       list.push(value.name);
       if (value.team != null) {
-        if (value.pid === MMKV.getString("userID"))
+        if (value.pid === MMKV.getString("userID")) {
           MMKV.setString("team", value.team);
+          MMKV.setInt("key", value.key);
+        }
       }
     });
     playerList = list;

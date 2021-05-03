@@ -13,6 +13,9 @@
     "blueOnBlack": "#99BBFF",
     "wrongRed": "#E53935",
     "lightPurple": "#f2bcf8",
-    "brown": "#4F2D20"
+    "brown": "#4F2D20",
+    "teamBlue": "#98E7FD",
+    "teamRed": "#FF8F62",
+    "transBlack": "#00000080"
   }
 }
