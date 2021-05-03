@@ -58,6 +58,10 @@ const App = () => {
         console.log("Recieved game info");
         MMKV.setMap("gameInfo", data.content);
         break;
+      case "CLOSE_ACCOUNT":
+        console.log("Recieved endStats");
+        MMKV.setMap("endStats", data.content);
+        break;  
       default:
         console.error("Unidentified data");
     }
