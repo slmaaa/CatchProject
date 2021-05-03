@@ -31,7 +31,7 @@ async def create_game_handler(websocket, _dict):
         return
     gdb[gid] = game.to_dict()
     db.push(gdb, G_DB)
-    await websocket.send('{"header": "CREATED", "content":'+str(gid)+'}')
+    await websocket.send('{"header": "CREATED", "content":'+json.dumps(gdb[gid])+'}')
     await register(websocket, str(gid))
 
 
@@ -98,12 +98,50 @@ async def add_handler(websocket, _dict):
     try:
         gdb = db.pull(G_DB)
         game = Game.from_dict(gdb[_dict["gid"]])
-        game.incrementLevel(_dict["gid"], _dict["team"])
-        await broadcast(_dict["gid"], "GAME_INFO", json.dumps(game.keyInfo))
+    except:
+        await websocket.send('{"header": "ERROR", "content": "Cannot find game"}')
+        return
+    try:
+        game.incrementLevel(int(_dict["cid"]), _dict["team"])
+    except:
+        await websocket.send('{"header": "ERROR", "content": "Incremnet fail"}')
+        return
+    try:
+        await broadcast(_dict["gid"], "GAME_INFO", game.keyInfo)
+    except:
+        await websocket.send('{"header": "ERROR", "content": "Broadcast fail"}')
+        return
+    try:
         gdb[_dict["gid"]] = game.to_dict()
         db.push(gdb, G_DB)
     except:
-        await websocket.send('{"header": "ERROR", "content": "Add fail"}')
+        await websocket.send('{"header": "ERROR", "content": "Save game fail"}')
+
+
+async def player_stats_handler(websocket, _dict):
+    try:
+        gdb = db.pull(G_DB)
+        game = Game.from_dict(gdb[_dict["gid"]])
+    except:
+        await websocket.send('{"header": "ERROR", "content": "Cannot find game"}')
+        return
+    try:
+        flag = game.setPlayerStats(
+            int(_dict["key"]), _dict["points"], _dict["dist"])
+    except:
+        await websocket.send('{"header": "ERROR", "content": "Updatae stats fail"}')
+        return
+    try:
+        if flag:
+            await broadcast(_dict["gid"], "CLOSE_ACCOUNT", {"players": game["players"]})
+    except:
+        await websocket.send('{"header": "ERROR", "content": "Broadcast fail"}')
+        return
+    try:
+        gdb[_dict["gid"]] = game.to_dict()
+        db.push(gdb, G_DB)
+    except:
+        await websocket.send('{"header": "ERROR", "content": "Save game fail"}')
 
 
 async def broadcast(room, header, content):
@@ -137,6 +175,9 @@ async def handler(websocket, path):
             elif (_dict["header"] == "ADD"):
                 print("Received ADD request")
                 await add_handler(websocket, _dict["content"])
+            elif (_dict["header" == "PLAYER_STATS"]):
+                print("Received PLAYER_STATS request")
+                await player_stats_handler(websocket, _dict["content"])
                 # else:
                 #     gameID = path[1:]
                 #
