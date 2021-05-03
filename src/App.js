@@ -1,12 +1,13 @@
+/* eslint-disable quotes */
 import React, { useState, useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import auth from "@react-native-firebase/auth";
+import MMKVStorage from "react-native-mmkv-storage";
 
 import InGame from "./components/InGame/InGame";
 import Login from "./components/Login";
 import SignUp from "./components/Signup";
-import ForgotPassword from "./components/ForgotPassword";
 import Home from "./components/Home";
 import Riddle from "./components/InGame/Riddle";
 import Sudoku from "./components/InGame/Sudoku";
@@ -14,9 +15,11 @@ import CreateGame from "./components/CreateGame";
 import Waiting from "./components/Waiting";
 import LoadingHome from "./components/LoadingHome";
 import setmap from "./components/setmap";
-import MMKVStorage from "react-native-mmkv-storage";
+import Maths from "./components/InGame/Math";
+import rsetmap from "./components/rsetmap";
+import history from "./components/history";
 import { color } from "./constants";
-
+[];
 const MMKV = new MMKVStorage.Loader().initialize();
 const Stack = createStackNavigator();
 const ws = new WebSocket("ws://192.168.29.243:8765");
@@ -44,7 +47,7 @@ const App = () => {
         break;
       case "CREATED":
         console.log("Game created");
-        MMKV.setString("createdGameID", data.content + "");
+        MMKV.setMap("joinedGame", data.content);
         break;
       case "JOINED":
         console.log("Game joined");
@@ -97,13 +100,6 @@ const App = () => {
                 headerShown: false,
               }}
             />
-            <Stack.Screen
-              name="ForgotPassword"
-              component={ForgotPassword}
-              options={{
-                headerShown: false,
-              }}
-            />
           </>
         ) : (
           <>
@@ -120,6 +116,28 @@ const App = () => {
               options={{
                 headerLeft: null,
                 title: "Set CheckPoints",
+                headerStyle: {
+                  backgroundColor: color.blueOnBlack,
+                },
+              }}
+            />
+            <Stack.Screen
+              name="rsetmap"
+              component={rsetmap}
+              options={{
+                headerLeft: null,
+                title: "Real Set CheckPoints",
+                headerStyle: {
+                  backgroundColor: color.blueOnBlack,
+                },
+              }}
+            />
+            <Stack.Screen
+              name="history"
+              component={history}
+              options={{
+                headerLeft: null,
+                title: "History",
                 headerStyle: {
                   backgroundColor: color.blueOnBlack,
                 },
@@ -156,7 +174,14 @@ const App = () => {
             <Stack.Screen
               name="Waiting"
               component={Waiting}
-              options={({ route }) => ({
+              options={() => ({
+                headerShown: false,
+              })}
+            />
+            <Stack.Screen
+              name="Maths"
+              component={Maths}
+              options={() => ({
                 headerShown: false,
               })}
             />
