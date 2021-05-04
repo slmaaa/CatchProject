@@ -1,7 +1,7 @@
 /* eslint-disable quotes */
 import React, { useState, useEffect } from "react";
 import { SafeAreaView, Text, ScrollView, StyleSheet, View } from "react-native";
-import { Button } from "react-native-elements";
+import { Avatar, Button } from "react-native-elements";
 import database from "@react-native-firebase/database";
 import MMKVStorage from "react-native-mmkv-storage";
 
@@ -9,6 +9,7 @@ import { color } from "../constants.json";
 import { deleteGame, getGame } from "./Helper/server";
 import useInterval from "./Helper/useInterval";
 import { wsSend } from "../App";
+import Icon from "react-native-vector-icons";
 
 export default Waiting = ({ navigation }) => {
   const MMKV = new MMKVStorage.Loader().initialize();
@@ -74,12 +75,33 @@ export default Waiting = ({ navigation }) => {
       list.push(
         <View style={styles.playerListRowConatiner} key={i % 2}>
           <View style={styles.leftPlayer} key={i}>
-            <Text style={styles.headerText} key={i}>
-              {playerList[i]}
+            <Text style={styles.LplayerName} key={i}>
+                {playerList[i]}
             </Text>
+            <Avatar
+              rounded
+              source={{
+                uri:"https://images-na.ssl-images-amazon.com/images/S/pv-target-images/7bbe5762c79ee0ad11c1267483b4a2d5e12868de779eaf751e8e86596e978bbb._V_SX1080_.jpg",
+              }}
+              //icon={{name: 'home'}}
+            />
+            {/* <Icon
+                reverse
+                name="sc-telegram"
+                type="evilicon"
+                size={20}
+                color="white"
+            /> */}
           </View>
           <View style={styles.rightPlayer} key={i + 1}>
-            <Text style={styles.headerText} key={i + 1}>
+            <Avatar
+              rounded
+              source={{
+                uri:"https://images-na.ssl-images-amazon.com/images/S/pv-target-images/7bbe5762c79ee0ad11c1267483b4a2d5e12868de779eaf751e8e86596e978bbb._V_SX1080_.jpg",
+              }}
+              //icon={{name: 'home'}}
+            />
+            <Text style={styles.RplayerName} key={i + 1}>
               {playerList[i + 1]}
             </Text>
           </View>
@@ -90,9 +112,16 @@ export default Waiting = ({ navigation }) => {
       list.push(
         <View style={styles.playerListRowConatiner} key={i % 2}>
           <View style={styles.leftPlayer} key={i}>
-            <Text style={styles.headerText} key={i}>
+            <Text style={styles.LplayerName} key={i}>
               {playerList[i]}
             </Text>
+            <Avatar
+                rounded
+                source={{
+                    uri:"https://images-na.ssl-images-amazon.com/images/S/pv-target-images/7bbe5762c79ee0ad11c1267483b4a2d5e12868de779eaf751e8e86596e978bbb._V_SX1080_.jpg",
+                }}
+                //icon={{name: 'home'}}
+            />
           </View>
         </View>
       );
@@ -117,6 +146,14 @@ export default Waiting = ({ navigation }) => {
           {`${game.hostName}'s Room`}
           {`\nRoom ID: ${game.gid}`}
         </Text>
+        <Avatar
+          rounded
+          //style={{alignSelf: "center"}}
+          source={{
+              uri:"https://images-na.ssl-images-amazon.com/images/S/pv-target-images/7bbe5762c79ee0ad11c1267483b4a2d5e12868de779eaf751e8e86596e978bbb._V_SX1080_.jpg",
+          }}
+          //icon={{name: 'home'}}
+        />
       </View>
       <ScrollView style={styles.playersListContainer}>{playerView}</ScrollView>
       <Button
@@ -137,8 +174,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   headerContainer: {
-    marginTop: 30,
-    marginBottom: 70,
+    marginTop: "10%",
+    marginBottom: "20%",
     height: "10%",
     backgroundColor: "#00000080",
     width: "48%",
@@ -146,13 +183,34 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 50,
     alignContent: "center",
     justifyContent: "center",
+    flexDirection: "row",
   },
   headerText: {
     fontSize: 14,
     fontWeight: "700",
+    width:"90%",
     color: "#FFFFFFFF",
     textAlign: "center",
     textAlignVertical: "center",
+    paddingLeft:"10%",
+  },
+  LplayerName: {
+    fontSize: 14,
+    fontWeight: "700",
+    width: "70%",
+    color: "white",
+    textAlign: "center",
+    textAlignVertical: "center",
+    paddingLeft:"10%",
+  },
+  RplayerName: {
+    fontSize: 14,
+    fontWeight: "700",
+    width: "70%",
+    color: "white",
+    textAlign: "center",
+    textAlignVertical: "center",
+    paddingRight: 5,
   },
   playersListContainer: { height: "60%" },
   button: {
@@ -172,12 +230,15 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   playerListRowConatiner: {
-    height: 60,
+    height: 100,
     flexDirection: "row",
     justifyContent: "space-between",
+    marginBottom: 5,
   },
   leftPlayer: {
-    flex: 0.36,
+    //flex: 0.36,
+    flexDirection: "row",
+    width: "40%",
     height: "100%",
     borderTopRightRadius: 50,
     borderBottomRightRadius: 50,
@@ -186,7 +247,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   rightPlayer: {
-    flex: 0.36,
+    //flex: 0.36,
+    flexDirection: "row",
+    width: "40%",
     height: "100%",
     borderTopLeftRadius: 50,
     borderBottomLeftRadius: 50,
