@@ -1,3 +1,4 @@
+/*"greyBackgorund": "#EFF0F7",*/
 /* eslint-disable quotes */
 import React, { useState, useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";

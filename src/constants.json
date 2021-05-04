@@ -1,10 +1,10 @@
 {
   "URL": "ws://192.168.29.243:5000/",
   "color": {
-    "primaryDark": "#2A00A2",
-    "greyBackgorund": "#EFF0F7",
+    "primaryDark": "#F1F1F1",
+    "greyBackgorund": "#F1F1F1",
     "offWhite": "#F1F1F1",
-    "primary": "#5F2EEA",
+    "primary": "#4F2D20",
     "darkGrey": "#6E7191",
     "justBlack": "#272727",
     "grey": "#9E9E9E",
@@ -16,6 +16,9 @@
     "brown": "#4F2D20",
     "teamBlue": "#98E7FD",
     "teamRed": "#FF8F62",
-    "transBlack": "#00000080"
+    "transBlack": "#00000080",
+    "signUpBlue": "#256EDB",
+    "white": "#FFFFFF",
+    "black": "#000000"
   }
 }
