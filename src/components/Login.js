@@ -19,7 +19,6 @@ import { color } from "../constants";
 import { storeData } from "./Helper/async";
 import { Icon } from "react-native-elements";
 
-const exampleImage = require('./assets/images/example.png')
 const exampleImageUri = Image.resolveAssetSource(logoImage).uri
 const Login = ({ navigation }) => {
   const [email, setEmail] = useState();
@@ -158,8 +157,8 @@ const styles = StyleSheet.create({
     backgroundColor: color.primary,
     borderRadius: 10,
     height: 50,
-    width: 130,
-    marginHorizontal: 75,
+    width: 160,
+    marginHorizontal: 60,
   },
   loginButtonText: {
     color: "#FFFFFF",

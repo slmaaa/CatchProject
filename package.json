@@ -68,6 +68,8 @@
     "@babel/preset-react": "^7.13.13",
     "@babel/runtime": "^7.12.5",
     "@babel/runtime-corejs2": "^7.13.10",
+    "@iconify/icons-fluent": "^1.1.12",
+    "@iconify/react": "^1.1.4",
     "@react-native-community/eslint-config": "^2.0.0",
     "babel-jest": "^26.6.3",
     "babel-loader": "^8.1.0",
