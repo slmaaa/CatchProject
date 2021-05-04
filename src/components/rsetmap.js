@@ -1,7 +1,7 @@
 import React, {useState,useEffect,useRef} from 'react';
 import {StyleSheet, View, Pressable, Text, Alert,Modal,TouchableHighlight} from 'react-native';
 import MapboxGL from '@react-native-mapbox-gl/maps';
-
+import NumericInput from 'react-native-numeric-input'
 MapboxGL.setAccessToken(
   'pk.eyJ1IjoicmFzaGlkdGhlZGV2ZWxvcGVyIiwiYSI6ImNrYXBncGlwdjBjbG4yd3FqaXl2ams1NHQifQ.jvRoapH6Ae7QHb8Kx4z9FQ',
 );
@@ -12,6 +12,8 @@ const App = () => {
   const [addcor,setaddcor]=useState([]);
   const [mapcenter, setmapcenter] = useState([]);
   const [infotoserve,setinfotoserve]=useState([]);
+  const[radius,setradius]=useState(10);
+  const[checkpointpower,setcheckpointpower]=useState(5);
   //const[ModalOpen, setModalOpen] = useState(false);
   const mapRef = useRef();
   useEffect(() => {
@@ -76,8 +78,6 @@ const App = () => {
     //setModalOpen(true)
     id = addcor.length+1;
     var name = "name";
-    var radius = 10;
-    var maxlevel = 5;
     setaddcor([...addcor, mapcenter])// centerlat,lng hvent implement
     setinfotoserve({...infotoserve,
       newpoint :{
@@ -86,9 +86,9 @@ const App = () => {
         "area": {
           "area": "CIRCLE",
           "center": { "lat": mapcenter[0], "lng": mapcenter[1] },
-          "radius": radius
+          "radius": {radius}
         },
-        "maxLevel": maxlevel,
+        "maxLevel": {checkpointpower},
       }
   });
     //console.log(infotoserve[1].geolocation.lan)
@@ -187,6 +187,43 @@ const App = () => {
        </Pressable>
        <View style={styles.shooter} />
        <View style={styles.shooter2} />
+       <View style={styles.input}>
+         <NumericInput 
+            value = {radius}
+            onChange={value => setradius({value})} 
+            onLimitReached={(isMax,msg) => console.log(isMax,msg)}
+            totalWidth={150} 
+            totalHeight={50} 
+            iconSize={25}
+            step={10}
+            valueType='real'
+            rounded 
+            textColor='#B0228C' 
+            iconStyle={{ color: 'white' }} 
+            rightButtonBackgroundColor='#EA3788' 
+            leftButtonBackgroundColor='#E56B70'/>
+            <Text style={styles.texttop}>CP Radius (m)</Text>
+       </View>
+       <View style={styles.input2}>
+         <NumericInput 
+            value = {checkpointpower}
+            onChange={value => setcheckpointpower({value})} 
+            onLimitReached={(isMax,msg) => console.log(isMax,msg)}
+            totalWidth={150} 
+            totalHeight={50} 
+            iconSize={25}
+            step={1}
+            valueType='real'
+            rounded 
+            textColor='#B0228C' 
+            iconStyle={{ color: 'white' }} 
+            rightButtonBackgroundColor='#EA3788' 
+            leftButtonBackgroundColor='#E56B70'/>
+            <Text style={styles.texttop}>Max Points</Text>
+       </View>
+
+
+       
        {/* <View style={styles.shootercircle} /> */}
       </View>
     </View>
@@ -194,6 +231,26 @@ const App = () => {
 };
 
 const styles = StyleSheet.create({
+  input:{
+    height: '10%',
+    width: '50%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position:'absolute',
+    top: '1%',
+    right: '0%',
+
+  },
+  input2:{
+    height: '10%',
+    width: '50%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position:'absolute',
+    top: '1%',
+    left: '0%',
+
+  },
   shooter:{
     borderRadius: 30,
     padding: 6,
@@ -266,6 +323,10 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 20,
     color: 'white',
+  },
+  texttop:{
+    fontSize: 20,
+    color: 'grey',
   },
   centeredView: {
     flex: 1,

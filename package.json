@@ -48,6 +48,7 @@
     "react-native-maps": "^0.27.1",
     "react-native-mmkv-storage": "^0.5.3",
     "react-native-modalbox": "^2.0.2",
+    "react-native-numeric-input": "^1.9.0",
     "react-native-progress": "^4.1.2",
     "react-native-progress-button": "^1.0.3",
     "react-native-reanimated": "^2.0.0",
