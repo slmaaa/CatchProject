@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { StyleSheet, View, Pressable, Text, Alert } from "react-native";
 import MapboxGL from "@react-native-mapbox-gl/maps";
 import mapboxgl from "mapbox-gl/dist/mapbox-gl-csp";
@@ -7,11 +7,13 @@ MapboxGL.setAccessToken(
 );
 import Geolocation from "react-native-geolocation-service";
 import RNLocation, { Location } from "react-native-location";
+import { map } from "core-js/core/array";
 const App = () => {
   const [location, setLocation] = useState(null);
   const [coordinates, setcoordinates] = useState([114.2655, 22.3364]);
   //   const [clicor,setclicor] = useState([114.2655,22.3364]);
   const [addcor, setaddcor] = useState([]);
+  const mapRef = useRef();
   useEffect(() => {
     //websocketSetup();
     RNLocation.configure({
@@ -47,8 +49,6 @@ const App = () => {
             // console.log("locations", locations)
             if (locations !== undefined && locations.length > 0) {
               let currentLocation = locations[0];
-              console.log(currentLocation.longitude);
-              console.log(currentLocation.latitude);
               setcoordinates([
                 JSON.stringify(currentLocation.longitude),
                 JSON.stringify(currentLocation.latitude),
@@ -106,10 +106,14 @@ const App = () => {
     return item;
   };
 
+  useEffect(() => {
+    mapRef.current.getCenter().then((val) => console.log(val));
+  });
   return (
     <View style={styles.page}>
       <View style={styles.container}>
         <MapboxGL.MapView
+          ref={mapRef}
           style={styles.map}
           onPress={(event) => {
             // const {geometry, properties} = event;
