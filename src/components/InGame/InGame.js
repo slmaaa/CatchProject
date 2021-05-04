@@ -27,6 +27,7 @@ import useInterval from "../Helper/useInterval";
 import { wsSend } from "../../App";
 import { color } from "../../constants.json";
 import { Button } from "react-native-elements";
+import { useFocusEffect } from "@react-navigation/core";
 const CP_RANGE = 25;
 
 const InGame = ({ navigation, route }) => {
@@ -35,7 +36,12 @@ const InGame = ({ navigation, route }) => {
 
   const gameInfo = useRef();
   const [location, setLocation] = useState(null);
+  const [lastLocation, setLastLocation] = useState(null);
+  const [challengesSolved, setChallengesSolved] = useState(0);
+  const distanceTravelled = useRef(0);
+  const [distanceCovered, setDistanceCovered] = useState(0);
   const [currentCID, setCurrentCID] = useState(-1); //Current checkpoint id. -1 if not in any checkpoints
+  const locationRecord = useRef([]);
   const mapRef = useRef();
   const gameRef = useRef({
     game: null,
@@ -43,7 +49,6 @@ const InGame = ({ navigation, route }) => {
     checkpointsLocation: null,
     numberOfCheckpoints: null,
   });
-
   const renderCheckpointsOnMap = () => {
     let cpRenderList = [];
     for (let i = 0; i < gameRef.current.numberOfCheckpoints; i++) {
@@ -107,6 +112,7 @@ const InGame = ({ navigation, route }) => {
     gameRef.current.checkpointsLocation = checkpointsLocation;
     gameRef.current.numberOfCheckpoints = game.checkpoints.length;
     MMKV.setArray("cpCooldowns", coolDowns);
+    MMKV.setInt("challengesSolved", 0);
     setInitializing(false);
   }, []);
   useEffect(() => {
@@ -143,6 +149,23 @@ const InGame = ({ navigation, route }) => {
           // console.log("locations", locations)
           if (locations !== undefined && locations.length > 0) {
             setLocation(locations[0]);
+            if (locationRecord.current.length === 0) {
+              locationRecord.current.push(locations[0]);
+            } else {
+              const dist = getDistance(
+                [
+                  locationRecord.current[locationRecord.current.length - 1]
+                    .longitude,
+                  locationRecord.current[locationRecord.current.length - 1]
+                    .latitude,
+                ],
+                [locations[0].longitude, locations[0].latitude]
+              );
+              if (dist >= 10) {
+                locationRecord.current.push(locations[0]);
+                distanceTravelled.current += dist;
+              }
+            }
           }
         });
       }
@@ -153,16 +176,19 @@ const InGame = ({ navigation, route }) => {
   }, []);
 
   useEffect(() => {
+    if (gameRef.current.game.status === "OVER") return;
     if (location !== null) {
       let flag, newCID;
       for (let i = 0; i < gameRef.current.numberOfCheckpoints; i++) {
         if (
-          getDistance(
-            {
-              latitude: location.latitude,
-              longitude: location.longitude,
-            },
-            gameRef.current.checkpointsLocation[i]
+          Math.abs(
+            getDistance(
+              {
+                latitude: location.latitude,
+                longitude: location.longitude,
+              },
+              gameRef.current.checkpointsLocation[i]
+            )
           ) <= CP_RANGE
         ) {
           newCID = i;
@@ -178,6 +204,7 @@ const InGame = ({ navigation, route }) => {
   }, [location]);
 
   useEffect(() => {
+    if (gameRef.current.game.status === "OVER") return;
     if (currentCID !== -1) {
       navigation.navigate("Maths", {
         cpName: gameRef.current.game.checkpoints[currentCID].name,
@@ -189,10 +216,12 @@ const InGame = ({ navigation, route }) => {
   }, [currentCID]);
 
   useInterval(() => {
+    setDistanceCovered(distanceTravelled.current);
     gameInfo.current = MMKV.getMap("gameInfo");
   }, 100);
 
   useEffect(() => {
+    if (gameRef.current.game.status === "OVER") return;
     if (gameInfo.current == null) {
       return;
     }
@@ -201,7 +230,31 @@ const InGame = ({ navigation, route }) => {
       gameRef.current.game.checkpoints[i].level = gameInfo.current.cpsLevel[i];
     }
     MMKV.setMap("joinedGame", gameRef.current.game);
+    if (gameRef.current.game.status === "OVER") {
+      wsSend(
+        JSON.stringify({
+          header: "PLAYER_STATS",
+          content: {
+            gid: gameRef.current.game.gid.toString(),
+            key: MMKV.getInt("key").toString(),
+            points: MMKV.getInt("challengesSolved").toString(),
+            dist: distanceTravelled.toString(),
+          },
+        }).then(() => {
+          let interval = setInterval(() => {
+            const endStats = MMKV.getMap("endStats");
+            if (endStats == null) return;
+            clearInterval(interval);
+            gameRef.current.game.players = endStats.players;
+          }, 100);
+        })
+      );
+    }
   }, [gameInfo.current]);
+
+  useFocusEffect(() => {
+    setChallengesSolved(MMKV.getInt("challengesSolved"));
+  });
 
   if (initializing) return null;
   else
@@ -227,19 +280,27 @@ const InGame = ({ navigation, route }) => {
               <MapboxGL.UserLocation />
             </MapboxGL.MapView>
           </View>
-          <Button
-            title={"test"}
-            onPress={() => {
-              if (currentCID !== -1) {
-                navigation.navigate("Maths", {
-                  cpName: gameRef.current.game.checkpoints[currentCID].name,
-                  gid: gameRef.current.game.gid,
-                  team: gameRef.current.team,
-                  cid: currentCID,
-                });
-              }
-            }}
-          />
+          <View
+            style={[
+              styles.playerStatsBar,
+              {
+                borderColor:
+                  gameRef.team === "BLUE" ? color.teamBlue : color.teamRed,
+              },
+            ]}
+          >
+            <View style={styles.profilePictureContainer}></View>
+            <Text style={[styles.playerStatsText, { textAlign: "left" }]}>
+              {MMKV.getString("userName")}
+            </Text>
+            <Text style={[styles.playerStatsText, { textAlign: "right" }]}>
+              {distanceCovered > 1000
+                ? distanceCovered / 1000 + "km"
+                : distanceCovered + "m"}{" "}
+              | {challengesSolved} points
+            </Text>
+            <Text></Text>
+          </View>
         </SafeAreaView>
       </>
     );
@@ -273,6 +334,34 @@ const styles = StyleSheet.create({
   },
   map: {
     flex: 1,
+  },
+  playerStatsBar: {
+    position: "absolute",
+    width: "60%",
+    top: 30,
+    height: "8%",
+    borderTopLeftRadius: 50,
+    borderBottomLeftRadius: 50,
+    right: 0,
+    borderWidth: 2,
+    borderRightWidth: 0,
+    backgroundColor: color.transBlack,
+    alignItems: "center",
+    flexDirection: "row",
+  },
+  profilePictureContainer: {
+    marginHorizontal: 5,
+    borderRadius: 40,
+    width: 45,
+    height: 45,
+    backgroundColor: "white",
+  },
+  playerStatsText: {
+    fontSize: 13,
+    fontWeight: "700",
+    color: "white",
+    textAlignVertical: "center",
+    marginHorizontal: 5,
   },
   actionButtonView: {
     position: "absolute",

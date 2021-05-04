@@ -55,6 +55,10 @@ export default Maths = ({ navigation, route }) => {
       )
         .then(() => {
           setTimeout(() => {
+            MMKV.setInt(
+              "challengesSolved",
+              MMKV.getInt("challengesSolved") + 1
+            );
             setLevel(MMKV.getMap("joinedGame").checkpoints[cid].level[team]);
           }, 1000);
         })
