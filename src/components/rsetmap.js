@@ -1,26 +1,34 @@
-import React, {useState,useEffect} from 'react';
-import {StyleSheet, View, Pressable, Text, Alert} from 'react-native';
+import React, {useState,useEffect,useRef} from 'react';
+import {StyleSheet, View, Pressable, Text, Alert,Modal,TouchableHighlight} from 'react-native';
 import MapboxGL from '@react-native-mapbox-gl/maps';
-import mapboxgl from "mapbox-gl/dist/mapbox-gl-csp";
+
 MapboxGL.setAccessToken(
   'pk.eyJ1IjoicmFzaGlkdGhlZGV2ZWxvcGVyIiwiYSI6ImNrYXBncGlwdjBjbG4yd3FqaXl2ams1NHQifQ.jvRoapH6Ae7QHb8Kx4z9FQ',
 );
-import Geolocation from "react-native-geolocation-service";
 import RNLocation, { Location } from 'react-native-location';
 const App = () => {
-  const [location, setLocation] = useState(null);
   const [coordinates,setcoordinates] = useState([114.2655,22.3364]);
-//   const [clicor,setclicor] = useState([114.2655,22.3364]);
-  const [addcor,setaddcor]=useState([])
-  useEffect(()=>{
-    //websocketSetup();
+  const [location, setLocation] = useState(null);
+  const [addcor,setaddcor]=useState([]);
+  const [mapcenter, setmapcenter] = useState([]);
+  const [infotoserve,setinfotoserve]=useState([]);
+  //const[ModalOpen, setModalOpen] = useState(false);
+  const mapRef = useRef();
+  useEffect(() => {
+    mapRef.current.getCenter().then((val) => 
+    setmapcenter(val)
+    );
+
+  });
+  useEffect(() => {
+    let unsub;
     RNLocation.configure({
       distanceFilter: 0, //meters
       desiredAccuracy: {
         ios: "best",
         // highAccuracy
         // balancedPowerAccuracy
-        android: "highAccuracy"
+        android: "highAccuracy",
       },
       // Android only
       androidProvider: "auto",
@@ -34,62 +42,73 @@ const App = () => {
       headingOrientation: "portrait",
       pausesLocationUpdatesAutomatically: false,
       showsBackgroundLocationIndicator: false,
-    }) 
+    });
     RNLocation.requestPermission({
       ios: "whenInUse",
       android: {
-        detail: "fine"
+        detail: "fine",
+      },
+    }).then((granted) => {
+      if (granted) {
+        unsub = RNLocation.subscribeToLocationUpdates((locations) => {
+          // console.log("locations", locations)
+          if (locations !== undefined && locations.length > 0) {
+            setLocation(locations[0]);
+          }
+        });
       }
-    }).then(granted => {
-        if (granted) {
-          let locationSubscription = RNLocation.subscribeToLocationUpdates(locations => {
-            // console.log("locations", locations)
-            if(locations !== undefined && locations.length > 0){
-              let currentLocation = locations[0];
-              console.log(currentLocation.longitude) ;
-              console.log(currentLocation.latitude) ;
-              setcoordinates([JSON.stringify(currentLocation.longitude),JSON.stringify(currentLocation.latitude)])  
-              // setBlueTeamScore(Math.floor(Math.random() * 100));
-              // setRedTeamScore(Math.floor(Math.random() * 100));
-            } 
-          })
-        }
-      })  
-  },[addcor])  
-//   const addbutton = ()=>{
-//     Alert.alert("addbutton")
-//     console.log("hihi")
-//   }
+    });
+    return function cleanup() {
+      unsub();
+    };
+  }, []);
+//   const modal = () =>{
+//     return(
+//        <Modal visible={ModalOpen} animationType='slide' style={styles.centeredView}>  
+//           <TouchableHighlight style={styles.centeredView} onPress={() => setModalOpen(false)}>
+//              <Text>hello</Text>
+//           </TouchableHighlight> 
+//       </Modal> 
+//     )
+// }
+  
+  const addbutton = ()=>{
+    //setModalOpen(true)
+    id = addcor.length+1;
+    var name = "name";
+    var radius = 10;
+    var maxlevel = 5;
+    setaddcor([...addcor, mapcenter])// centerlat,lng hvent implement
+    setinfotoserve({...infotoserve,
+      newpoint :{
+        "cid": id,
+        "name": name,
+        "area": {
+          "area": "CIRCLE",
+          "center": { "lat": mapcenter[0], "lng": mapcenter[1] },
+          "radius": radius
+        },
+        "maxLevel": maxlevel,
+      }
+  });
+    //console.log(infotoserve[1].geolocation.lan)
+  }
   const startbutton = ()=>{
-    Alert.alert("startbutton")
+    console.log(infotoserve)
+    //Alert.alert(infotoserve.length)
+    console.log(coordinates)
   }
 
   const setpoint = (counter) => {
     const id = counter;
     const lan = addcor[counter][0];
     const lat = addcor[counter][1];
-    coordinate = [lan,lat]
-    const redteam = addcor[counter][2]
-    const blueteam = addcor[counter][3]
-
-    const colorStyles1 = {
-      borderRightColor:"white",
-      borderLeftColor:"red",
-      borderRightWidth: 40-redteam,
-      borderLeftWidth: redteam,
-
-    };
-  const colorStyles2 = {
-    borderRightColor:"white",
-    borderLeftColor:"blue",
-    borderRightWidth: 40-blueteam,
-    borderLeftWidth: blueteam,
-    };
+    var coordinate = [lan,lat]
     return(
     
     <MapboxGL.PointAnnotation key={id} coordinate={coordinate}>
         <View style={styles.container}>
-          <View style={styles.circle} />
+          <View style={styles.circle}/>
         </View>
        
     </MapboxGL.PointAnnotation>
@@ -108,45 +127,27 @@ const App = () => {
     return item;
 
   }
-
-
-  
-  
-  
   return (
     <View style={styles.page}>
       <View style={styles.container}>
-        <MapboxGL.MapView style={styles.map}
-        onPress={(event) => {
-            // const {geometry, properties} = event; 
-            Alert.alert(
-                "Add New point",
-                "Add latitude"+event.geometry.coordinates[0]+ " and longtitude " + event.geometry.coordinates[1]+" to the Map?",
-                [
-                  {
-                    text: "Cancel",
-                    onPress: () => console.log("Cancel Pressed"),
-                    style: "cancel"
-                  },
-                  { text: "OK", onPress: () => setaddcor([...addcor, [event.geometry.coordinates[0],event.geometry.coordinates[1]]]) }
-                ]
-              );
-            //Alert.alert("Add latitude"+event.geometry.coordinates[0]+" and longtitude " + event.geometry.coordinates[1]+" to the Map?")
-            //setaddcor([...addcor, [event.geometry.coordinates[0],event.geometry.coordinates[1]]]);
-
-  
-//    this.setState({ 
-//      latitude: geometry.coordinates[1], 
-//      longitude: geometry.coordinates[0], 
-//      screenPointX: properties.screenPointX, 
-//      screenPointY: properties.screenPointY, 
-//    }); 
-            
-            
-        }
-    }
-    >
-          <MapboxGL.Camera zoomLevel={14} centerCoordinate={coordinates} />
+        <MapboxGL.MapView style={styles.map}  ref={mapRef}
+        // onPress={(event) => {
+        //     // const {geometry, properties} = event; 
+        //     Alert.alert(
+        //         "Add New point",
+        //         "Add latitude"+event.geometry.coordinates[0]+ " and longtitude " + event.geometry.coordinates[1]+" to the Map?",
+        //         [
+        //           {
+        //             text: "Cancel",
+        //             onPress: () => console.log("Cancel Pressed"),
+        //             style: "cancel"
+        //           },
+        //           { text: "OK", onPress: () => setaddcor([...addcor, [event.geometry.coordinates[0],event.geometry.coordinates[1]]]) }
+        //         ]
+        //       );             
+        // }}
+      >
+          <MapboxGL.Camera zoomLevel={16} centerCoordinate={coordinates} />
           <MapboxGL.PointAnnotation
            key="pointAnnotation"
            id="pointAnnotation"
@@ -162,8 +163,8 @@ const App = () => {
                 }} />
           </MapboxGL.PointAnnotation>
           {setpoints()}
-          
         </MapboxGL.MapView>
+        {/* {modal()} */}
         <Pressable
         style={({pressed}) => [
           {
@@ -174,7 +175,7 @@ const App = () => {
         onPress={startbutton}>
         <Text style={styles.buttonText}>Start</Text>
        </Pressable>
-       {/* <Pressable
+       <Pressable
         style={({pressed}) => [
           {
             backgroundColor: pressed ? 'lightblue' : 'blue',
@@ -183,19 +184,47 @@ const App = () => {
         ]}
         onPress={addbutton}>
         <Text style={styles.buttonText}>Add</Text>
-       </Pressable> */}
+       </Pressable>
+       <View style={styles.shooter} />
+       <View style={styles.shooter2} />
+       {/* <View style={styles.shootercircle} /> */}
       </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  shooter:{
+    borderRadius: 30,
+    padding: 6,
+    height: '10%',
+    width: '1%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position:'absolute',
+    top: '45%',
+    right: '50%',
+    flex: 1,
+    backgroundColor: "black",
+  },
+  shooter2:{
+    borderRadius: 30,
+    padding: 6,
+    height: '1%',
+    width: '15%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position:'absolute',
+    top: '49%',
+    right: '44%',
+    backgroundColor: "black",
+  },
   circle: {
     marginTop:0,
     width: 40,
     height: 40,
     borderRadius: 40/2,
-    backgroundColor: 'rgba(52, 52, 52, 0.5)'
+    backgroundColor: 'rgba(52, 52, 52, 0.8)'
  },
   page: {
     flex: 1,
@@ -220,7 +249,7 @@ const styles = StyleSheet.create({
     elevation: 10,
     position:'absolute',
     top: '90%',
-    right: '25%',
+    right: '0%',
   },
   button2: {
     borderRadius: 30,
@@ -237,6 +266,12 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 20,
     color: 'white',
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: 'rgba(0,0,0,0.5)'
   },
 });
 
