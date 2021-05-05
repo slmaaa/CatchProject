@@ -29,7 +29,6 @@ import Icon2 from 'react-native-vector-icons/MaterialCommunityIcons';
 import Icon3 from 'react-native-vector-icons/MaterialIcons';
 import Icon4 from 'react-native-vector-icons/Ionicons';
 import * as Progress from "react-native-progress";
-<<<<<<< HEAD
 import Home from "./Home";
 
 const data = [
@@ -44,9 +43,7 @@ const data = [
     { id: '9', title: 'Fourth item' },
   ];
 const App = ({navigation}) => {
-=======
 const App = () => {
->>>>>>> a07118ac8f3f9086b169e1443562cddca54e0912
   const [route, setRoute] = useState(null);
   const[ModalOpen, setModalOpen] = useState(false);
   const [coordinates,setcoordinates] = useState([114.2655,22.3364]);
@@ -341,4 +338,5 @@ const styles = StyleSheet.create({
   }
 });
 
+}
 export default App;

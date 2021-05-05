@@ -97,9 +97,7 @@ const Home = ({ navigation }) => {
           name='file-tray-full-outline'
           type='ionicon'
           color='#4F2D20'
-          onPress={() => {
-            navigation.navigate("history");
-        }}
+          
           />
       
 
