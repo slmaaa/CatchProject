@@ -16,7 +16,7 @@ import {
 
 import { color } from "../constants";
 import { storeData } from "./Helper/async";
-import { Icon } from "react-native-elements";
+import { Avatar, Icon } from "react-native-elements";
 
 const Login = ({ navigation }) => {
   const [email, setEmail] = useState();

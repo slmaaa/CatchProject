@@ -22,7 +22,7 @@ import { color } from "./constants";
 [];
 const MMKV = new MMKVStorage.Loader().initialize();
 const Stack = createStackNavigator();
-const ws = new WebSocket("ws://192.168.29.243:8765");
+const ws = new WebSocket("ws://localhost:8765/");
 
 export const wsSend = async (data) => {
   await ws.send(data);
