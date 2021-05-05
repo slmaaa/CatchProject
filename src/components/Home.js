@@ -2,6 +2,7 @@
 HomeScreen:
 Shown nearby player location and route player to screens
 */
+<script src="https://kit.fontawesome.com/8726c16deb.js" crossorigin="anonymous"></script>
 import React, { useEffect, useState } from "react";
 import { Text, SafeAreaView, Button, StyleSheet, View, Image, TouchableOpacity,} from "react-native";
 import { Overlay, Input } from "react-native-elements";
@@ -9,12 +10,13 @@ import auth from "@react-native-firebase/auth";
 import database from "@react-native-firebase/database";
 import MMKVStorage from "react-native-mmkv-storage";
 
-import { Icon, InlineIcon } from '@iconify/react';
-import documentOnePage24Regular from '@iconify/icons-fluent/document-one-page-24-regular';
+import { Icon } from "react-native-elements";
 import { join } from "./joinGame";
 import { URL } from "../constants.json";
 import { wsSend } from "../App";
 import { color } from "../constants";
+import histroy from "./history";
+import CreateAndJoin from "./CreateAndJoin";
 
 const MMKV = new MMKVStorage.Loader().initialize();
 
@@ -68,18 +70,54 @@ const Home = ({ navigation }) => {
       </Overlay>
 
       <Text>{"Welcome " + MMKV.getString("userName")}</Text>
-      <Icon recordIcon={documentOnePage24Regular} style={{color: '#ffffff', fontSize: '100px'}} />
+      
+      <Button
+        title={"Testing"}
+        onPress={() => {
+          navigation.navigate("RealHome");
+        }}
+      ></Button>
+
       <View style={styles.loginButtonView}>
-              <TouchableOpacity
-                onPress={() => {
-                  navigation.navigate("RealHome");
-                }}
-              >
-                <View style={styles.loginButton}>
-                  <Text style={styles.loginButtonText}>Game</Text>
-                </View>
-              </TouchableOpacity>
-            </View>
+        <TouchableOpacity
+          onPress={() => {
+          navigation.navigate("CreateAndJoin");
+          }}
+        >
+          <View style={styles.loginButton}>
+            <Text style={styles.loginButtonText}>Game</Text>
+          </View>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.homeButtons}>
+
+          <Icon
+          reverse
+          name='file-tray-full-outline'
+          type='ionicon'
+          color='#4F2D20'
+          onPress={() => {
+            navigation.navigate("history");
+        }}
+          />
+      
+
+      <Icon 
+        reverse
+        name='medal-outline'
+        type='ionicon'
+        color='#4F2D20'
+      />
+
+      <Icon
+        reverse
+        name='people-outline'
+        type='ionicon'
+        color='#4F2D20'
+      />
+
+      </View>
     </SafeAreaView>
   );
 };
@@ -185,6 +223,10 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     color: color.signUpBlue,
     marginHorizontal: 110,
+  },
+  homeButtons:{
+    marginHorizontal: 320,
+    marginVertical: -60,
   },
 });
 export default Home;

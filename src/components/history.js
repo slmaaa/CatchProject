@@ -29,6 +29,8 @@ import Icon2 from 'react-native-vector-icons/MaterialCommunityIcons';
 import Icon3 from 'react-native-vector-icons/MaterialIcons';
 import Icon4 from 'react-native-vector-icons/Ionicons';
 import * as Progress from "react-native-progress";
+import Home from "./Home";
+
 const data = [
     { id: '1', title: 'First item' },
     { id: '2', title: 'Second item' },
@@ -40,7 +42,7 @@ const data = [
     { id: '8', title: 'Fourth item' },
     { id: '9', title: 'Fourth item' },
   ];
-const App = () => {
+const App = ({navigation}) => {
   const [route, setRoute] = useState(null);
   const[ModalOpen, setModalOpen] = useState(false);
   const [coordinates,setcoordinates] = useState([114.2655,22.3364]);
@@ -158,6 +160,13 @@ const modalslidethree = () =>{
   }
   return (
     <View style={styles.page}>
+      <Button
+        title={"Back"}
+        onPress={() => {
+          navigation.navigate("Home");
+        }}
+      ></Button>
+
       <View style={styles.container}>
         <MapboxGL.MapView style={styles.map}>
           <MapboxGL.Camera zoomLevel={15} centerCoordinate={coordinates} /> 
