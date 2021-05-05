@@ -1,5 +1,5 @@
 import React from "react";
-import { SafeAreaView, Text, StyleSheet, View, ActivityIndicator } from "react-native";
+import { SafeAreaView, Text } from "react-native";
 import auth from "@react-native-firebase/auth";
 import database from "@react-native-firebase/database";
 
@@ -47,20 +47,6 @@ export default LoadingHome = ({ navigation }) => {
   return (
     <SafeAreaView>
       <Text>Loading</Text>
-      <View style={[styles.container, props.style]}>
-        <ActivityIndicator style={styles.activityIndicator1}></ActivityIndicator>
-      </View>
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    alignItems: "center",
-    justifyContent: "center"
-  },
-  activityIndicator1: {
-    width: 22,
-    height: 22
-  }
-});
