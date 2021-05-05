@@ -6,7 +6,7 @@ import {
   TextInput,
   View,
   Text,
-  Button,
+  Image,
   StatusBar,
   TouchableOpacity,
   KeyboardAvoidingView,
@@ -14,14 +14,15 @@ import {
   Keyboard,
 } from "react-native";
 
+import logoImage from "./image/IMG_4059.jpg";
 import { color } from "../constants";
 import { storeData } from "./Helper/async";
-import { Avatar, Icon } from "react-native-elements";
+import { Icon } from "react-native-elements";
 
+const exampleImageUri = Image.resolveAssetSource(logoImage).uri
 const Login = ({ navigation }) => {
   const [email, setEmail] = useState();
   const [pw, setPW] = useState();
-
   return (
     <>
       <StatusBar barStyle="light-content" />
@@ -30,15 +31,14 @@ const Login = ({ navigation }) => {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <View style={styles.loginView}>
-            <Text style={styles.titleText}>Login</Text>
+        <View style={styles.loginView}>
+          <View style={stylesImage.container}>
+            <Image style = {stylesImage.tinyLogo}
+                source={{uri: exampleImageUri}}
+              ></Image>
+          </View>
+
             <View style={styles.emailView}>
-              <Icon
-                name="email-outline"
-                type="material-community"
-                size={30}
-                color={"grey"}
-              />
               <View style={styles.emailInputView}>
                 <Text style={styles.inputTitle}>Email</Text>
                 <TextInput
@@ -51,13 +51,8 @@ const Login = ({ navigation }) => {
                 ></TextInput>
               </View>
             </View>
+            
             <View style={styles.pwView}>
-              <Icon
-                name="eye"
-                type="material-community"
-                size={30}
-                color={"grey"}
-              />
               <View style={styles.pwInputView}>
                 <Text style={styles.inputTitle}>Password</Text>
                 <TextInput
@@ -70,6 +65,8 @@ const Login = ({ navigation }) => {
                 ></TextInput>
               </View>
             </View>
+            
+              
             <View style={styles.loginButtonView}>
               <TouchableOpacity
                 onPress={() => {
@@ -88,12 +85,7 @@ const Login = ({ navigation }) => {
             <TouchableWithoutFeedback
               onPress={() => navigation.navigate("SignUp")}
             >
-            <Text>Sign Up?</Text>
-            </TouchableWithoutFeedback>
-            <TouchableWithoutFeedback
-              onPress={() => navigation.navigate("ForgotPassword")}
-            >
-            <Text>Forgot Password?</Text>
+              <Text style={styles.signUp}>SignUp?</Text>
             </TouchableWithoutFeedback>
           </View>
         </TouchableWithoutFeedback>
@@ -102,61 +94,74 @@ const Login = ({ navigation }) => {
   );
 };
 
+const stylesImage = StyleSheet.create({
+  container: {
+    flex: 0.001,
+    justifyContent: "flex-end",
+    alignItems: 'center',
+  },
+  tinyLogo: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+  },
+  logo: {
+    width: 66,
+    height: 58,
+  },
+});
+
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: color.primaryDark,
+    backgroundColor: color.greyBackgorund,
     flex: 1,
     justifyContent: "flex-end",
   },
   loginView: {
-    backgroundColor: "white",
+    backgroundColor: color.greyBackgorund,
     justifyContent: "space-between",
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     paddingLeft: "15%",
     paddingRight: "15%",
     paddingBottom: 120,
-    paddingTop: "17%",
-    minHeight: 500,
-    maxHeight: "95%",
-  },
-  titleText: {
-    fontFamily: "Poppins-Bold",
-    fontSize: 32,
-    lineHeight: 36,
-    height: 64,
+    paddingTop: "45%",
+    minHeight: 600,
+    maxHeight: "100%",
   },
   emailView: {
-    backgroundColor: color.greyBackgorund,
-    borderRadius: 10,
     height: 64,
     flexDirection: "row",
     alignItems: "center",
     paddingLeft: "5%",
     paddingVertical: 5,
+    borderBottomColor: 'black',
+    borderBottomWidth: 1,
   },
   pwView: {
-    backgroundColor: color.greyBackgorund,
-    borderRadius: 10,
+    
     height: 64,
     flexDirection: "row",
     alignItems: "center",
     paddingLeft: "5%",
-    paddingVertical: 5,
+    borderBottomColor: 'black',
+    borderBottomWidth: 1,
   },
   loginButtonView: {
-    height: 64,
-    borderRadius: 16,
+    height: 50,
+    borderRadius: 10,
   },
   loginButton: {
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: color.primary,
-    borderRadius: 16,
-    height: 64,
+    borderRadius: 10,
+    height: 50,
+    width: 160,
+    marginHorizontal: 60,
   },
   loginButtonText: {
-    color: "#F7F7FC",
+    color: "#FFFFFF",
     fontFamily: "Poppins-Medium",
   },
   emailInputView: {
@@ -174,13 +179,24 @@ const styles = StyleSheet.create({
   inputTitle: {
     fontFamily: "Poppins-Regular",
     fontSize: 14,
-    lineHeight: 24,
-    color: color.darkGrey,
+    lineHeight: 15,
+    color: color.black,
     flex: 0.5,
+    marginHorizontal: -20,
   },
   inputText: {
-    flex: 0.5,
+    flex: 1,
+    marginHorizontal: -20,
+  },
+  signUp:{
+    flex: 0.2,
+    fontSize: 14,
+    lineHeight: 24,
+    color: color.signUpBlue,
+    marginHorizontal: 110,
   },
 });
+
+
 
 export default Login;
