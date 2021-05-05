@@ -29,6 +29,7 @@ import Icon2 from 'react-native-vector-icons/MaterialCommunityIcons';
 import Icon3 from 'react-native-vector-icons/MaterialIcons';
 import Icon4 from 'react-native-vector-icons/Ionicons';
 import * as Progress from "react-native-progress";
+<<<<<<< HEAD
 import Home from "./Home";
 
 const data = [
@@ -43,6 +44,9 @@ const data = [
     { id: '9', title: 'Fourth item' },
   ];
 const App = ({navigation}) => {
+=======
+const App = () => {
+>>>>>>> a07118ac8f3f9086b169e1443562cddca54e0912
   const [route, setRoute] = useState(null);
   const[ModalOpen, setModalOpen] = useState(false);
   const [coordinates,setcoordinates] = useState([114.2655,22.3364]);
@@ -50,23 +54,34 @@ const App = ({navigation}) => {
 
   var timespend = 26; // time of the game from serve
   var distance = 0;
-  const startbutton = ()=>{
-    Alert.alert("startbutton")
-  }  
-  useEffect(() => {
-    fetchRoute();
-  })
-  const fetchRoute = async () => {
-    const reqOptions = {
-      waypoints: addcor,
-      profile: 'driving-traffic',
-      geometries: 'geojson',
-    };
-    const res = await directionsClient.getDirections(reqOptions).send();
-    console.log(res.body.routes[0].geometry.coordinates);
-    const newRoute = makeLineString(res.body.routes[0].geometry.coordinates);
-    setRoute(newRoute);
-  };
+  let featureCollection = [
+    {
+      type: "Feature",
+      properties: { color: "red" },
+      geometry: {
+        type: "LineString",
+        coordinates: [
+          [114.2635,22.3372],
+          [114.2655,22.3364],
+          [114.2645,22.3344],
+        ],
+      },
+    },
+  ];
+  // useEffect(() => {
+  //   fetchRoute();
+  // })
+  // const fetchRoute = async () => {
+  //   const reqOptions = {
+  //     waypoints: addcor,
+  //     profile: 'driving-traffic',
+  //     geometries: 'geojson',
+  //   };
+  //   const res = await directionsClient.getDirections(reqOptions).send();
+  //   console.log(res.body.routes[0].geometry.coordinates);
+  //   const newRoute = makeLineString(res.body.routes[0].geometry.coordinates);
+  //   setRoute(newRoute);
+  // };
 
   const modalslideone = () =>{
       for(let i = 0; i < addcor.length-1; i++){
@@ -111,23 +126,6 @@ const modalslidethree = () =>{
     return(
       <View style={styles.slide1}>
       <Text style={styles.text}>Make a new Friend?</Text>
-      <FlatList
-      showsVerticalScrollIndicator={false}
-      showsHorizontalScrollIndicator={false}
-        data={data}
-        keyExtractor={item => item.first}
-        renderItem={() => (
-          <View style={styles.listItemfd}>
-            <Image
-              //source={{ uri: item.picture.thumbnail }}
-              style={styles.coverImagefd}
-            />
-            <View style={styles.metaInfofd}>
-              <Text style={styles.titlefd}>{data.title}</Text>
-            </View>
-          </View>
-        )}
-      />
     </View>
     )
 }
@@ -170,13 +168,34 @@ const modalslidethree = () =>{
       <View style={styles.container}>
         <MapboxGL.MapView style={styles.map}>
           <MapboxGL.Camera zoomLevel={15} centerCoordinate={coordinates} /> 
-          {
+          {/* {
           route && (
            <MapboxGL.ShapeSource id='shapeSource' shape={route}>
               <MapboxGL.LineLayer id='lineLayer' style={{lineWidth: 5, lineJoin: 'bevel', lineColor: 'green'}} />
             </MapboxGL.ShapeSource>
           )
-        }
+        } */}
+        <MapboxGL.ShapeSource
+          id="line"
+          shape={{
+            type: "FeatureCollection",
+            features: featureCollection,
+          }}
+        >
+          {featureCollection.map((item) => {
+            return (
+              <MapboxGL.LineLayer
+                id={"linelayer"}
+                style={{
+                  lineJoin: "round",
+                  lineColor: item.properties.color,
+                  lineWidth: 5,
+                  lineCap: "round",
+                }}
+              />
+            );
+          })}
+        </MapboxGL.ShapeSource>
         </MapboxGL.MapView>
         {detailbutton()}
         {modal()}
