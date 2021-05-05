@@ -11,7 +11,6 @@ import Login from "./components/Login";
 import SignUp from "./components/Signup";
 import Home from "./components/Home";
 import RealHome from "./components/RealHome";
-import CreateAndJoin from "./components/CreateAndJoin";
 import Riddle from "./components/InGame/Riddle";
 import Sudoku from "./components/InGame/Sudoku";
 import CreateGame from "./components/CreateGame";
@@ -163,17 +162,6 @@ const App = () => {
               options={{
                 headerLeft: null,
                 title: "RealHome",
-                headerStyle: {
-                  backgroundColor: color.primary,
-                },
-              }}
-            />
-            <Stack.Screen
-              name="CreateAndJoin"
-              component={CreateAndJoin}
-              options={{
-                headerLeft: null,
-                title: "CreateAndJoin",
                 headerStyle: {
                   backgroundColor: color.primary,
                 },
