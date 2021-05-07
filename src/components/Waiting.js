@@ -95,18 +95,14 @@ export default Waiting = ({ navigation }) => {
     if (i < playerList.length) {
       list.push(
         <View style={styles.playerListRowConatiner} key={i % 2}>
+          <View style={styles.playerListRowConatiner} key={i % 2}>
           <View style={styles.leftPlayer} key={i}>
-            <Text style={styles.LplayerName} key={i}>
+            <Text style={styles.LplayerName}>
               {playerList[i]}
             </Text>
-            <Avatar
-              rounded
-              source={{
-                uri: "https://images-na.ssl-images-amazon.com/images/S/pv-target-images/7bbe5762c79ee0ad11c1267483b4a2d5e12868de779eaf751e8e86596e978bbb._V_SX1080_.jpg",
-              }}
-            //icon={{name: 'home'}}
-            />
+            <Image style={styles.cardImage} source={{ uri: link }} />
           </View>
+        </View>
         </View>
       );
     }
