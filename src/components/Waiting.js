@@ -95,14 +95,22 @@ export default Waiting = ({ navigation }) => {
     if (i < playerList.length) {
       list.push(
         <View style={styles.playerListRowConatiner} key={i % 2}>
-          <View style={styles.playerListRowConatiner} key={i % 2}>
           <View style={styles.leftPlayer} key={i}>
             <Text style={styles.LplayerName}>
               {playerList[i]}
             </Text>
-            <Image style={styles.cardImage} source={{ uri: link }} />
+            <Image style={styles.PlayerAvatar} source={{ uri: link }} />
           </View>
-        </View>
+          <View style={styles.AddButton}>
+            <View style={{ justifyContent: "center", alignItems: "center" }}>
+              <Icon
+                iconStyle={styles.Icon}
+                name="back"
+                type="Entypo"
+                alignSelf="center"
+              ></Icon>
+            </View>
+          </View>
         </View>
       );
     }
@@ -236,4 +244,21 @@ const styles = StyleSheet.create({
     shadowRadius: 15,
     elevation: 5,
   },
+  AddButton: {
+    width: width * 0.40,
+    height: height * 0.1,
+    flexDirection: 'row',
+    marginTop: 10,
+    // backgroundColor: "#00000080",
+    justifyContent: "flex-start",
+    alignItems: "center",
+  },
+  Icon: {
+    backgroundColor: "#00000080",
+    color: "black",
+    borderRadius: height * 0.5,
+    width: height * 0.1,
+    height: height * 0.1,
+    // justifyContent: "center"
+  }
 });
