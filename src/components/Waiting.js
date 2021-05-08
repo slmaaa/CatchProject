@@ -77,15 +77,23 @@ export default Waiting = ({ navigation }) => {
     for (i = 0; i + 1 < playerList.length; i += 2) {
       list.push(
         <View style={styles.playerListRowConatiner} key={i % 2}>
-          <View style={styles.leftPlayer} key={i}>
-            <Text style={styles.LplayerName}>
+          <View style={[styles.Player,
+          {
+            borderBottomRightRadius: height * 0.05,
+            borderTopRightRadius: height * 0.05,
+          }]} key={i}>
+            <Text style={[styles.PlayerName, { paddingLeft: 20 }]}>
               {playerList[i]}
             </Text>
-            <Image style={styles.cardImage} source={{ uri: link }} />
+            <Image style={styles.PlayerAvatar} source={{ uri: link }} />
           </View>
-          <View style={styles.rightPlayer} key={i + 1}>
-            <Image style={styles.cardImage} source={{ uri: link }} />
-            <Text style={styles.RplayerName}>
+          <View style={[styles.Player,
+          {
+            borderTopLeftRadius: height * 0.05,
+            borderBottomLeftRadius: height * 0.05,
+          }]} key={i + 1}>
+            <Image style={styles.PlayerAvatar} source={{ uri: link }} />
+            <Text style={[styles.PlayerName, { marginLeft: -40 }]}>
               {playerList[i + 1]}
             </Text>
           </View>
@@ -157,8 +165,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   headerContainer: {
-    width: "45%",
-    height: "10%",
+    width: width * 0.45,
+    height: height * 0.1,
     flexDirection: 'row',
     marginTop: height * 0.05,
     marginBottom: 30,
@@ -175,7 +183,7 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     textAlign: "left",
   },
-  cardImage: {
+  PlayerAvatar: {
     borderRadius: height / 30,
     height: height / 15,
     width: height / 15,
@@ -188,13 +196,11 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginBottom: 5,
   },
-  leftPlayer: {
+  Player: {
     width: width * 0.40,
     height: height * 0.1,
     flexDirection: 'row',
     marginTop: 10,
-    borderBottomRightRadius: height * 0.05,
-    borderTopRightRadius: height * 0.05,
     backgroundColor: "#00000080",
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -204,28 +210,16 @@ const styles = StyleSheet.create({
     height: height * 0.1,
     flexDirection: 'row',
     marginTop: 10,
-    borderTopLeftRadius: height * 0.05,
-    borderBottomLeftRadius: height * 0.05,
     backgroundColor: "#00000080",
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  LplayerName: {
+  PlayerName: {
     fontSize: 14,
     fontWeight: "700",
     color: "white",
     textAlign: "center",
     textAlignVertical: "center",
-    flex: 3,
-    paddingLeft: 20,
-  },
-  RplayerName: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: "white",
-    textAlign: "center",
-    textAlignVertical: "center",
-    marginLeft: -40,
     flex: 3,
   },
   button: {
@@ -244,13 +238,18 @@ const styles = StyleSheet.create({
     shadowRadius: 15,
     elevation: 5,
   },
+  backbutton: {
+    height: 50,
+    width: 50,
+    alignSelf: "center",
+    backgroundColor: color.brown,
+    borderRadius: 10,
+  },
   AddButton: {
     width: width * 0.40,
     height: height * 0.1,
     flexDirection: 'row',
     marginTop: 10,
-    // backgroundColor: "#00000080",
-    justifyContent: "flex-start",
     alignItems: "center",
   },
   Icon: {
