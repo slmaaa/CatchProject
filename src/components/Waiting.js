@@ -158,12 +158,24 @@ export default Waiting = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.headerContainer}>
-        <Text style={styles.headerText}>
-          {`${game.hostName}'s Room`}
-          {`\nRoom ID: ${game.gid}`}
-        </Text>
-        <Image style={styles.PlayerAvatar} source={{ uri: link }} />
+      <View style={{
+        justifyContent: "flex-start",
+        flexDirection: "row",
+        marginVertical: height * 0.05,
+        alignItems: "baseline"
+      }}>
+        <View style={styles.headerContainer}>
+          <Text style={styles.headerText}>
+            {`${game.hostName}'s Room`}
+            {`\nRoom ID: ${game.gid}`}
+          </Text>
+          <Image style={styles.PlayerAvatar} source={{ uri: link }} />
+        </View>
+        <TouchableOpacity style={styles.backButton}>
+          <Text style={styles.IconReplacementText}>
+            {"<<"}
+          </Text>
+        </TouchableOpacity>
       </View>
       <View style={styles.playersListContainer}>
         <ScrollView>{playerView}</ScrollView>
@@ -190,9 +202,9 @@ const styles = StyleSheet.create({
     width: width * 0.45,
     height: height * 0.1,
     flexDirection: 'row',
-    marginVertical: height * 0.05,
+    marginTop: height * 0.03,
     paddingRight: 40,
-    marginBottom: height * 0.1,
+    marginBottom: height * 0.05,
     borderBottomRightRadius: height / 20,
     borderTopRightRadius: height / 20,
     backgroundColor: "#00000080",
@@ -273,12 +285,16 @@ const styles = StyleSheet.create({
     shadowRadius: 15,
     elevation: 5,
   },
-  backbutton: {
-    height: 50,
-    width: 50,
-    alignSelf: "center",
+  backButton: {
+    marginLeft: height / 6,
+    borderRadius: height / 60,
+    height: height / 15,
+    width: height / 15,
     backgroundColor: color.brown,
-    borderRadius: 10,
+    flexDirection: "row",
+    alignItems: "baseline",
+    justifyContent: "center",
+    marginHorizontal: height / 80,
   },
   AddButton: {
     borderRadius: height / 30,
@@ -289,16 +305,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginHorizontal: height / 80,
   },
-  PlusSignText: {
+  IconReplacementText: {
     fontSize: 30,
     color: "white",
-    textAlignVertical: "center"
+    textAlignVertical: "center",
+    justifyContent: "center"
   },
-  Icon: {
-    // backgroundColor: "#00000080",
-    color: "black",
-    width: height * 0.1,
-    height: height * 0.1,
-    // justifyContent: "center"
-  }
+  // Icon: {
+  //   // backgroundColor: "#00000080",
+  //   color: "black",
+  //   width: height * 0.1,
+  //   height: height * 0.1,
+  //   // justifyContent: "center"
+  // }
 });
