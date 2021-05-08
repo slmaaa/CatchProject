@@ -181,6 +181,9 @@ const styles = StyleSheet.create({
         backgroundColor: "#00000080",
         justifyContent: 'space-between',
         alignItems: 'center',
+        borderTopWidth: 5,
+        borderBottomWidth: 5,
+        borderRightWidth: 5,
     },
     PlayerName: {
         fontSize: 14,
