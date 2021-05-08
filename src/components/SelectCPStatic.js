@@ -153,12 +153,7 @@ export default SelectCheckPoint = ({ navigation }) => {
     for (i = 0; i < playerList.length; i+=2) {
       list.push(
         <View style={styles.playerListRowConatiner} key={i % 2}>
-          <View style={[styles.Player,
-          {
-            borderBottomRightRadius: height * 0.05,
-            borderTopRightRadius: height * 0.05,
-            borderColor:"#98E7FD"
-          }]} key={i}>
+          <View style={styles.BluePlayer} key={i}>
             <Image style={styles.PlayerAvatar} source={{ uri: link }} />
           </View>
         </View>
@@ -167,12 +162,7 @@ export default SelectCheckPoint = ({ navigation }) => {
     for (i = 1; i < playerList.length; i+=2) {
         list.push(
           <View style={styles.playerListRowConatiner} key={i % 2}>
-            <View style={[styles.Player,
-            {
-              borderBottomRightRadius: height * 0.05,
-              borderTopRightRadius: height * 0.05,
-              borderColor:"#FF8F62"
-            }]} key={i}>
+            <View style={styles.OrangePlayer} key={i}>
               <Image style={styles.PlayerAvatar} source={{ uri: link }} />
             </View>
           </View>

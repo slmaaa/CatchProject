@@ -77,21 +77,13 @@ export default Waiting = ({ navigation }) => {
     for (i = 0; i + 1 < playerList.length; i += 2) {
       list.push(
         <View style={styles.playerListRowConatiner} key={i % 2}>
-          <View style={[styles.Player,
-          {
-            borderBottomRightRadius: height * 0.05,
-            borderTopRightRadius: height * 0.05,
-          }]} key={i}>
+          <View style={styles.LeftPlayer} key={i}>
             <Text style={[styles.PlayerName, { paddingLeft: 20 }]}>
               {playerList[i]}
             </Text>
             <Image style={styles.PlayerAvatar} source={{ uri: link }} />
           </View>
-          <View style={[styles.Player,
-          {
-            borderTopLeftRadius: height * 0.05,
-            borderBottomLeftRadius: height * 0.05,
-          }]} key={i + 1}>
+          <View style={styles.RightPlayer} key={i + 1}>
             <Image style={styles.PlayerAvatar} source={{ uri: link }} />
             <Text style={[styles.PlayerName, { marginLeft: -40 }]}>
               {playerList[i + 1]}
@@ -103,20 +95,49 @@ export default Waiting = ({ navigation }) => {
     if (i < playerList.length) {
       list.push(
         <View style={styles.playerListRowConatiner} key={i % 2}>
-          <View style={styles.leftPlayer} key={i}>
-            <Text style={styles.LplayerName}>
+          <View style={styles.LeftPlayer} key={i}>
+            <Text style={[styles.PlayerName, { paddingLeft: 20 }]}>
               {playerList[i]}
             </Text>
             <Image style={styles.PlayerAvatar} source={{ uri: link }} />
           </View>
-          <View style={styles.AddButton}>
+          <View style={styles.RightPlayer}>
             <View style={{ justifyContent: "center", alignItems: "center" }}>
-              <Icon
+              <TouchableOpacity style={styles.AddButton}>
+                <Text style={styles.PlusSignText}>
+                  {"+"}
+                </Text>
+              </TouchableOpacity>
+              {/* <Icon
                 iconStyle={styles.Icon}
                 name="back"
                 type="Entypo"
                 alignSelf="center"
-              ></Icon>
+              ></Icon> */}
+            </View>
+          </View>
+        </View>
+      );
+    }
+    else {
+      list.push(
+        <View style={styles.playerListRowConatiner} key={i % 2}>
+          <View style={styles.LeftPlayer} key={i}>
+            <View style={{ justifyContent: "center", alignItems: "center" }}>
+              <TouchableOpacity style={styles.AddButton}>
+                <Text style={styles.PlusSignText}>
+                  {"+"}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+          <View style={styles.RightPlayer}>
+            <View style={{ justifyContent: "center", alignItems: "center" }}>
+              <TouchableOpacity style={styles.AddButton}>
+                <Text style={styles.PlusSignText}>
+                  {"+"}
+                </Text>
+              </TouchableOpacity>
             </View>
           </View>
         </View>
@@ -142,7 +163,7 @@ export default Waiting = ({ navigation }) => {
           {`${game.hostName}'s Room`}
           {`\nRoom ID: ${game.gid}`}
         </Text>
-        <Image style={styles.cardImage} source={{ uri: link }} />
+        <Image style={styles.PlayerAvatar} source={{ uri: link }} />
       </View>
       <View style={styles.playersListContainer}>
         <ScrollView>{playerView}</ScrollView>
@@ -159,6 +180,7 @@ export default Waiting = ({ navigation }) => {
     </View>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     backgroundColor: color.offWhite,
@@ -168,8 +190,9 @@ const styles = StyleSheet.create({
     width: width * 0.45,
     height: height * 0.1,
     flexDirection: 'row',
-    marginTop: height * 0.05,
-    marginBottom: 30,
+    marginVertical: height * 0.05,
+    paddingRight: 40,
+    marginBottom: height * 0.1,
     borderBottomRightRadius: height / 20,
     borderTopRightRadius: height / 20,
     backgroundColor: "#00000080",
@@ -187,26 +210,44 @@ const styles = StyleSheet.create({
     borderRadius: height / 30,
     height: height / 15,
     width: height / 15,
-    marginHorizontal: height / 50,
+    marginHorizontal: height / 80,
   },
-  playersListContainer: { height: "60%" },
+  playersListContainer: { height: "50%" },
   playerListRowConatiner: {
-    height: 100,
+    height: height / 8,
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 5,
+    // marginBottom: 5,
   },
-  Player: {
+  LeftPlayer: {
     width: width * 0.40,
     height: height * 0.1,
     flexDirection: 'row',
-    marginTop: 10,
     backgroundColor: "#00000080",
-    justifyContent: 'space-between',
+    // justifyContent: 'space-between',
+    justifyContent: 'flex-end',
     alignItems: 'center',
     borderTopWidth: 5,
     borderBottomWidth: 5,
     borderRightWidth: 5,
+    borderBottomRightRadius: height * 0.05,
+    borderTopRightRadius: height * 0.05,
+    borderColor: "#98E7FD"
+  },
+  RightPlayer: {
+    width: width * 0.40,
+    height: height * 0.1,
+    flexDirection: 'row',
+    backgroundColor: "#00000080",
+    // justifyContent: 'space-between',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    borderTopWidth: 5,
+    borderBottomWidth: 5,
+    borderLeftWidth: 5,
+    borderBottomLeftRadius: height * 0.05,
+    borderTopLeftRadius: height * 0.05,
+    borderColor: "#FF8F62"
   },
   PlayerName: {
     fontSize: 14,
@@ -240,16 +281,22 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   AddButton: {
-    width: width * 0.40,
-    height: height * 0.1,
-    flexDirection: 'row',
-    marginTop: 10,
+    borderRadius: height / 30,
+    height: height / 15,
+    width: height / 15,
+    borderWidth: 2,
+    borderColor: "white",
     alignItems: "center",
+    marginHorizontal: height / 80,
+  },
+  PlusSignText: {
+    fontSize: 30,
+    color: "white",
+    textAlignVertical: "center"
   },
   Icon: {
-    backgroundColor: "#00000080",
+    // backgroundColor: "#00000080",
     color: "black",
-    borderRadius: height * 0.5,
     width: height * 0.1,
     height: height * 0.1,
     // justifyContent: "center"
