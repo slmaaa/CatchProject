@@ -205,15 +205,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  rightPlayer: {
-    width: width * 0.40,
-    height: height * 0.1,
-    flexDirection: 'row',
-    marginTop: 10,
-    backgroundColor: "#00000080",
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
   PlayerName: {
     fontSize: 14,
     fontWeight: "700",
