@@ -123,7 +123,12 @@ export default SelectCheckPoint = ({ navigation }) => {
                     </Text>
                     <Image style={styles.PlayerAvatar} source={{ uri: link }} />
                 </View>
-                <TouchableOpacity style={styles.backButton}>
+                <TouchableOpacity
+                    style={styles.backButton}
+                // onPress={() => {
+                //     console.log("back");
+                // }}
+                >
                     <Text style={styles.IconReplacementText}>
                         {"<<"}
                     </Text>
