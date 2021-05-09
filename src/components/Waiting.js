@@ -91,10 +91,10 @@ export default Waiting = ({ navigation }) => {
             <Text style={[styles.PlayerName, { paddingLeft: 20 }]}>
               {playerList[i]}
             </Text>
-            <Image style={styles.PlayerAvatar} source={{ uri: link }} />
+            <Image style={styles.playerAvatar} source={{ uri: link }} />
           </View>
           <View style={styles.RightPlayer} key={i + 1}>
-            <Image style={styles.PlayerAvatar} source={{ uri: link }} />
+            <Image style={styles.playerAvatar} source={{ uri: link }} />
             <Text style={[styles.PlayerName, { marginLeft: -40 }]}>
               {playerList[i + 1]}
             </Text>
@@ -109,7 +109,7 @@ export default Waiting = ({ navigation }) => {
             <Text style={[styles.PlayerName, { paddingLeft: 20 }]}>
               {playerList[i]}
             </Text>
-            <Image style={styles.PlayerAvatar} source={{ uri: link }} />
+            <Image style={styles.playerAvatar} source={{ uri: link }} />
           </View>
           <View style={styles.RightPlayer}>
             <View style={{ justifyContent: "center", alignItems: "center" }}>
@@ -174,7 +174,7 @@ export default Waiting = ({ navigation }) => {
             {`${game.hostName}'s Room`}
             {`\nRoom ID: ${game.gid}`}
           </Text>
-          <Image style={styles.PlayerAvatar} source={{ uri: link }} />
+          <Image style={styles.playerAvatar} source={{ uri: link }} />
         </View>
         <TouchableOpacity style={styles.backButton}>
           <Text style={styles.IconReplacementText}>{"<<"}</Text>
@@ -222,7 +222,7 @@ const styles = StyleSheet.create({
     textAlign: "left",
     marginRight: 10,
   },
-  PlayerAvatar: {
+  playerAvatar: {
     borderRadius: height / 30,
     height: height / 15,
     width: height / 15,

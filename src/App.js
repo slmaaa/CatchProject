@@ -20,6 +20,7 @@ import setmap from "./components/setmap";
 import Maths from "./components/InGame/Math";
 import rsetmap from "./components/rsetmap";
 import history from "./components/history";
+import JoinOrCreate from "./components/joinOrCreate";
 import { color } from "./constants";
 [];
 const MMKV = new MMKVStorage.Loader().initialize();
@@ -161,6 +162,13 @@ const App = () => {
                 headerStyle: {
                   backgroundColor: color.primary,
                 },
+              }}
+            />
+            <Stack.Screen
+              name="joinOrCreate"
+              component={JoinOrCreate}
+              options={{
+                headerShown: false,
               }}
             />
             <Stack.Screen

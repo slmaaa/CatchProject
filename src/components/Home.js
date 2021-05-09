@@ -13,14 +13,12 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { Overlay, Input, Button } from "react-native-elements";
-import auth from "@react-native-firebase/auth";
-import database from "@react-native-firebase/database";
 import MMKVStorage from "react-native-mmkv-storage";
 import MapboxGL from "@react-native-mapbox-gl/maps";
 
 import { Icon, InlineIcon } from "@iconify/react";
 import documentOnePage24Regular from "@iconify/icons-fluent/document-one-page-24-regular";
-import { join } from "./joinGame";
+import { join } from "./joinOrCreate";
 import { URL } from "../constants.json";
 import { wsSend } from "../App";
 import { color } from "../constants";
@@ -29,25 +27,14 @@ MapboxGL.setAccessToken(
 );
 
 import histroy from "./history";
-import CreateAndJoin from "./CreateAndJoin";
 import RealHome from "./RealHome";
 
 const MMKV = new MMKVStorage.Loader().initialize();
 var { height, width } = Dimensions.get("window");
-const Home = ({ navigation }) => {
-  const userName = MMKV.getString("userName");
-  const userID = MMKV.getString("userID");
 
+const Home = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
-      <Text>{"Welcome " + MMKV.getString("userName")}</Text>
-
-      <View style={styles.loginButtonView}>
-        <View style={styles.loginButton}>
-          <Text style={styles.loginButtonText}>Game</Text>
-        </View>
-      </View>
-
       <View style={styles.homeButtons}>
         <Icon
           reverse
@@ -75,7 +62,7 @@ const Home = ({ navigation }) => {
         titleStyle={{ color: "white", fontSize: 24 }}
         buttonStyle={{ backgroundColor: color.brown }}
         onPress={() => {
-          navigation.navigate("RealHome");
+          navigation.navigate("joinOrCreate");
         }}
       ></Button>
     </SafeAreaView>
