@@ -154,7 +154,7 @@ export default InGamePlayerView = ({ navigation }) => {
         wsSend("header: ");
     };
 
-    console.log("width: ", width, "height: ", height);
+    // console.log("width: ", width, "height: ", height);
 
     return (
         <View style={styles.container}>
