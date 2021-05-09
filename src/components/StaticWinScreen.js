@@ -164,9 +164,29 @@ export default Waiting = ({ navigation }) => {
                                 {"\n2.2KM / 7R"}
                             </Text>
                         </View>
+                        {/* With Crown start*/}
+                        <View style={{ top: -20, paddingStart: 5, position: "absolute" }}>
+                            <View style={{ top: 28, right: 5, bottom: 0 }}>
+                                <Image style={styles.PlayerAvatar} source={{ uri: link }} />
+                            </View>
+                            <View style={{ top: -43, left: 25, width: 40, height: 40 }}>
+                                <Image style={styles.Crown} source={require("./image/PurpleCrown.png")} />
+                            </View>
+                        </View>
+                        {/* With Crown end*/}
                         <Image style={styles.PlayerAvatar} source={{ uri: link }} />
                     </View>
                     <View style={styles.RightPlayer} key={i + 1}>
+                        {/* With Crown start*/}
+                        <View style={{ top: -20, paddingStart: 5, position: "absolute" }}>
+                            <View style={{ top: 28, right: 5, bottom: 0 }}>
+                                <Image style={styles.PlayerAvatar} source={{ uri: link }} />
+                            </View>
+                            <View style={{ top: -43, left: 25, width: 40, height: 40 }}>
+                                <Image style={styles.Crown} source={require("./image/PurpleCrown.png")} />
+                            </View>
+                        </View>
+                        {/* With Crown end*/}
                         <Image style={styles.PlayerAvatar} source={{ uri: link }} />
                         <Text style={[styles.PlayerName, { marginLeft: 0 }]}>
                             {playerList[i + 1]}
@@ -202,24 +222,6 @@ export default Waiting = ({ navigation }) => {
         if (i < playerList.length) {
             list.push(
                 //Blue Wins
-                // <View style={styles.playerListRowConatiner} key={i % 2}>
-                //     <View style={styles.LeftPlayerWin} key={i}>
-                //         <View style={{ marginStart: 20, marginEnd: 10 }}>
-                //             <Text style={[styles.WinText, { color: "#98E7FD" }]}>
-                //                 {"WIN"}
-                //             </Text>
-                //         </View>
-                //         <View style={{ justifyContent: "center", alignContent: "space-around", }}>
-                //             <Text style={[styles.PlayerName]}>
-                //                 {playerList[i]}
-                //                 {"\n2.2KM / 7R"}
-                //             </Text>
-                //         </View>
-                //         <Image style={styles.PlayerAvatar} source={{ uri: link }} />
-                //     </View>
-                // </View>
-
-                //with crown
                 <View style={styles.playerListRowConatiner} key={i % 2}>
                     <View style={styles.LeftPlayerWin} key={i}>
                         <View style={{ marginStart: 20, marginEnd: 10 }}>
@@ -227,20 +229,13 @@ export default Waiting = ({ navigation }) => {
                                 {"WIN"}
                             </Text>
                         </View>
-                        <View style={{ justifyContent: "center", alignContent: "space-around", paddingEnd: 70 }}>
+                        <View style={{ justifyContent: "center", alignContent: "space-around", }}>
                             <Text style={[styles.PlayerName]}>
                                 {playerList[i]}
                                 {"\n2.2KM / 7R"}
                             </Text>
                         </View>
-                        <View style={{ top: -20, paddingStart: 10, position: "absolute" }}>
-                            <View style={{ top: 28, right: 5, bottom: 0 }}>
-                                <Image style={styles.PlayerAvatar} source={{ uri: link }} />
-                            </View>
-                            <View style={{ top: -43, left: 25, width: 40, height: 40 }}>
-                                <Image style={styles.Crown} source={require("./image/PurpleCrown.png")} />
-                            </View>
-                        </View>
+                        <Image style={styles.PlayerAvatar} source={{ uri: link }} />
                     </View>
                 </View>
 
