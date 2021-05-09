@@ -19,8 +19,10 @@ import {
   Avatar,
   Icon,
 } from "react-native-elements";
+import * as Progress from "react-native-progress";
 import MMKVStorage from "react-native-mmkv-storage";
 import documentOnePage24Regular from "@iconify/icons-fluent/document-one-page-24-regular";
+import database from "@react-native-firebase/database";
 import { join } from "./joinOrCreate";
 import { URL } from "../constants.json";
 import { wsSend } from "../App";
@@ -30,7 +32,7 @@ const MMKV = new MMKVStorage.Loader().initialize();
 var { height, width } = Dimensions.get("window");
 const JoinOrCreate = ({ navigation }) => {
   const [initializing, setInitializing] = useState(true);
-
+  const [creating, setCreating] = useState(false);
   const friends = [];
   const nearbyRooms = [];
   const list = [
@@ -55,8 +57,73 @@ const JoinOrCreate = ({ navigation }) => {
       <Text style={styles.title}>{title}</Text>
     </View>
   );
+
+  async function setGame() {
+    const game = {
+      gid: "None",
+      gname: "None",
+      status: "PREPARE",
+      hostID: MMKV.getString("userID"),
+      hostName: MMKV.getString("userName"),
+      players: [
+        {
+          pid: MMKV.getString("userID"),
+          name: MMKV.getString("userName"),
+          avatar: "None",
+        },
+      ],
+      teams: ["RED", "BLUE"],
+    };
+
+    let createdGame = null;
+    wsSend(JSON.stringify({ header: "CREATE", content: game }))
+      .then(async () => {
+        let interval = setInterval(() => {
+          createdGame = MMKV.getMap("joinedGame");
+          if (createdGame == null) return;
+          clearInterval(interval);
+          MMKV.setString("gameID", createdGame.gid.toString());
+          database()
+            .ref("users/" + MMKV.getString("userID"))
+            .update({
+              gameID: createdGame.gid.toString(),
+              status: "PREPARE_HOST",
+            });
+          MMKV.setString("userStatus", "PREPARE_HOST");
+          navigation.replace("Waiting");
+        }, 100);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  }
+  const handleCreate = () => {
+    setCreating(true);
+    setGame();
+  };
   return (
     <SafeAreaView container={styles.container}>
+      <Overlay
+        isVisible={creating}
+        overlayStyle={{ width: "80%", borderRadius: 30 }}
+      >
+        <Text style={styles.creatingText}>Creating...</Text>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+            margin: 5,
+          }}
+        >
+          <Progress.CircleSnail
+            indeterminate
+            size={100}
+            thickness={7}
+            color={[color.teamRed, color.teamBlue]}
+          />
+        </View>
+      </Overlay>
       <Button
         containerStyle={styles.backButtonContainer}
         buttonStyle={styles.backButton}
@@ -79,6 +146,7 @@ const JoinOrCreate = ({ navigation }) => {
       <Button
         containerStyle={styles.createButtonContianer}
         buttonStyle={styles.createButton}
+        onPress={handleCreate}
         icon={<Icon name="plus" type={"material-community"} color={"white"} />}
       />
       <Button
@@ -142,6 +210,12 @@ const styles = StyleSheet.create({
   header: {
     fontSize: 16,
     fontWeight: "700",
+  },
+  creatingText: {
+    fontSize: 22,
+    fontWeight: "700",
+    textAlign: "center",
+    margin: 5,
   },
 });
 export default JoinOrCreate;

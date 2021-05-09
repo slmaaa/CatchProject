@@ -36,7 +36,7 @@ export default CreateGame = ({ navigation }) => {
   async function setGame() {
     game = {
       gid: "None",
-      gname: gameName,
+      gname: "None",
       status: "PREPARE",
       hostID: MMKV.getString("userID"),
       hostName: MMKV.getString("userName"),
@@ -82,11 +82,6 @@ export default CreateGame = ({ navigation }) => {
   };
   return (
     <SafeAreaView style={styles.container}>
-      <Input
-        placeholder="Game name"
-        onChangeText={setGameName}
-        style={{ color: "white" }}
-      />
       <View style={styles.switchContainer}>
         <Text style={styles.switchText}>Join as host</Text>
         <Switch
