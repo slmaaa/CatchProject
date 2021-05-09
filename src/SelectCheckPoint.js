@@ -13,7 +13,7 @@ import {
 import MMKVStorage from "react-native-mmkv-storage";
 // import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import { color } from "../constants.json";
+import { color } from "./constants.json";
 //import { deleteGame, getGame } from "./Helper/server";
 import useInterval from "./useInterval";
 //import { Icon } from "react-native-elements/dist/icons/Icon";

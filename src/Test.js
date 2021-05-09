@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { SafeAreaView, Text, ScrollView, StyleSheet, View, Image, Dimensions, TouchableOpacity } from "react-native";
 import { Avatar, Button, Card, ListItem } from "react-native-elements";
 
-import { color } from "../constants.json";
+import { color } from "./constants.json";
 import useInterval from "./useInterval";
 import Icon from "react-native-vector-icons";
 import { renderNode } from "react-native-elements/dist/helpers";
