@@ -11,9 +11,19 @@ const App = () => {
   const [location, setLocation] = useState(null);
   const [addcor,setaddcor]=useState([]);
   const [mapcenter, setmapcenter] = useState([]);
-  const [infotoserve,setinfotoserve]=useState([]);
+  const [infotoserve,setinfotoserve]=useState({
+      "cid": "",
+      "name": "",
+      "area": {
+        "area": "",
+        "center": { "lat": "", "lng": ""},
+        "radius": ""
+      },
+      "maxLevel": "",
+  });
   const[radius,setradius]=useState(10);
   const[checkpointpower,setcheckpointpower]=useState(5);
+  let selectedcheckpoints = [];
   //const[ModalOpen, setModalOpen] = useState(false);
   const mapRef = useRef();
   useEffect(() => {
@@ -78,9 +88,9 @@ const App = () => {
     //setModalOpen(true)
     id = addcor.length+1;
     var name = "name";
+    console.log(addcor.length)
     setaddcor([...addcor, mapcenter])// centerlat,lng hvent implement
-    setinfotoserve({...infotoserve,
-      newpoint :{
+    let selectedcheckpoint = {
         "cid": id,
         "name": name,
         "area": {
@@ -89,14 +99,14 @@ const App = () => {
           "radius": {radius}
         },
         "maxLevel": {checkpointpower},
-      }
-  });
-    //console.log(infotoserve[1].geolocation.lan)
+    }
+    //selectedcheckpoints.push(selectedcheckpoint);
+    setinfotoserve({...infotoserve,selectedcheckpoint});
   }
   const startbutton = ()=>{
-    console.log(infotoserve)
+    console.log(selectedcheckpoints.length)
     //Alert.alert(infotoserve.length)
-    console.log(coordinates)
+    console.log(infotoserve.length)
   }
 
   const setpoint = (counter) => {

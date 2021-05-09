@@ -9,14 +9,18 @@ import auth from "@react-native-firebase/auth";
 import database from "@react-native-firebase/database";
 import MMKVStorage from "react-native-mmkv-storage";
 
-import { Icon } from "react-native-elements";
+import { Icon, InlineIcon } from '@iconify/react';
+import documentOnePage24Regular from '@iconify/icons-fluent/document-one-page-24-regular';
 import { join } from "./joinGame";
 import { URL } from "../constants.json";
 import { wsSend } from "../App";
 import { color } from "../constants";
+<<<<<<< HEAD
 import histroy from "./history";
 import CreateAndJoin from "./CreateAndJoin";
 import RealHome from "./RealHome";
+=======
+>>>>>>> cffc3f5d4ba01e5c7a196e59bf2b62b8a5853598
 
 const MMKV = new MMKVStorage.Loader().initialize();
 
@@ -198,10 +202,6 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     color: color.signUpBlue,
     marginHorizontal: 110,
-  },
-  homeButtons:{
-    marginHorizontal: 320,
-    marginVertical: -60,
   },
 });
 export default Home;
