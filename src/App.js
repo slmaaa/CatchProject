@@ -66,7 +66,7 @@ const App = () => {
       case "CLOSE_ACCOUNT":
         console.log("Recieved endStats");
         MMKV.setMap("endStats", data.content);
-        break;  
+        break;
       default:
         console.error("Unidentified data");
     }
@@ -149,11 +149,7 @@ const App = () => {
               name="Home"
               component={Home}
               options={{
-                headerLeft: null,
-                title: "Home",
-                headerStyle: {
-                  backgroundColor: color.primary,
-                },
+                headerShown: false,
               }}
             />
             <Stack.Screen

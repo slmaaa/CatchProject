@@ -3,83 +3,61 @@ HomeScreen:
 Shown nearby player location and route player to screens
 */
 import React, { useEffect, useState } from "react";
-import { Text, SafeAreaView, Button, StyleSheet, View, Image, TouchableOpacity,} from "react-native";
-import { Overlay, Input } from "react-native-elements";
+import {
+  Text,
+  SafeAreaView,
+  StyleSheet,
+  View,
+  Image,
+  Dimensions,
+  TouchableOpacity,
+} from "react-native";
+import { Overlay, Input, Button } from "react-native-elements";
 import auth from "@react-native-firebase/auth";
 import database from "@react-native-firebase/database";
 import MMKVStorage from "react-native-mmkv-storage";
+import MapboxGL from "@react-native-mapbox-gl/maps";
 
-import { Icon, InlineIcon } from '@iconify/react';
-import documentOnePage24Regular from '@iconify/icons-fluent/document-one-page-24-regular';
+import { Icon, InlineIcon } from "@iconify/react";
+import documentOnePage24Regular from "@iconify/icons-fluent/document-one-page-24-regular";
 import { join } from "./joinGame";
 import { URL } from "../constants.json";
 import { wsSend } from "../App";
 import { color } from "../constants";
+MapboxGL.setAccessToken(
+  "pk.eyJ1IjoiaGVjdG9yY2hjaCIsImEiOiJja205YmhldXUwdHQ1Mm9xbGw4N2RodndhIn0.yX90QKE2jcgG-7V5wOGXeQ"
+);
 
 const MMKV = new MMKVStorage.Loader().initialize();
-
+var { height, width } = Dimensions.get("window");
 const Home = ({ navigation }) => {
-  const [joinOverlayVisible, setJoinOverlayVisible] = useState(false);
-  const [roomID, setRoomID] = useState();
   const userName = MMKV.getString("userName");
   const userID = MMKV.getString("userID");
 
-  const handleOnPressJoin = () => {
-    let game;
-    wsSend(
-      JSON.stringify({
-        header: "JOIN",
-        content: {
-          player: {
-            pid: MMKV.getString("userID"),
-            name: MMKV.getString("userName"),
-            avatar: "None",
-          },
-          gid: roomID,
-        },
-      })
-    ).then(() => {
-      let interval = setInterval(() => {
-        game = MMKV.getMap("joinedGame");
-        if (game == null) return;
-        clearInterval(interval);
-        MMKV.setString("gameID", roomID);
-        MMKV.setString("gameName", game.gname);
-        database()
-          .ref("users/" + MMKV.getString("userID"))
-          .update({ gameID: roomID, status: "PREPARE" });
-        MMKV.setString("userStatus", "PREPARE");
-        navigation.replace("Waiting", {
-          gameName: game.gname,
-        });
-      }, 100);
-    });
-  };
   return (
-    <SafeAreaView>
-      
-      <Overlay
-        isVisible={joinOverlayVisible}
-        onBackdropPress={() => setJoinOverlayVisible(false)}
-        overlayStyle={{ width: "80%" }}
+    <SafeAreaView style={styles.container}>
+      <Icon
+        recordIcon={documentOnePage24Regular}
+        style={{ color: "#ffffff", fontSize: "100px" }}
+      />
+      <MapboxGL.MapView
+        style={styles.map}
+        pitchEnabled={false}
+        scrollEnabled={false}
+        rotateEnabled={false}
       >
-        <Input placeholder="Enter room ID" onChangeText={setRoomID}></Input>
-        <Button title={"Join"} onPress={handleOnPressJoin} />
-      </Overlay>
-
-      <Text>{"Welcome " + MMKV.getString("userName")}</Text>
-      <Icon recordIcon={documentOnePage24Regular} style={{color: '#ffffff', fontSize: '100px'}} />
-      <View style={styles.loginButtonView}>
-              <TouchableOpacity
-                onPress={() => {
-                  navigation.navigate("RealHome");
-                }}
-              >
-                <View style={styles.loginButton}>
-                  <Text style={styles.loginButtonText}>Game</Text>
-                </View>
-              </TouchableOpacity>
-            </View>
+        <MapboxGL.Camera followUserLocation={true} followUserMode={"compass"} />
+        <MapboxGL.UserLocation />
+      </MapboxGL.MapView>
+      <Button
+        title={"GAME"}
+        containerStyle={styles.button}
+        titleStyle={{ color: "white", fontSize: 24 }}
+        buttonStyle={{ backgroundColor: color.brown }}
+        onPress={() => {
+          navigation.navigate("RealHome");
+        }}
+      ></Button>
     </SafeAreaView>
   );
 };
@@ -88,7 +66,7 @@ const stylesImage = StyleSheet.create({
   container: {
     flex: 0.001,
     justifyContent: "flex-end",
-    alignItems: 'center',
+    alignItems: "center",
   },
   tinyLogo: {
     width: 100,
@@ -103,88 +81,28 @@ const stylesImage = StyleSheet.create({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: color.greyBackgorund,
     flex: 1,
-    justifyContent: "flex-end",
   },
-  loginView: {
-    backgroundColor: color.greyBackgorund,
-    justifyContent: "space-between",
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
-    paddingLeft: "15%",
-    paddingRight: "15%",
-    paddingBottom: 120,
-    paddingTop: "45%",
-    minHeight: 600,
-    maxHeight: "100%",
-  },
-  emailView: {
-    height: 64,
-    flexDirection: "row",
-    alignItems: "center",
-    paddingLeft: "5%",
-    paddingVertical: 5,
-    borderBottomColor: 'black',
-    borderBottomWidth: 1,
-  },
-  pwView: {
-    
-    height: 64,
-    flexDirection: "row",
-    alignItems: "center",
-    paddingLeft: "5%",
-    borderBottomColor: 'black',
-    borderBottomWidth: 1,
-  },
-  loginButtonView: {
-    height: 50,
-    borderRadius: 10,
-  },
-  loginButton: {
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: color.primary,
-    borderRadius: 10,
-    height: 50,
-    width: 160,
-    marginHorizontal: 115,
-    marginVertical: 510,
-  },
-  loginButtonText: {
-    color: "#FFFFFF",
-    fontFamily: "Poppins-Medium",
-  },
-  emailInputView: {
-    flexDirection: "column",
-    alignItems: "flex-start",
-    justifyContent: "center",
-    paddingLeft: "5%",
-  },
-  pwInputView: {
-    flexDirection: "column",
-    alignItems: "flex-start",
-    justifyContent: "center",
-    paddingLeft: "5%",
-  },
-  inputTitle: {
-    fontFamily: "Poppins-Regular",
-    fontSize: 14,
-    lineHeight: 15,
-    color: color.black,
-    flex: 0.5,
-    marginHorizontal: -20,
-  },
-  inputText: {
+  map: {
     flex: 1,
-    marginHorizontal: -20,
   },
-  signUp:{
-    flex: 0.2,
-    fontSize: 14,
-    lineHeight: 24,
-    color: color.signUpBlue,
-    marginHorizontal: 110,
+  button: {
+    position: "absolute",
+    height: 50,
+    top: height * 0.8,
+    width: "40%",
+    marginVertical: 50,
+    alignSelf: "center",
+    color: color.brown,
+    borderRadius: 10,
+    shadowColor: "black",
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.37,
+    shadowRadius: 15,
+    elevation: 5,
   },
 });
 export default Home;

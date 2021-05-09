@@ -3,14 +3,21 @@ HomeScreen:
 Shown nearby player location and route player to screens
 */
 import React, { useEffect, useState } from "react";
-import { Text, SafeAreaView, Button, StyleSheet, View, Image } from "react-native";
+import {
+  Text,
+  SafeAreaView,
+  Button,
+  StyleSheet,
+  View,
+  Image,
+} from "react-native";
 import { Overlay, Input } from "react-native-elements";
 import auth from "@react-native-firebase/auth";
 import database from "@react-native-firebase/database";
 import MMKVStorage from "react-native-mmkv-storage";
 
-import { Icon, InlineIcon } from '@iconify/react';
-import documentOnePage24Regular from '@iconify/icons-fluent/document-one-page-24-regular';
+import { Icon, InlineIcon } from "@iconify/react";
+import documentOnePage24Regular from "@iconify/icons-fluent/document-one-page-24-regular";
 import { join } from "./joinGame";
 import { URL } from "../constants.json";
 import { wsSend } from "../App";
@@ -57,72 +64,74 @@ const Home = ({ navigation }) => {
   };
   return (
     <SafeAreaView>
-      
       <Overlay
         isVisible={joinOverlayVisible}
         onBackdropPress={() => setJoinOverlayVisible(false)}
         overlayStyle={{ width: "80%" }}
       >
-        <Input placeholder="Enter room ID" onChangeText={setRoomID}></Input>
+        <Input placeholder="Enter room ID" onChangeText={setRoomID} />
         <Button title={"Join"} onPress={handleOnPressJoin} />
       </Overlay>
 
       <Text>{"Welcome " + MMKV.getString("userName")}</Text>
-      <Icon recordIcon={documentOnePage24Regular} style={{color: '#ffffff', fontSize: '100px'}} />
+      <Icon
+        recordIcon={documentOnePage24Regular}
+        style={{ color: "#ffffff", fontSize: "100px" }}
+      />
       <Button
         title={"Game"}
         onPress={() => {
           navigation.navigate("CreateGame");
         }}
-      ></Button>
+      />
       <Button
         title={"Create game room"}
         onPress={() => {
           navigation.navigate("CreateGame");
         }}
-      ></Button>
+      />
       <Button
         title={"Join game"}
         onPress={() => {
           setJoinOverlayVisible(true);
         }}
-      ></Button>
+      />
       <Button
         title={"SetMap Test"}
         onPress={() => {
           navigation.navigate("setmap");
         }}
-      ></Button>
+      />
       <Button
         title={"Real SetMap Test"}
         onPress={() => {
           navigation.navigate("rsetmap");
         }}
-      ></Button>
+      />
       <Button
         title={"Run History"}
         onPress={() => {
           navigation.navigate("history");
         }}
-      ></Button>
+      />
       <Button
         title={"InGame Test"}
         onPress={() => {
           navigation.navigate("InGame");
         }}
-      ></Button>
+      />
       <Button
         title={"Logout"}
         onPress={() => {
           auth().signOut();
         }}
-      ></Button>
+      />
       <Button
         title={"Back"}
         onPress={() => {
           navigation.navigate("Home");
         }}
-      ></Button>
+      />
     </SafeAreaView>
   );
 };
@@ -131,7 +140,7 @@ const stylesImage = StyleSheet.create({
   container: {
     flex: 0.001,
     justifyContent: "flex-end",
-    alignItems: 'center',
+    alignItems: "center",
   },
   tinyLogo: {
     width: 100,
@@ -168,16 +177,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingLeft: "5%",
     paddingVertical: 5,
-    borderBottomColor: 'black',
+    borderBottomColor: "black",
     borderBottomWidth: 1,
   },
   pwView: {
-    
     height: 64,
     flexDirection: "row",
     alignItems: "center",
     paddingLeft: "5%",
-    borderBottomColor: 'black',
+    borderBottomColor: "black",
     borderBottomWidth: 1,
   },
   loginButtonView: {
@@ -221,7 +229,7 @@ const styles = StyleSheet.create({
     flex: 1,
     marginHorizontal: -20,
   },
-  signUp:{
+  signUp: {
     flex: 0.2,
     fontSize: 14,
     lineHeight: 24,

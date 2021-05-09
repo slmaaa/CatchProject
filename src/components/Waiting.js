@@ -1,6 +1,16 @@
 /* eslint-disable quotes */
 import React, { useState, useEffect } from "react";
-import { SafeAreaView, Text, ScrollView, StyleSheet, View, Image, StatusBar, Dimensions } from "react-native";
+import {
+  SafeAreaView,
+  Text,
+  ScrollView,
+  StyleSheet,
+  View,
+  Image,
+  StatusBar,
+  Dimensions,
+  TouchableOpacity,
+} from "react-native";
 import { Avatar, Button } from "react-native-elements";
 import database from "@react-native-firebase/database";
 import MMKVStorage from "react-native-mmkv-storage";
@@ -11,12 +21,12 @@ import useInterval from "./Helper/useInterval";
 import { wsSend } from "../App";
 import Icon from "react-native-vector-icons";
 
-var { height, width } = Dimensions.get('window');
-var link = "https://images-na.ssl-images-amazon.com/images/S/pv-target-images/7bbe5762c79ee0ad11c1267483b4a2d5e12868de779eaf751e8e86596e978bbb._V_SX1080_.jpg";
+var { height, width } = Dimensions.get("window");
+var link =
+  "https://images-na.ssl-images-amazon.com/images/S/pv-target-images/7bbe5762c79ee0ad11c1267483b4a2d5e12868de779eaf751e8e86596e978bbb._V_SX1080_.jpg";
 
 export default Waiting = ({ navigation }) => {
   const MMKV = new MMKVStorage.Loader().initialize();
-
   const [game, setGame] = useState(MMKV.getMap("joinedGame"));
   const [roomInfo, setRoomInfo] = useState(null);
   const [playerView, setPlayersView] = useState([]);
@@ -104,9 +114,7 @@ export default Waiting = ({ navigation }) => {
           <View style={styles.RightPlayer}>
             <View style={{ justifyContent: "center", alignItems: "center" }}>
               <TouchableOpacity style={styles.AddButton}>
-                <Text style={styles.PlusSignText}>
-                  {"+"}
-                </Text>
+                <Text style={styles.PlusSignText}>{"+"}</Text>
               </TouchableOpacity>
               {/* <Icon
                 iconStyle={styles.Icon}
@@ -118,25 +126,20 @@ export default Waiting = ({ navigation }) => {
           </View>
         </View>
       );
-    }
-    else {
+    } else {
       list.push(
         <View style={styles.playerListRowConatiner} key={i % 2}>
           <View style={styles.LeftPlayer} key={i}>
             <View style={{ justifyContent: "center", alignItems: "center" }}>
               <TouchableOpacity style={styles.AddButton}>
-                <Text style={styles.PlusSignText}>
-                  {"+"}
-                </Text>
+                <Text style={styles.PlusSignText}>{"+"}</Text>
               </TouchableOpacity>
             </View>
           </View>
           <View style={styles.RightPlayer}>
             <View style={{ justifyContent: "center", alignItems: "center" }}>
               <TouchableOpacity style={styles.AddButton}>
-                <Text style={styles.PlusSignText}>
-                  {"+"}
-                </Text>
+                <Text style={styles.PlusSignText}>{"+"}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -158,12 +161,14 @@ export default Waiting = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <View style={{
-        justifyContent: "flex-start",
-        flexDirection: "row",
-        marginVertical: height * 0.05,
-        alignItems: "baseline"
-      }}>
+      <View
+        style={{
+          justifyContent: "flex-start",
+          flexDirection: "row",
+          marginVertical: height * 0.05,
+          alignItems: "baseline",
+        }}
+      >
         <View style={styles.headerContainer}>
           <Text style={styles.headerText}>
             {`${game.hostName}'s Room`}
@@ -172,9 +177,7 @@ export default Waiting = ({ navigation }) => {
           <Image style={styles.PlayerAvatar} source={{ uri: link }} />
         </View>
         <TouchableOpacity style={styles.backButton}>
-          <Text style={styles.IconReplacementText}>
-            {"<<"}
-          </Text>
+          <Text style={styles.IconReplacementText}>{"<<"}</Text>
         </TouchableOpacity>
       </View>
       <View style={styles.playersListContainer}>
@@ -201,22 +204,23 @@ const styles = StyleSheet.create({
   headerContainer: {
     width: width * 0.45,
     height: height * 0.1,
-    flexDirection: 'row',
+    flexDirection: "row",
     marginTop: height * 0.03,
     paddingRight: 40,
     marginBottom: height * 0.05,
     borderBottomRightRadius: height / 20,
     borderTopRightRadius: height / 20,
     backgroundColor: "#00000080",
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   headerText: {
-    fontSize: 10,
+    fontSize: 12,
     color: "#FFFFFF",
-    fontWeight: 'normal',
+    fontWeight: "700",
     paddingLeft: 10,
     textAlign: "left",
+    marginRight: 10,
   },
   PlayerAvatar: {
     borderRadius: height / 30,
@@ -232,34 +236,26 @@ const styles = StyleSheet.create({
     // marginBottom: 5,
   },
   LeftPlayer: {
-    width: width * 0.40,
+    width: width * 0.4,
     height: height * 0.1,
-    flexDirection: 'row',
+    flexDirection: "row",
     backgroundColor: "#00000080",
     // justifyContent: 'space-between',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-    borderTopWidth: 5,
-    borderBottomWidth: 5,
-    borderRightWidth: 5,
+    justifyContent: "flex-end",
+    alignItems: "center",
     borderBottomRightRadius: height * 0.05,
     borderTopRightRadius: height * 0.05,
-    borderColor: "#98E7FD"
   },
   RightPlayer: {
-    width: width * 0.40,
+    width: width * 0.4,
     height: height * 0.1,
-    flexDirection: 'row',
+    flexDirection: "row",
     backgroundColor: "#00000080",
     // justifyContent: 'space-between',
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    borderTopWidth: 5,
-    borderBottomWidth: 5,
-    borderLeftWidth: 5,
+    justifyContent: "flex-start",
+    alignItems: "center",
     borderBottomLeftRadius: height * 0.05,
     borderTopLeftRadius: height * 0.05,
-    borderColor: "#FF8F62"
   },
   PlayerName: {
     fontSize: 14,
@@ -271,7 +267,7 @@ const styles = StyleSheet.create({
   },
   button: {
     height: 50,
-    width: "50%",
+    width: "40%",
     marginVertical: 50,
     alignSelf: "center",
     color: color.brown,
@@ -309,7 +305,7 @@ const styles = StyleSheet.create({
     fontSize: 30,
     color: "white",
     textAlignVertical: "center",
-    justifyContent: "center"
+    justifyContent: "center",
   },
   // Icon: {
   //   // backgroundColor: "#00000080",
