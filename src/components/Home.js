@@ -10,14 +10,12 @@ import database from "@react-native-firebase/database";
 import MMKVStorage from "react-native-mmkv-storage";
 
 import { Icon, InlineIcon } from '@iconify/react';
-import documentOnePage24Regular from '@iconify/icons-fluent/document-one-page-24-regular';
 import { join } from "./joinGame";
 import { URL } from "../constants.json";
 import { wsSend } from "../App";
 import { color } from "../constants";
 
 import histroy from "./history";
-import CreateAndJoin from "./CreateAndJoin";
 import RealHome from "./RealHome";
 
 const MMKV = new MMKVStorage.Loader().initialize();
@@ -64,14 +62,6 @@ const Home = ({ navigation }) => {
 
       <Text>{"Welcome " + MMKV.getString("userName")}</Text>
 
-      <View style={styles.loginButtonView}>
-
-          <View style={styles.loginButton}>
-            <Text style={styles.loginButtonText}>Game</Text>
-          </View>
-
-      </View>
-
       <View style={styles.homeButtons}>
           <Icon
           reverse
@@ -93,6 +83,14 @@ const Home = ({ navigation }) => {
         type='ionicon'
         color='#4F2D20'
       />
+
+      </View>
+
+      <View style={styles.loginButtonView}>
+
+          <View style={styles.loginButton}>
+            <Text style={styles.loginButtonText}>Game</Text>
+          </View>
 
       </View>
     </SafeAreaView>
@@ -198,6 +196,11 @@ const styles = StyleSheet.create({
     flex: 0.2,
     fontSize: 14,
     lineHeight: 24,
+    color: color.signUpBlue,
+    marginHorizontal: 110,
+  },
+  homeButtons:{
+    flex: 0.2,
     color: color.signUpBlue,
     marginHorizontal: 110,
   },
