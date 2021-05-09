@@ -2,7 +2,6 @@
 HomeScreen:
 Shown nearby player location and route player to screens
 */
-<script src="https://kit.fontawesome.com/8726c16deb.js" crossorigin="anonymous"></script>
 import React, { useEffect, useState } from "react";
 import { Text, SafeAreaView, Button, StyleSheet, View, Image, TouchableOpacity,} from "react-native";
 import { Overlay, Input } from "react-native-elements";
@@ -17,6 +16,7 @@ import { wsSend } from "../App";
 import { color } from "../constants";
 import histroy from "./history";
 import CreateAndJoin from "./CreateAndJoin";
+import RealHome from "./RealHome";
 
 const MMKV = new MMKVStorage.Loader().initialize();
 
@@ -59,47 +59,24 @@ const Home = ({ navigation }) => {
   };
   return (
     <SafeAreaView>
-      
-      <Overlay
-        isVisible={joinOverlayVisible}
-        onBackdropPress={() => setJoinOverlayVisible(false)}
-        overlayStyle={{ width: "80%" }}
-      >
-        <Input placeholder="Enter room ID" onChangeText={setRoomID}></Input>
-        <Button title={"Join"} onPress={handleOnPressJoin} />
-      </Overlay>
 
       <Text>{"Welcome " + MMKV.getString("userName")}</Text>
-      
-      <Button
-        title={"Testing"}
-        onPress={() => {
-          navigation.navigate("RealHome");
-        }}
-      ></Button>
 
       <View style={styles.loginButtonView}>
-        <TouchableOpacity
-          onPress={() => {
-          navigation.navigate("CreateAndJoin");
-          }}
-        >
+
           <View style={styles.loginButton}>
             <Text style={styles.loginButtonText}>Game</Text>
           </View>
-        </TouchableOpacity>
+
       </View>
 
       <View style={styles.homeButtons}>
-
           <Icon
           reverse
           name='file-tray-full-outline'
           type='ionicon'
           color='#4F2D20'
-          
           />
-      
 
       <Icon 
         reverse

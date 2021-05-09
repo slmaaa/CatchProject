@@ -155,7 +155,7 @@ const App = () => {
                 headerStyle: {
                   backgroundColor: color.primary,
                 },
-              }}
+              }} 
             />
             <Stack.Screen
               name="RealHome"

@@ -18,7 +18,7 @@ import { color } from "../constants";
 
 const MMKV = new MMKVStorage.Loader().initialize();
 
-const Home = ({ navigation }) => {
+const RealHome = ({ navigation }) => {
   const [joinOverlayVisible, setJoinOverlayVisible] = useState(false);
   const [roomID, setRoomID] = useState();
   const userName = MMKV.getString("userName");
@@ -229,4 +229,4 @@ const styles = StyleSheet.create({
     marginHorizontal: 110,
   },
 });
-export default Home;
+export default RealHome;
