@@ -234,7 +234,7 @@ export default Waiting = ({ navigation }) => {
                             </Text>
                         </View>
                         <View style={{ top: -20, paddingStart: 10, position: "absolute" }}>
-                            <View style={{ top: 30, right: 5, bottom: 0 }}>
+                            <View style={{ top: 28, right: 5, bottom: 0 }}>
                                 <Image style={styles.PlayerAvatar} source={{ uri: link }} />
                             </View>
                             <View style={{ top: -43, left: 25, width: 40, height: 40 }}>
