@@ -15,12 +15,10 @@ import { join } from "./joinGame";
 import { URL } from "../constants.json";
 import { wsSend } from "../App";
 import { color } from "../constants";
-<<<<<<< HEAD
+
 import histroy from "./history";
 import CreateAndJoin from "./CreateAndJoin";
 import RealHome from "./RealHome";
-=======
->>>>>>> cffc3f5d4ba01e5c7a196e59bf2b62b8a5853598
 
 const MMKV = new MMKVStorage.Loader().initialize();
 
