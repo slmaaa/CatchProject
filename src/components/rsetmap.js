@@ -1,19 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
-import {
-  StyleSheet,
-  View,
-  Pressable,
-  Text,
-  Alert,
-  Modal,
-  TouchableHighlight,
-} from "react-native";
+import { StyleSheet, View, Text, Dimensions } from "react-native";
+import { Button, Icon } from "react-native-elements";
 import MapboxGL from "@react-native-mapbox-gl/maps";
-import NumericInput from "react-native-numeric-input";
 MapboxGL.setAccessToken(
   "pk.eyJ1IjoicmFzaGlkdGhlZGV2ZWxvcGVyIiwiYSI6ImNrYXBncGlwdjBjbG4yd3FqaXl2ams1NHQifQ.jvRoapH6Ae7QHb8Kx4z9FQ"
 );
 import RNLocation, { Location } from "react-native-location";
+import { color } from "../constants.json";
+const { height, width } = Dimensions.get("window");
 const App = () => {
   const [coordinates, setcoordinates] = useState([114.2655, 22.3364]);
   const [location, setLocation] = useState(null);
@@ -91,7 +85,7 @@ const App = () => {
 
   const addbutton = () => {
     //setModalOpen(true)
-    id = addcor.length + 1;
+    const id = addcor.length + 1;
     var name = "name";
     console.log(addcor.length);
     setaddcor([...addcor, mapcenter]); // centerlat,lng hvent implement
@@ -120,11 +114,11 @@ const App = () => {
     const lat = addcor[counter][1];
     var coordinate = [lan, lat];
     return (
-      <MapboxGL.PointAnnotation key={id} coordinate={coordinate}>
-        <View style={styles.container}>
-          <View style={styles.circle} />
-        </View>
-      </MapboxGL.PointAnnotation>
+      <MapboxGL.PointAnnotation
+        key={id}
+        id={id.toString()}
+        coordinate={coordinate}
+      ></MapboxGL.PointAnnotation>
     );
   };
 
@@ -136,111 +130,35 @@ const App = () => {
     return item;
   };
   return (
-    <View style={styles.page}>
-      <View style={styles.container}>
-        <MapboxGL.MapView
-          style={styles.map}
-          ref={mapRef}
-          // onPress={(event) => {
-          //     // const {geometry, properties} = event;
-          //     Alert.alert(
-          //         "Add New point",
-          //         "Add latitude"+event.geometry.coordinates[0]+ " and longtitude " + event.geometry.coordinates[1]+" to the Map?",
-          //         [
-          //           {
-          //             text: "Cancel",
-          //             onPress: () => console.log("Cancel Pressed"),
-          //             style: "cancel"
-          //           },
-          //           { text: "OK", onPress: () => setaddcor([...addcor, [event.geometry.coordinates[0],event.geometry.coordinates[1]]]) }
-          //         ]
-          //       );
-          // }}
-        >
-          <MapboxGL.Camera zoomLevel={16} centerCoordinate={coordinates} />
-          <MapboxGL.PointAnnotation
-            key="pointAnnotation"
-            id="pointAnnotation"
-            coordinate={coordinates}
-          >
-            {/* currentLocation */}
-            <View
-              style={{
-                height: 30,
-                width: 30,
-                backgroundColor: "#00cccc",
-                borderRadius: 50,
-                borderColor: "#fff",
-                borderWidth: 3,
-              }}
-            />
-          </MapboxGL.PointAnnotation>
+    <View style={styles.container}>
+      <View style={styles.mapContainer}>
+        <MapboxGL.MapView style={styles.map} ref={mapRef}>
+          <MapboxGL.Camera
+            defaultSettings={{
+              zoomLevel: 17,
+            }}
+            followUserLocation={true}
+          />
+          <MapboxGL.UserLocation />
+
           {setpoints()}
         </MapboxGL.MapView>
-        {/* {modal()} */}
-        <Pressable
-          style={({ pressed }) => [
-            {
-              backgroundColor: pressed ? "lightblue" : "green",
-            },
-            styles.button1,
-          ]}
-          onPress={startbutton}
-        >
-          <Text style={styles.buttonText}>Start</Text>
-        </Pressable>
-        <Pressable
-          style={({ pressed }) => [
-            {
-              backgroundColor: pressed ? "lightblue" : "blue",
-            },
-            styles.button2,
-          ]}
-          onPress={addbutton}
-        >
-          <Text style={styles.buttonText}>Add</Text>
-        </Pressable>
-        <View style={styles.shooter} />
-        <View style={styles.shooter2} />
-        <View style={styles.input}>
-          <NumericInput
-            value={radius}
-            onChange={(value) => setradius({ value })}
-            onLimitReached={(isMax, msg) => console.log(isMax, msg)}
-            totalWidth={150}
-            totalHeight={50}
-            iconSize={25}
-            step={10}
-            valueType="real"
-            rounded
-            textColor="#B0228C"
-            iconStyle={{ color: "white" }}
-            rightButtonBackgroundColor="#EA3788"
-            leftButtonBackgroundColor="#E56B70"
-          />
-          <Text style={styles.texttop}>CP Radius (m)</Text>
-        </View>
-        <View style={styles.input2}>
-          <NumericInput
-            value={checkpointpower}
-            onChange={(value) => setcheckpointpower({ value })}
-            onLimitReached={(isMax, msg) => console.log(isMax, msg)}
-            totalWidth={150}
-            totalHeight={50}
-            iconSize={25}
-            step={1}
-            valueType="real"
-            rounded
-            textColor="#B0228C"
-            iconStyle={{ color: "white" }}
-            rightButtonBackgroundColor="#EA3788"
-            leftButtonBackgroundColor="#E56B70"
-          />
-          <Text style={styles.texttop}>Max Points</Text>
-        </View>
 
         {/* <View style={styles.shootercircle} /> */}
       </View>
+      <Button
+        icon={
+          <Icon
+            name="plus"
+            type={"material-community"}
+            color={"white"}
+            size={height / 15}
+          />
+        }
+        containerStyle={styles.button}
+        buttonStyle={{ backgroundColor: color.brown, borderRadius: 60 }}
+        onPress={addbutton}
+      ></Button>
     </View>
   );
 };
@@ -296,10 +214,10 @@ const styles = StyleSheet.create({
     borderRadius: 40 / 2,
     backgroundColor: "rgba(52, 52, 52, 0.8)",
   },
-  page: {
+  container: {
     flex: 1,
   },
-  container: {
+  mapContainer: {
     width: "100%",
     height: "100%",
     // borderRadius: 50/2,
@@ -309,29 +227,20 @@ const styles = StyleSheet.create({
     flex: 1,
     position: "relative",
   },
-  button1: {
-    borderRadius: 30,
-    padding: 6,
-    height: "10%",
-    width: "50%",
-    justifyContent: "center",
-    alignItems: "center",
-    elevation: 10,
+  button: {
     position: "absolute",
-    top: "90%",
-    right: "0%",
-  },
-  button2: {
-    borderRadius: 30,
-    padding: 6,
-    height: "10%",
-    width: "50%",
-    justifyContent: "center",
-    alignItems: "center",
-    elevation: 10,
-    position: "absolute",
-    top: "90%",
-    right: "50%",
+    top: height * 0.9,
+    alignSelf: "center",
+    color: color.brown,
+    borderRadius: height / 15,
+    shadowColor: "black",
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.37,
+    shadowRadius: height / 15,
+    elevation: 5,
   },
   buttonText: {
     fontSize: 20,

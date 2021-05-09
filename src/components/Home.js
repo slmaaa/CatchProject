@@ -96,9 +96,8 @@ const styles = StyleSheet.create({
   button: {
     position: "absolute",
     height: 50,
-    top: height * 0.8,
+    top: height * 0.9,
     width: "40%",
-    marginVertical: 50,
     alignSelf: "center",
     color: color.brown,
     borderRadius: 10,

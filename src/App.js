@@ -21,11 +21,12 @@ import Maths from "./components/InGame/Math";
 import rsetmap from "./components/rsetmap";
 import history from "./components/history";
 import JoinOrCreate from "./components/joinOrCreate";
+import PrepareRoom from "./components/PrepareRoom";
 import { color } from "./constants";
 [];
 const MMKV = new MMKVStorage.Loader().initialize();
 const Stack = createStackNavigator();
-const ws = new WebSocket("ws://192.168.29.243:8765");
+const ws = new WebSocket("ws://113.254.98.79:80");
 
 export const wsSend = async (data) => {
   await ws.send(data);
@@ -128,11 +129,7 @@ const App = () => {
               name="rsetmap"
               component={rsetmap}
               options={{
-                headerLeft: null,
-                title: "Real Set CheckPoints",
-                headerStyle: {
-                  backgroundColor: color.blueOnBlack,
-                },
+                headerShown: false,
               }}
             />
             <Stack.Screen
@@ -167,6 +164,13 @@ const App = () => {
             <Stack.Screen
               name="joinOrCreate"
               component={JoinOrCreate}
+              options={{
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="PrepareRoom"
+              component={PrepareRoom}
               options={{
                 headerShown: false,
               }}
