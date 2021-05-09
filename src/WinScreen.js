@@ -177,7 +177,6 @@ export default Waiting = ({ navigation }) => {
                         {/* With Crown end*/}
                     </View>
                     <View style={styles.RightPlayer} key={i + 1}>
-                        <Image style={styles.PlayerAvatar} source={{ uri: link }} />
                         {/* With Crown start*/}
                         <View style={{ top: -20, paddingStart: 5, position: "absolute" }}>
                             <View style={{ top: 28, right: 5, bottom: 0 }}>
@@ -188,6 +187,7 @@ export default Waiting = ({ navigation }) => {
                             </View>
                         </View>
                         {/* With Crown end*/}
+                        <Image style={styles.PlayerAvatar} source={{ uri: link }} />
                         <Text style={[styles.PlayerName, { marginLeft: 0 }]}>
                             {playerList[i + 1]}
                             {"\n2.2KM / 7R"}
