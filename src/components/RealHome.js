@@ -18,7 +18,7 @@ import MMKVStorage from "react-native-mmkv-storage";
 
 import { Icon, InlineIcon } from "@iconify/react";
 import documentOnePage24Regular from "@iconify/icons-fluent/document-one-page-24-regular";
-import { join } from "./joinGame";
+import { join } from "./joinOrCreate";
 import { URL } from "../constants.json";
 import { wsSend } from "../App";
 import { color } from "../constants";
