@@ -3,7 +3,7 @@ HomeScreen:
 Shown nearby player location and route player to screens
 */
 import React, { useEffect, useState } from "react";
-import { Text, SafeAreaView, Button, StyleSheet, View, Image, TouchableOpacity,} from "react-native";
+import { Text, SafeAreaView, Button, StyleSheet, View, Image } from "react-native";
 import { Overlay, Input } from "react-native-elements";
 import auth from "@react-native-firebase/auth";
 import database from "@react-native-firebase/database";
@@ -69,17 +69,60 @@ const Home = ({ navigation }) => {
 
       <Text>{"Welcome " + MMKV.getString("userName")}</Text>
       <Icon recordIcon={documentOnePage24Regular} style={{color: '#ffffff', fontSize: '100px'}} />
-      <View style={styles.loginButtonView}>
-              <TouchableOpacity
-                onPress={() => {
-                  navigation.navigate("RealHome");
-                }}
-              >
-                <View style={styles.loginButton}>
-                  <Text style={styles.loginButtonText}>Game</Text>
-                </View>
-              </TouchableOpacity>
-            </View>
+      <Button
+        title={"Game"}
+        onPress={() => {
+          navigation.navigate("CreateGame");
+        }}
+      ></Button>
+      <Button
+        title={"Create game room"}
+        onPress={() => {
+          navigation.navigate("CreateGame");
+        }}
+      ></Button>
+      <Button
+        title={"Join game"}
+        onPress={() => {
+          setJoinOverlayVisible(true);
+        }}
+      ></Button>
+      <Button
+        title={"SetMap Test"}
+        onPress={() => {
+          navigation.navigate("setmap");
+        }}
+      ></Button>
+      <Button
+        title={"Real SetMap Test"}
+        onPress={() => {
+          navigation.navigate("rsetmap");
+        }}
+      ></Button>
+      <Button
+        title={"Run History"}
+        onPress={() => {
+          navigation.navigate("history");
+        }}
+      ></Button>
+      <Button
+        title={"InGame Test"}
+        onPress={() => {
+          navigation.navigate("InGame");
+        }}
+      ></Button>
+      <Button
+        title={"Logout"}
+        onPress={() => {
+          auth().signOut();
+        }}
+      ></Button>
+      <Button
+        title={"Back"}
+        onPress={() => {
+          navigation.navigate("Home");
+        }}
+      ></Button>
     </SafeAreaView>
   );
 };
@@ -147,9 +190,8 @@ const styles = StyleSheet.create({
     backgroundColor: color.primary,
     borderRadius: 10,
     height: 50,
-    width: 160,
-    marginHorizontal: 115,
-    marginVertical: 510,
+    width: 130,
+    marginHorizontal: 75,
   },
   loginButtonText: {
     color: "#FFFFFF",
