@@ -28,6 +28,10 @@ MapboxGL.setAccessToken(
   "pk.eyJ1IjoiaGVjdG9yY2hjaCIsImEiOiJja205YmhldXUwdHQ1Mm9xbGw4N2RodndhIn0.yX90QKE2jcgG-7V5wOGXeQ"
 );
 
+import histroy from "./history";
+import CreateAndJoin from "./CreateAndJoin";
+import RealHome from "./RealHome";
+
 const MMKV = new MMKVStorage.Loader().initialize();
 var { height, width } = Dimensions.get("window");
 const Home = ({ navigation }) => {
@@ -36,10 +40,26 @@ const Home = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Icon
-        recordIcon={documentOnePage24Regular}
-        style={{ color: "#ffffff", fontSize: "100px" }}
-      />
+      <Text>{"Welcome " + MMKV.getString("userName")}</Text>
+
+      <View style={styles.loginButtonView}>
+        <View style={styles.loginButton}>
+          <Text style={styles.loginButtonText}>Game</Text>
+        </View>
+      </View>
+
+      <View style={styles.homeButtons}>
+        <Icon
+          reverse
+          name="file-tray-full-outline"
+          type="ionicon"
+          color="#4F2D20"
+        />
+
+        <Icon reverse name="medal-outline" type="ionicon" color="#4F2D20" />
+
+        <Icon reverse name="people-outline" type="ionicon" color="#4F2D20" />
+      </View>
       <MapboxGL.MapView
         style={styles.map}
         pitchEnabled={false}
