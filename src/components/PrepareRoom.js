@@ -1,5 +1,5 @@
 /* eslint-disable quotes */
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
   SafeAreaView,
   Text,
@@ -13,7 +13,7 @@ import {
 import { Button, Icon } from "react-native-elements";
 import database from "@react-native-firebase/database";
 import MMKVStorage from "react-native-mmkv-storage";
-
+import { useFocusEffect } from "@react-navigation/core";
 import { color } from "../constants.json";
 import { deleteGame, getGame } from "./Helper/server";
 import useInterval from "./Helper/useInterval";
@@ -28,12 +28,12 @@ var link =
 
 export default PrepareRoom = ({ navigation }) => {
   const MMKV = new MMKVStorage.Loader().initialize();
-  const [game, setGame] = useState(MMKV.getMap("joinedGame"));
   const [roomInfo, setRoomInfo] = useState(null);
   const [playerView, setPlayersView] = useState([]);
+  const [checkpoints, setCheckpoints] = useState([]);
   const gameID = MMKV.getString("gameID");
   const userID = MMKV.getString("userID");
-  let status;
+  const gameRef = useRef(MMKV.getMap("joinedGame"));
 
   const deleteRoom = () => {
     deleteGame.then(() => {
@@ -52,12 +52,48 @@ export default PrepareRoom = ({ navigation }) => {
 
   useEffect(() => {
     let list = [];
-    game.players.map((value) =>
+    gameRef.current.players.map((value) =>
       list.push({ name: value.name, team: value.team })
     );
     setPlayersView(renderPlayersList(list));
   }, []);
 
+  useFocusEffect(
+    useCallback(() => {
+      if (roomInfo === null || roomInfo === undefined) return;
+      MMKV.setMap("roomInfo", null);
+      setRoomInfo(null);
+      let game = MMKV.getMap("joinedGame");
+      game["status"] = roomInfo.status;
+      if (roomInfo.checkpoints !== undefined && roomInfo.checkpoints.length > 0)
+        game["checkpoints"] = roomInfo.checkpoints;
+      MMKV.setMap("joinedGame", game);
+      if (roomInfo.checkpoints !== undefined) {
+        roomInfo.checkpoints.map((val) => {
+          setCheckpoints([...checkpoints, val.area.center]);
+        });
+      }
+      if (roomInfo.status === "RUNNING") {
+        navigation.replace("InGame");
+      }
+    }, [roomInfo])
+  );
+  const RenderCheckpointsOnMap = () => {
+    if (checkpoints.length > 0) {
+      let list = [];
+      for (let i = 0; i < checkpoints.length; ++i) {
+        list.push(
+          <MapboxGL.PointAnnotation
+            key={i}
+            id={i.toString()}
+            coordinate={[checkpoints[i].lng, checkpoints[i].lat]}
+          />
+        );
+      }
+      return list;
+    }
+    return null;
+  };
   const renderPlayersList = (playerList = []) => {
     if (playerList.length === 0) return;
     let list = [],
@@ -92,11 +128,12 @@ export default PrepareRoom = ({ navigation }) => {
           followUserMode={"compass"}
           zoomLevel={17}
         />
+        <RenderCheckpointsOnMap />
       </MapboxGL.MapView>
       <View style={styles.headerContainer}>
         <Text style={styles.headerText}>
-          {`${game.hostName}'s Room`}
-          {`\nRoom ID: ${game.gid}`}
+          {`${gameRef.current.hostName}'s Room`}
+          {`\nRoom ID: ${gameRef.current.gid}`}
         </Text>
         <Image style={styles.PlayerAvatar} source={{ uri: link }} />
       </View>
@@ -108,7 +145,7 @@ export default PrepareRoom = ({ navigation }) => {
         titleStyle={{ color: "white", fontSize: 24 }}
         buttonStyle={{ backgroundColor: color.brown, borderRadius: 50 }}
         onPress={() => {
-          navigation.navigate("rsetmap");
+          navigation.navigate("CheckPointSetting");
         }}
         icon={
           <Icon
