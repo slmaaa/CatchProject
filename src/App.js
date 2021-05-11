@@ -20,11 +20,13 @@ import setmap from "./components/setmap";
 import Maths from "./components/InGame/Math";
 import rsetmap from "./components/rsetmap";
 import history from "./components/history";
+import JoinOrCreate from "./components/joinOrCreate";
+import PrepareRoom from "./components/PrepareRoom";
 import { color } from "./constants";
 [];
 const MMKV = new MMKVStorage.Loader().initialize();
 const Stack = createStackNavigator();
-const ws = new WebSocket("ws://192.168.29.243:8765");
+const ws = new WebSocket("ws://113.254.98.79:80");
 
 export const wsSend = async (data) => {
   await ws.send(data);
@@ -66,7 +68,7 @@ const App = () => {
       case "CLOSE_ACCOUNT":
         console.log("Recieved endStats");
         MMKV.setMap("endStats", data.content);
-        break;  
+        break;
       default:
         console.error("Unidentified data");
     }
@@ -127,11 +129,7 @@ const App = () => {
               name="rsetmap"
               component={rsetmap}
               options={{
-                headerLeft: null,
-                title: "Real Set CheckPoints",
-                headerStyle: {
-                  backgroundColor: color.blueOnBlack,
-                },
+                headerShown: false,
               }}
             />
             <Stack.Screen
@@ -149,12 +147,8 @@ const App = () => {
               name="Home"
               component={Home}
               options={{
-                headerLeft: null,
-                title: "Home",
-                headerStyle: {
-                  backgroundColor: color.primary,
-                },
-              }} 
+                headerShown: false,
+              }}
             />
             <Stack.Screen
               name="RealHome"
@@ -165,6 +159,20 @@ const App = () => {
                 headerStyle: {
                   backgroundColor: color.primary,
                 },
+              }}
+            />
+            <Stack.Screen
+              name="joinOrCreate"
+              component={JoinOrCreate}
+              options={{
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="PrepareRoom"
+              component={PrepareRoom}
+              options={{
+                headerShown: false,
               }}
             />
             <Stack.Screen

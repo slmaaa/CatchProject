@@ -1,23 +1,37 @@
 /* eslint-disable quotes */
-import React, { useState, useEffect } from "react";
-import { SafeAreaView, Text, ScrollView, StyleSheet, View, Image, StatusBar, Dimensions } from "react-native";
-import { Avatar, Button } from "react-native-elements";
+import React, { useState, useEffect, useCallback } from "react";
+import {
+  SafeAreaView,
+  Text,
+  ScrollView,
+  StyleSheet,
+  View,
+  Image,
+  StatusBar,
+  Dimensions,
+  TouchableOpacity,
+} from "react-native";
+import { Avatar, Button, Icon } from "react-native-elements";
 import database from "@react-native-firebase/database";
 import MMKVStorage from "react-native-mmkv-storage";
+import MapboxGL from "@react-native-mapbox-gl/maps";
+MapboxGL.setAccessToken(
+  "pk.eyJ1IjoiaGVjdG9yY2hjaCIsImEiOiJja205YmhldXUwdHQ1Mm9xbGw4N2RodndhIn0.yX90QKE2jcgG-7V5wOGXeQ"
+);
 
 import { color } from "../constants.json";
 import { deleteGame, getGame } from "./Helper/server";
 import useInterval from "./Helper/useInterval";
 import { wsSend } from "../App";
-import Icon from "react-native-vector-icons";
+import { useFocusEffect } from "@react-navigation/core";
 
-var { height, width } = Dimensions.get('window');
-var link = "https://images-na.ssl-images-amazon.com/images/S/pv-target-images/7bbe5762c79ee0ad11c1267483b4a2d5e12868de779eaf751e8e86596e978bbb._V_SX1080_.jpg";
+const { height, width } = Dimensions.get("window");
+let link = `https://picsum.photos/200?t=${Date.now()}`;
 
 export default Waiting = ({ navigation }) => {
   const MMKV = new MMKVStorage.Loader().initialize();
-
   const [game, setGame] = useState(MMKV.getMap("joinedGame"));
+  const [assigningTeam, setAssigningTeam] = useState(false);
   const [roomInfo, setRoomInfo] = useState(null);
   const [playerView, setPlayersView] = useState([]);
   const gameID = MMKV.getString("gameID");
@@ -47,28 +61,30 @@ export default Waiting = ({ navigation }) => {
     setPlayersView(renderPlayersList());
   }, []);
 
-  useEffect(() => {
-    if (roomInfo == null) return;
-    status = roomInfo.status;
-    let game = MMKV.getMap("joinedGame");
-    game.players = roomInfo.players;
-    let list = [];
-    roomInfo.players.map((value) => {
-      list.push(value.name);
-      if (value.team != null) {
-        if (value.pid === MMKV.getString("userID")) {
-          MMKV.setString("team", value.team);
-          MMKV.setInt("key", value.key);
+  useFocusEffect(
+    useCallback(() => {
+      if (roomInfo == null) return;
+      status = roomInfo.status;
+      let game = MMKV.getMap("joinedGame");
+      game.players = roomInfo.players;
+      let list = [];
+      roomInfo.players.map((value) => {
+        list.push(value.name);
+        if (value.team != null) {
+          if (value.pid === MMKV.getString("userID")) {
+            MMKV.setString("team", value.team);
+            MMKV.setInt("key", value.key);
+          }
         }
+      });
+      playerList = list;
+      setPlayersView(renderPlayersList());
+      if (status === "PREPARE") {
+        navigation.replace("PrepareRoom");
+        return;
       }
-    });
-    playerList = list;
-    setPlayersView(renderPlayersList());
-    if (status === "RUNNING") {
-      navigation.replace("InGame");
-      return;
-    }
-  }, [roomInfo]);
+    }, [roomInfo])
+  );
 
   const renderPlayersList = () => {
     if (playerList.length === 0) return;
@@ -81,10 +97,10 @@ export default Waiting = ({ navigation }) => {
             <Text style={[styles.PlayerName, { paddingLeft: 20 }]}>
               {playerList[i]}
             </Text>
-            <Image style={styles.PlayerAvatar} source={{ uri: link }} />
+            <Image style={styles.playerAvatar} source={{ uri: link }} />
           </View>
           <View style={styles.RightPlayer} key={i + 1}>
-            <Image style={styles.PlayerAvatar} source={{ uri: link }} />
+            <Image style={styles.playerAvatar} source={{ uri: link }} />
             <Text style={[styles.PlayerName, { marginLeft: -40 }]}>
               {playerList[i + 1]}
             </Text>
@@ -99,14 +115,17 @@ export default Waiting = ({ navigation }) => {
             <Text style={[styles.PlayerName, { paddingLeft: 20 }]}>
               {playerList[i]}
             </Text>
-            <Image style={styles.PlayerAvatar} source={{ uri: link }} />
+            <Image style={styles.playerAvatar} source={{ uri: link }} />
           </View>
           <View style={styles.RightPlayer}>
             <View style={{ justifyContent: "center", alignItems: "center" }}>
               <TouchableOpacity style={styles.AddButton}>
-                <Text style={styles.PlusSignText}>
-                  {"+"}
-                </Text>
+                <Icon
+                  name="plus"
+                  type={"material-community"}
+                  size={height / 16}
+                  color={"white"}
+                />
               </TouchableOpacity>
               {/* <Icon
                 iconStyle={styles.Icon}
@@ -118,25 +137,30 @@ export default Waiting = ({ navigation }) => {
           </View>
         </View>
       );
-    }
-    else {
+    } else {
       list.push(
         <View style={styles.playerListRowConatiner} key={i % 2}>
           <View style={styles.LeftPlayer} key={i}>
             <View style={{ justifyContent: "center", alignItems: "center" }}>
               <TouchableOpacity style={styles.AddButton}>
-                <Text style={styles.PlusSignText}>
-                  {"+"}
-                </Text>
+                <Icon
+                  name="plus"
+                  type={"material-community"}
+                  size={height / 16}
+                  color={"white"}
+                />
               </TouchableOpacity>
             </View>
           </View>
           <View style={styles.RightPlayer}>
             <View style={{ justifyContent: "center", alignItems: "center" }}>
               <TouchableOpacity style={styles.AddButton}>
-                <Text style={styles.PlusSignText}>
-                  {"+"}
-                </Text>
+                <Icon
+                  name="plus"
+                  type={"material-community"}
+                  size={height / 16}
+                  color={"white"}
+                />
               </TouchableOpacity>
             </View>
           </View>
@@ -146,49 +170,51 @@ export default Waiting = ({ navigation }) => {
     return list;
   };
 
-  const renderButton = () => {
-    if (MMKV.getString == "PREPARE_HOST") {
-      return <Button containerstyle={styles.button} title={"Confirm"}></Button>;
-    }
-  };
-
-  const handleOnPressStart = () => {
-    wsSend("header: ");
-  };
-
   return (
     <View style={styles.container}>
-      <View style={{
-        justifyContent: "flex-start",
-        flexDirection: "row",
-        marginVertical: height * 0.05,
-        alignItems: "baseline"
-      }}>
-        <View style={styles.headerContainer}>
-          <Text style={styles.headerText}>
-            {`${game.hostName}'s Room`}
-            {`\nRoom ID: ${game.gid}`}
-          </Text>
-          <Image style={styles.PlayerAvatar} source={{ uri: link }} />
-        </View>
-        <TouchableOpacity style={styles.backButton}>
-          <Text style={styles.IconReplacementText}>
-            {"<<"}
-          </Text>
-        </TouchableOpacity>
+      <MapboxGL.MapView
+        style={styles.map}
+        pitchEnabled={false}
+        scrollEnabled={false}
+        rotateEnabled={false}
+        zoomLevel={16}
+      >
+        <MapboxGL.Camera
+          defaultSettings={{
+            zoomLevel: 17,
+          }}
+          followUserLocation={true}
+          followUserMode={"compass"}
+          zoomLevel={17}
+        />
+      </MapboxGL.MapView>
+      <Button
+        containerStyle={styles.backButtonContainer}
+        buttonStyle={styles.backButton}
+        onPress={() => navigation.goBack()}
+        icon={<Icon name="arrow-back" type={"material"} color={"white"} />}
+      />
+      <View style={styles.headerContainer}>
+        <Text style={styles.headerText}>
+          {`${game.hostName}'s Room`}
+          {`\nRoom ID: ${game.gid}`}
+        </Text>
+        <Image style={styles.playerAvatar} source={{ uri: link }} />
       </View>
       <View style={styles.playersListContainer}>
         <ScrollView>{playerView}</ScrollView>
       </View>
-      <Button
-        title={"Confirm"}
-        containerStyle={styles.button}
-        titleStyle={{ color: "white", fontSize: 24 }}
-        buttonStyle={{ backgroundColor: color.brown }}
-        onPress={() => {
-          wsSend(JSON.stringify({ header: "START", content: gameID }));
-        }}
-      ></Button>
+      {MMKV.getString("userStatus") === "PREPARE_HOST" && (
+        <Button
+          title={"Confirm"}
+          containerStyle={styles.button}
+          titleStyle={{ color: "white", fontSize: 24 }}
+          buttonStyle={{ backgroundColor: color.brown }}
+          onPress={() => {
+            wsSend(JSON.stringify({ header: "CONFIRM", content: gameID }));
+          }}
+        ></Button>
+      )}
     </View>
   );
 };
@@ -201,24 +227,25 @@ const styles = StyleSheet.create({
   headerContainer: {
     width: width * 0.45,
     height: height * 0.1,
-    flexDirection: 'row',
+    flexDirection: "row",
     marginTop: height * 0.03,
     paddingRight: 40,
     marginBottom: height * 0.05,
     borderBottomRightRadius: height / 20,
     borderTopRightRadius: height / 20,
     backgroundColor: "#00000080",
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   headerText: {
-    fontSize: 10,
+    fontSize: 12,
     color: "#FFFFFF",
-    fontWeight: 'normal',
+    fontWeight: "700",
     paddingLeft: 10,
     textAlign: "left",
+    marginRight: 10,
   },
-  PlayerAvatar: {
+  playerAvatar: {
     borderRadius: height / 30,
     height: height / 15,
     width: height / 15,
@@ -232,34 +259,26 @@ const styles = StyleSheet.create({
     // marginBottom: 5,
   },
   LeftPlayer: {
-    width: width * 0.40,
+    width: width * 0.4,
     height: height * 0.1,
-    flexDirection: 'row',
+    flexDirection: "row",
     backgroundColor: "#00000080",
     // justifyContent: 'space-between',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-    borderTopWidth: 5,
-    borderBottomWidth: 5,
-    borderRightWidth: 5,
+    justifyContent: "flex-end",
+    alignItems: "center",
     borderBottomRightRadius: height * 0.05,
     borderTopRightRadius: height * 0.05,
-    borderColor: "#98E7FD"
   },
   RightPlayer: {
-    width: width * 0.40,
+    width: width * 0.4,
     height: height * 0.1,
-    flexDirection: 'row',
+    flexDirection: "row",
     backgroundColor: "#00000080",
     // justifyContent: 'space-between',
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    borderTopWidth: 5,
-    borderBottomWidth: 5,
-    borderLeftWidth: 5,
+    justifyContent: "flex-start",
+    alignItems: "center",
     borderBottomLeftRadius: height * 0.05,
     borderTopLeftRadius: height * 0.05,
-    borderColor: "#FF8F62"
   },
   PlayerName: {
     fontSize: 14,
@@ -270,9 +289,10 @@ const styles = StyleSheet.create({
     flex: 3,
   },
   button: {
+    position: "absolute",
     height: 50,
-    width: "50%",
-    marginVertical: 50,
+    top: height * 0.9,
+    width: "40%",
     alignSelf: "center",
     color: color.brown,
     borderRadius: 10,
@@ -285,16 +305,20 @@ const styles = StyleSheet.create({
     shadowRadius: 15,
     elevation: 5,
   },
-  backButton: {
-    marginLeft: height / 6,
-    borderRadius: height / 60,
-    height: height / 15,
-    width: height / 15,
-    backgroundColor: color.brown,
-    flexDirection: "row",
-    alignItems: "baseline",
+  backButtonContainer: {
+    position: "absolute",
+    top: height * 0.06,
+    right: width / 12,
+    color: color.brown,
+    alignItems: "center",
     justifyContent: "center",
-    marginHorizontal: height / 80,
+    margin: 5,
+  },
+  backButton: {
+    backgroundColor: color.brown,
+    borderRadius: height / 60,
+    width: height / 15,
+    height: height / 15,
   },
   AddButton: {
     borderRadius: height / 30,
@@ -303,13 +327,19 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: "white",
     alignItems: "center",
+    justifyContent: "center",
     marginHorizontal: height / 80,
   },
   IconReplacementText: {
     fontSize: 30,
     color: "white",
     textAlignVertical: "center",
-    justifyContent: "center"
+    justifyContent: "center",
+  },
+  map: {
+    height: "100%",
+    width: "100%",
+    position: "absolute",
   },
   // Icon: {
   //   // backgroundColor: "#00000080",
