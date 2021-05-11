@@ -67,7 +67,7 @@ async def join_game_handler(websocket, _dict):
         await websocket.send('{"header": "ERROR", "content": "Game not found"}')
 
 
-async def start_game_handler(websocket, gid):
+async def confirm_game_handler(websocket, gid):
     try:
         gdb = db.pull(G_DB)
         if (gdb[gid]["status"] == "DELETED"):
@@ -82,12 +82,67 @@ async def start_game_handler(websocket, gid):
         #     return
 
         game.assignTeam()
-        game.start()
         gdb[gid] = game.to_dict()
         db.push(gdb, G_DB)
         game = gdb[gid]
         room_info = {"status": game["status"],
                      "players": game["players"]}
+        await broadcast(gid, "ROOM_INFO", room_info)
+    except Exception as e:
+        print(e)
+        await websocket.send('{"header": "ERROR", "content": "Confirmation fail"}')
+
+
+async def save_checkpoints_handler(websocket, _dict):
+    try:
+        gid = _dict["gid"]
+        cps = list()
+        for cp in _dict["checkpoints"]:
+            cps.append(Checkpoint.from_dict(cp))
+
+    except:
+        await websocket.send('{"header":"ERROR", "content":"Save checkpoints- Wrong Format"}')
+        return
+    try:
+        gdb = db.pull(G_DB)
+        if (gdb[gid]["status"] == "DELETED"):
+            await websocket.send('{"header":"ERROR", "content":"Room has been deleted"}')
+            return
+        game = Game.from_dict(gdb[gid])
+        game.checkpoints = cps
+        gdb[gid] = game.to_dict()
+        db.push(gdb, G_DB)
+        await websocket.send('{"header": "CPS_SAVED", "content":true}')
+        game = gdb[gid]
+        room_info = {"status": game["status"],
+                     "checkpoints": game["checkpoints"]}
+        await broadcast(gid, "ROOM_INFO", room_info)
+
+    except Exception as e:
+        print(e)
+        await websocket.send('{"header": "ERROR", "content": "Game not found"}')
+
+
+async def start_game_handler(websocket, gid):
+    try:
+        gdb = db.pull(G_DB)
+        if (gdb[gid]["status"] == "DELETED"):
+            await websocket.send('{"header":"ERROR", "content":"Room has been deleted"}')
+            return
+
+        game = Game.from_dict(gdb[gid])
+
+        # Disable for testing
+        # if len(game.players) < game.min_players:
+        #     await websocket.send('{"header":"ERROR", "content":"Not enough players"}')
+        #     return
+        game.start()
+        gdb[gid] = game.to_dict()
+        db.push(gdb, G_DB)
+        game = gdb[gid]
+        room_info = {"status": game["status"],
+                     "players": game["players"],
+                     "checkpoints": game["checkpoints"]}
         await broadcast(gid, "ROOM_INFO", room_info)
     except Exception as e:
         print(e)
@@ -169,13 +224,19 @@ async def handler(websocket, path):
                 print("Received JOIN request")
                 await join_game_handler(
                     websocket, _dict["content"])
+            elif (_dict["header"] == "CONFIRM"):
+                print("Received CONFIRM request")
+                await confirm_game_handler(websocket, _dict["content"])
+            elif (_dict["header"] == "SAVE_CPS"):
+                print("Received SAVE_CPS request")
+                await save_checkpoints_handler(websocket, _dict["content"])
             elif (_dict["header"] == "START"):
                 print("Received START request")
                 await start_game_handler(websocket, _dict["content"])
             elif (_dict["header"] == "ADD"):
                 print("Received ADD request")
                 await add_handler(websocket, _dict["content"])
-            elif (_dict["header" == "PLAYER_STATS"]):
+            elif (_dict["header"] == "PLAYER_STATS"):
                 print("Received PLAYER_STATS request")
                 await player_stats_handler(websocket, _dict["content"])
                 # else:
@@ -197,6 +258,6 @@ async def hello(websocket, path):
     print(f"> {greeting}")
 
 
-start_server = websockets.serve(handler, "0.0.0.0", 8765)
+start_server = websockets.serve(handler, "", 8765)
 asyncio.get_event_loop().run_until_complete(start_server)
 asyncio.get_event_loop().run_forever()
