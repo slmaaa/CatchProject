@@ -18,7 +18,7 @@ import Waiting from "./components/Waiting";
 import LoadingHome from "./components/LoadingHome";
 import setmap from "./components/setmap";
 import Maths from "./components/InGame/Math";
-import rsetmap from "./components/rsetmap";
+import CheckPointSetting from "./components/CheckPointSetting";
 import history from "./components/history";
 import JoinOrCreate from "./components/joinOrCreate";
 import PrepareRoom from "./components/PrepareRoom";
@@ -60,6 +60,10 @@ const App = () => {
       case "ROOM_INFO":
         console.log("Recieved room info");
         MMKV.setMap("roomInfo", data.content);
+        break;
+      case "CPS_SAVED":
+        console.log("CPs saved");
+        MMKV.setBool("cpsSaved", true);
         break;
       case "GAME_INFO":
         console.log("Recieved game info");
@@ -126,8 +130,8 @@ const App = () => {
               }}
             />
             <Stack.Screen
-              name="rsetmap"
-              component={rsetmap}
+              name="CheckPointSetting"
+              component={CheckPointSetting}
               options={{
                 headerShown: false,
               }}

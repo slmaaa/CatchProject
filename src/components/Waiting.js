@@ -64,9 +64,13 @@ export default Waiting = ({ navigation }) => {
   useFocusEffect(
     useCallback(() => {
       if (roomInfo == null) return;
+      MMKV.setMap("roomInfo", null);
+      setRoomInfo(null);
       status = roomInfo.status;
       let game = MMKV.getMap("joinedGame");
       game.players = roomInfo.players;
+      game.status = roomInfo.status;
+      MMKV.setMap("joinedGame", game);
       let list = [];
       roomInfo.players.map((value) => {
         list.push(value.name);
@@ -80,8 +84,8 @@ export default Waiting = ({ navigation }) => {
       playerList = list;
       setPlayersView(renderPlayersList());
       if (status === "PREPARE") {
+        MMKV.setMap("roomInfo", null);
         navigation.replace("PrepareRoom");
-        return;
       }
     }, [roomInfo])
   );

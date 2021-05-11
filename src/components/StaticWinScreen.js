@@ -1,6 +1,6 @@
 /* eslint-disable quotes */
 import React, { useState, useEffect } from "react";
-import { SafeAreaView, Text, ScrollView, StyleSheet, View, Image, StatusBar, Dimensions } from "react-native";
+import { SafeAreaView, Text, ScrollView, StyleSheet, View, Image, StatusBar, Dimensions, ImageBackground } from "react-native";
 import {
     Avatar,
     Button,
@@ -151,82 +151,102 @@ export default Waiting = ({ navigation }) => {
         for (i = 0; i + 1 < playerList.length; i += 2) {
             list.push(
                 //Blue Wins
+                <View style={styles.playerListRowConatiner} key={i % 2}>
+                    <View style={styles.LeftPlayerWin} key={i}>
+                        <View style={{ marginStart: 20, marginEnd: 10 }}>
+                            <Text style={[styles.WinText, { color: "#98E7FD" }]}>
+                                {"WIN"}
+                            </Text>
+                        </View>
+                        <View style={{ justifyContent: "center", alignContent: "space-around", }}>
+                            <Text style={[styles.PlayerName,]}>
+                                {playerList[i]}
+                                {"\n2.2KM / 7R"}
+                            </Text>
+                        </View>
+                        <Image style={styles.PlayerAvatar} source={{ uri: link }} />
+                        {/* With Crown start*/}
+                        <View style={{ top: -20, paddingStart: 5, position: "absolute" }}>
+                            <View style={{ top: 28, right: 5, bottom: 0 }}>
+                                <Image style={styles.PlayerAvatar} source={{ uri: link }} />
+                            </View>
+                            <View style={{ top: -43, left: 25, width: 40, height: 40 }}>
+                                <Image style={styles.Crown} source={require("./image/PurpleCrown.png")} />
+                            </View>
+                        </View>
+                        {/* With Crown end*/}
+                    </View>
+                    <View style={styles.RightPlayer} key={i + 1}>
+                        <Image style={styles.PlayerAvatar} source={{ uri: link }} />
+                        {/* With Crown start*/}
+                        <View style={{ top: -20, paddingStart: 5, position: "absolute" }}>
+                            <View style={{ top: 28, right: 5, bottom: 0 }}>
+                                <Image style={styles.PlayerAvatar} source={{ uri: link }} />
+                            </View>
+                            <View style={{ top: -43, left: 25, width: 40, height: 40 }}>
+                                <Image style={styles.Crown} source={require("./image/PurpleCrown.png")} />
+                            </View>
+                        </View>
+                        {/* With Crown end*/}
+                        <Text style={[styles.PlayerName, { marginLeft: 0 }]}>
+                            {playerList[i + 1]}
+                            {"\n2.2KM / 7R"}
+                        </Text>
+                    </View>
+                </View>
+
+                //Blue Loses
                 // <View style={styles.playerListRowConatiner} key={i % 2}>
-                //     <View style={styles.LeftPlayerWin} key={i}>
-                //         <View style={{ marginStart: 20, marginEnd: 10 }}>
-                //             <Text style={[styles.WinText, { color: "#98E7FD" }]}>
-                //                 {"WIN"}
-                //             </Text>
-                //         </View>
-                //         <View style={{ justifyContent: "center", alignContent: "space-around", }}>
-                //             <Text style={[styles.PlayerName, ]}>
-                //                 {playerList[i]}
-                //                 {"\n2.2KM / 7R"}
-                //             </Text>
-                //         </View>
+                //     <View style={styles.LeftPlayer} key={i}>
+                //         <Text style={[styles.PlayerName, { paddingLeft: 10 }]}>
+                //             {playerList[i]}
+                //             {"\n2.2KM / 7R"}
+                //         </Text>
                 //         <Image style={styles.PlayerAvatar} source={{ uri: link }} />
                 //     </View>
-                //     <View style={styles.RightPlayer} key={i + 1}>
+                //     <View style={styles.RightPlayerWin} key={i + 1}>
                 //         <Image style={styles.PlayerAvatar} source={{ uri: link }} />
                 //         <Text style={[styles.PlayerName, { marginLeft: 0 }]}>
                 //             {playerList[i + 1]}
                 //             {"\n2.2KM / 7R"}
                 //         </Text>
+                //         <View style={{ marginStart: 10, marginEnd: 10 }}>
+                //             <Text style={[styles.WinText, { color: "#FF8F62" }]}>
+                //                 {"WIN"}
+                //             </Text>
+                //         </View>
                 //     </View>
                 // </View>
-
-                //Blue Loses
-                <View style={styles.playerListRowConatiner} key={i % 2}>
-                    <View style={styles.LeftPlayer} key={i}>
-                        <Text style={[styles.PlayerName, { paddingLeft: 10 }]}>
-                            {playerList[i]}
-                            {"\n2.2KM / 7R"}
-                        </Text>
-                        <Image style={styles.PlayerAvatar} source={{ uri: link }} />
-                    </View>
-                    <View style={styles.RightPlayerWin} key={i + 1}>
-                        <Image style={styles.PlayerAvatar} source={{ uri: link }} />
-                        <Text style={[styles.PlayerName, { marginLeft: 0 }]}>
-                            {playerList[i + 1]}
-                            {"\n2.2KM / 7R"}
-                        </Text>
-                        <View style={{ marginStart: 10, marginEnd: 10 }}>
-                            <Text style={[styles.WinText, { color: "#FF8F62" }]}>
-                                {"WIN"}
-                            </Text>
-                        </View>
-                    </View>
-                </View>
             );
         }
         if (i < playerList.length) {
             list.push(
                 //Blue Wins
-                // <View style={styles.playerListRowConatiner} key={i % 2}>
-                //     <View style={styles.LeftPlayerWin} key={i}>
-                //         <View style={{ marginStart: 20, marginEnd: 10 }}>
-                //             <Text style={[styles.WinText, { color: "#98E7FD" }]}>
-                //                 {"WIN"}
-                //             </Text>
-                //         </View>
-                //         <View style={{ justifyContent: "center", alignContent: "space-around", }}>
-                //             <Text style={[styles.PlayerName]}>
-                //                 {playerList[i]}
-                //                 {"\n2.2KM / 7R"}
-                //             </Text>
-                //         </View>
-                //         <Image style={styles.PlayerAvatar} source={{ uri: link }} />
-                //     </View>
-                // </View>
+                <View style={styles.playerListRowConatiner} key={i % 2}>
+                    <View style={styles.LeftPlayerWin} key={i}>
+                        <View style={{ marginStart: 20, marginEnd: 10 }}>
+                            <Text style={[styles.WinText, { color: "#98E7FD" }]}>
+                                {"WIN"}
+                            </Text>
+                        </View>
+                        <View style={{ justifyContent: "center", alignContent: "space-around", }}>
+                            <Text style={[styles.PlayerName]}>
+                                {playerList[i]}
+                                {"\n2.2KM / 7R"}
+                            </Text>
+                        </View>
+                        <Image style={styles.PlayerAvatar} source={{ uri: link }} />
+                    </View>
+                </View>
 
                 //Blue loses
-                <View style={styles.LeftPlayer} key={i}>
-                    <Text style={[styles.PlayerName, { paddingLeft: 10 }]}>
-                        {playerList[i]}
-                        {"\n2.2KM / 7R"}
-                    </Text>
-                    <Image style={styles.PlayerAvatar} source={{ uri: link }} />
-                </View>
+                // <View style={styles.LeftPlayer} key={i}>
+                //     <Text style={[styles.PlayerName, { paddingLeft: 10 }]}>
+                //         {playerList[i]}
+                //         {"\n2.2KM / 7R"}
+                //     </Text>
+                //     <Image style={styles.PlayerAvatar} source={{ uri: link }} />
+                // </View>
             );
         }
         return list;
@@ -419,11 +439,10 @@ const styles = StyleSheet.create({
         textAlignVertical: "center",
         justifyContent: "center"
     },
-    // Icon: {
-    //   // backgroundColor: "#00000080",
-    //   color: "black",
-    //   width: height * 0.1,
-    //   height: height * 0.1,
-    //   // justifyContent: "center"
-    // }
+    Crown: {
+        flex: 1,
+        width: null,
+        height: null,
+        resizeMode: "cover",
+    }
 });

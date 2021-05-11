@@ -1,6 +1,8 @@
+from random import Random, random
 from checkpoint import Checkpoint
 from player import Player
 from time import time as now
+import random
 
 
 class Game:
@@ -35,6 +37,7 @@ class Game:
 
     def assignTeam(self):
         teaming = []
+        random.shuffle(self.players)
         players_per_team = round(
             len(self.players) / len(self.teams) + 0.5)
         for team_number in range(len(self.teams)):
@@ -43,8 +46,12 @@ class Game:
             player.team = team
         for index, player in enumerate(self.players):
             player.key = index
+        self.status = "PREPARE"
 
     def start(self):
+        for team in self.teams:
+            for cp in self.checkpoints:
+                cp.level[team] = 0
         self.startTime = now()
         self.status = "RUNNING"
 
@@ -109,7 +116,7 @@ class Game:
         return Game(gid, gname, status, hostID, hostName, checkpoints,
                     players, teams, min_players, max_players, startTime, endTime, capturedCount, unCapturedCount, winTeam, statsCount)
 
-    @staticmethod
+    @ staticmethod
     def new_game(_dict):
         gid = _dict["gid"]
         gname = _dict["gname"]
@@ -117,7 +124,7 @@ class Game:
             "status", None)
         hostID = _dict["hostID"]
         hostName = _dict["hostName"]
-        checkpoints = [Checkpoint.from_dict(cp) for cp in _dict["checkpoints"]]
+        checkpoints = []
         players = [Player.from_dict(player)
                    for player in _dict.get("players", [])]
         min_players, max_players = _dict.get(
