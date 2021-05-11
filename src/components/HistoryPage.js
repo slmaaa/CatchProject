@@ -185,26 +185,6 @@ const HistoryPage = ({ navigation }) => {
           </>
         )}
       />
-      <Button
-        containerStyle={styles.createButtonContianer}
-        buttonStyle={styles.createButton}
-        onPress={handleCreate}
-        icon={<Icon name="plus" type={"material-community"} color={"white"} />}
-      />
-      <Button
-        containerStyle={styles.createButtonContianer}
-        buttonStyle={styles.createButton}
-        onPress={() => {
-          setJoinOverlayVisible(true);
-        }}
-        icon={
-          <Icon
-            name="account-multiple-plus"
-            type={"material-community"}
-            color={"white"}
-          />
-        }
-      />
     </SafeAreaView>
   );
 };
