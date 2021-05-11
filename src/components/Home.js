@@ -16,7 +16,8 @@ import { Overlay, Input, Button } from "react-native-elements";
 import MMKVStorage from "react-native-mmkv-storage";
 import MapboxGL from "@react-native-mapbox-gl/maps";
 
-import { Icon, InlineIcon } from "@iconify/react";
+import { Icon } from 'react-native-elements'
+
 import documentOnePage24Regular from "@iconify/icons-fluent/document-one-page-24-regular";
 import { join } from "./joinOrCreate";
 import { URL } from "../constants.json";
@@ -35,18 +36,8 @@ var { height, width } = Dimensions.get("window");
 const Home = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.homeButtons}>
-        <Icon
-          reverse
-          name="file-tray-full-outline"
-          type="ionicon"
-          color="#4F2D20"
-        />
+      
 
-        <Icon reverse name="medal-outline" type="ionicon" color="#4F2D20" />
-
-        <Icon reverse name="people-outline" type="ionicon" color="#4F2D20" />
-      </View>
       <MapboxGL.MapView
         style={styles.map}
         pitchEnabled={false}
@@ -56,8 +47,49 @@ const Home = ({ navigation }) => {
         <MapboxGL.Camera followUserLocation={true} followUserMode={"compass"} />
         <MapboxGL.UserLocation />
       </MapboxGL.MapView>
+
       <Button
-        title={"GAME"}
+        containerStyle={styles.historyButtonContianer}
+        buttonStyle={styles.historyButton}
+        onPress={() => {
+          navigation.navigate("history");
+        }}
+        icon={   
+          <Icon
+            name="archive"
+            type="material-community"
+            color={"white"}
+          />
+        }
+      />
+
+      <Button
+        containerStyle={styles.badgesButtonContianer}
+        buttonStyle={styles.badgesButton}
+        icon={   
+          <Icon
+            name="medal"
+            type="material-community"
+            color={"white"}
+          />
+        }
+      />
+
+      <Button
+        containerStyle={styles.friendsButtonContianer}
+        buttonStyle={styles.friendsButton}
+        icon={   
+          <Icon
+            name="account-multiple"
+            type="material-community"
+            color={"white"}
+          />
+        }
+      />
+
+
+      <Button
+        title={"Game"}
         containerStyle={styles.button}
         titleStyle={{ color: "white", fontSize: 24 }}
         buttonStyle={{ backgroundColor: color.brown }}
@@ -65,7 +97,11 @@ const Home = ({ navigation }) => {
           navigation.navigate("joinOrCreate");
         }}
       ></Button>
+
+
+
     </SafeAreaView>
+
   );
 };
 
@@ -96,7 +132,7 @@ const styles = StyleSheet.create({
   button: {
     position: "absolute",
     height: 50,
-    top: height * 0.9,
+    top: height * 0.85,
     width: "40%",
     alignSelf: "center",
     color: color.brown,
@@ -110,10 +146,50 @@ const styles = StyleSheet.create({
     shadowRadius: 15,
     elevation: 5,
   },
-  homeButtons:{
-    flex: 0.2,
-    color: color.signUpBlue,
-    marginHorizontal: 110,
+  historyButtonContianer: {
+    position:"absolute",
+    top: height * 0.016,
+    left: width * 0.8,
+    color: color.brown,
+    alignItems: "flex-end",
+    justifyContent: "center",
+    margin: 10,
+  },
+  historyButton: {
+    backgroundColor: color.brown,
+    width: height / 15,
+    height: height / 15,
+    borderRadius: height / 60,
+  },
+  badgesButtonContianer: {
+    position:"absolute",
+    top: height * 0.11,
+    left: width * 0.8,
+    color: color.brown,
+    alignItems: "flex-end",
+    justifyContent: "center",
+    margin: 10,
+  },
+  badgesButton: {
+    backgroundColor: color.brown,
+    width: height / 15,
+    height: height / 15,
+    borderRadius: height / 60,
+  },
+  friendsButtonContianer: {
+    position:"absolute",
+    top: height * 0.20,
+    left: width * 0.8,
+    color: color.brown,
+    alignItems: "flex-end",
+    justifyContent: "center",
+    margin: 10,
+  },
+  friendsButton: {
+    backgroundColor: color.brown,
+    width: height / 15,
+    height: height / 15,
+    borderRadius: height / 60,
   },
 });
 export default Home;
