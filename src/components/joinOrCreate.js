@@ -29,9 +29,12 @@ import { wsSend } from "../App";
 import { color } from "../constants";
 
 const MMKV = new MMKVStorage.Loader().initialize();
+
 var { height, width } = Dimensions.get("window");
 const JoinOrCreate = ({ navigation }) => {
   const [initializing, setInitializing] = useState(true);
+  const [joinOverlayVisible, setJoinOverlayVisible] = useState(false);
+  const [roomID, setRoomID] = useState();
   const [creating, setCreating] = useState(false);
   const friends = [];
   const nearbyRooms = [];
@@ -62,7 +65,7 @@ const JoinOrCreate = ({ navigation }) => {
     const game = {
       gid: "None",
       gname: "None",
-      status: "PREPARE",
+      status: "WAITING",
       hostID: MMKV.getString("userID"),
       hostName: MMKV.getString("userName"),
       players: [
@@ -101,6 +104,37 @@ const JoinOrCreate = ({ navigation }) => {
     setCreating(true);
     setGame();
   };
+  const handleOnPressJoin = () => {
+    let game;
+    wsSend(
+      JSON.stringify({
+        header: "JOIN",
+        content: {
+          player: {
+            pid: MMKV.getString("userID"),
+            name: MMKV.getString("userName"),
+            avatar: "None",
+          },
+          gid: roomID,
+        },
+      })
+    ).then(() => {
+      let interval = setInterval(() => {
+        game = MMKV.getMap("joinedGame");
+        if (game == null) return;
+        clearInterval(interval);
+        MMKV.setString("gameID", roomID);
+        MMKV.setString("gameName", game.gname);
+        database()
+          .ref("users/" + MMKV.getString("userID"))
+          .update({ gameID: roomID, status: "WAITING" });
+        MMKV.setString("userStatus", "WAITING");
+        navigation.replace("Waiting", {
+          gameName: game.gname,
+        });
+      }, 100);
+    });
+  };
   return (
     <SafeAreaView container={styles.container}>
       <Overlay
@@ -123,6 +157,14 @@ const JoinOrCreate = ({ navigation }) => {
             color={[color.teamRed, color.teamBlue]}
           />
         </View>
+      </Overlay>
+      <Overlay
+        isVisible={joinOverlayVisible}
+        onBackdropPress={() => setJoinOverlayVisible(false)}
+        overlayStyle={{ width: "80%" }}
+      >
+        <Input placeholder="Enter room ID" onChangeText={setRoomID} />
+        <Button title={"Join"} onPress={handleOnPressJoin} />
       </Overlay>
       <Button
         containerStyle={styles.backButtonContainer}
@@ -152,6 +194,9 @@ const JoinOrCreate = ({ navigation }) => {
       <Button
         containerStyle={styles.createButtonContianer}
         buttonStyle={styles.createButton}
+        onPress={() => {
+          setJoinOverlayVisible(true);
+        }}
         icon={
           <Icon
             name="account-multiple-plus"
