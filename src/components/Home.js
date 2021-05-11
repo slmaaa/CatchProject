@@ -26,6 +26,7 @@ import { color } from "../constants";
 MapboxGL.setAccessToken(
   "pk.eyJ1IjoiaGVjdG9yY2hjaCIsImEiOiJja205YmhldXUwdHQ1Mm9xbGw4N2RodndhIn0.yX90QKE2jcgG-7V5wOGXeQ"
 );
+let link = `https://picsum.photos/200?t=${Date.now()}`;
 
 import histroy from "./history";
 import RealHome from "./RealHome";
@@ -50,6 +51,14 @@ const Home = ({ navigation }) => {
         <MapboxGL.Camera followUserLocation={true} followUserMode={"compass"} />
         <MapboxGL.UserLocation />
       </MapboxGL.MapView>
+
+
+      <View style={styles.headerContainer}>
+        <Text style={styles.headerText}>
+            {MMKV.getString("userName")}
+        </Text>
+        <Image style={styles.playerAvatar} source={{ uri: link }} />
+      </View>
 
       <Button
         containerStyle={styles.historyButtonContianer}
@@ -199,6 +208,34 @@ const styles = StyleSheet.create({
     width: height / 15,
     height: height / 15,
     borderRadius: height / 60,
+  },
+  headerContainer: {
+    position:"absolute",
+    width: width * 0.45,
+    height: height * 0.1,
+    flexDirection: "row",
+    marginTop: height * 0.03,
+    paddingRight: 40,
+    marginBottom: height * 0.05,
+    borderBottomRightRadius: height / 20,
+    borderTopRightRadius: height / 20,
+    backgroundColor: "#00000080",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  headerText: {
+    fontSize: 16,
+    color: "white",
+    fontWeight: "700",
+    paddingLeft: 30,
+    textAlign: "left",
+    marginRight: 10,
+  },
+  playerAvatar: {
+    borderRadius: height / 30,
+    height: height / 15,
+    width: height / 15,
+    marginHorizontal: height / 80,
   },
 });
 export default Home;
