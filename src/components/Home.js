@@ -29,6 +29,9 @@ MapboxGL.setAccessToken(
 
 import histroy from "./history";
 import RealHome from "./RealHome";
+import Badges from "./Badges";
+import Friends from "./Friends";
+import HistoryPage from "./HistoryPage";
 
 const MMKV = new MMKVStorage.Loader().initialize();
 var { height, width } = Dimensions.get("window");
@@ -52,7 +55,7 @@ const Home = ({ navigation }) => {
         containerStyle={styles.historyButtonContianer}
         buttonStyle={styles.historyButton}
         onPress={() => {
-          navigation.navigate("history");
+          navigation.navigate("HistoryPage");
         }}
         icon={   
           <Icon
@@ -66,6 +69,9 @@ const Home = ({ navigation }) => {
       <Button
         containerStyle={styles.badgesButtonContianer}
         buttonStyle={styles.badgesButton}
+        onPress={() => {
+          navigation.navigate("Badges");
+        }}
         icon={   
           <Icon
             name="medal"
@@ -78,6 +84,9 @@ const Home = ({ navigation }) => {
       <Button
         containerStyle={styles.friendsButtonContianer}
         buttonStyle={styles.friendsButton}
+        onPress={() => {
+          navigation.navigate("Friends");
+        }}
         icon={   
           <Icon
             name="account-multiple"

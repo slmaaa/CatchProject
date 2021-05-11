@@ -11,6 +11,9 @@ import Login from "./components/Login";
 import SignUp from "./components/Signup";
 import Home from "./components/Home";
 import RealHome from "./components/RealHome";
+import Badges from "./components/Badges";
+import HistoryPage from "./components/HistoryPage";
+import Friends from "./components/Friends";
 import Riddle from "./components/InGame/Riddle";
 import Sudoku from "./components/InGame/Sudoku";
 import CreateGame from "./components/CreateGame";
@@ -150,6 +153,27 @@ const App = () => {
             <Stack.Screen
               name="Home"
               component={Home}
+              options={{
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="Badges"
+              component={Badges}
+              options={{
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="Friends"
+              component={Friends}
+              options={{
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="HistoryPage"
+              component={HistoryPage}
               options={{
                 headerShown: false,
               }}
