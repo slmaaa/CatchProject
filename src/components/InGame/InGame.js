@@ -265,10 +265,10 @@ const InGame = ({ navigation, route }) => {
         <StatusBar barStyle="dark-content" />
         <SafeAreaView style={styles.container}>
           <Overlay
-            isVisible={creating}
+            isVisible={gameOverAccountingVisible}
             overlayStyle={{ width: "80%", borderRadius: 30 }}
           >
-            <Text style={styles.creatingText}>Creating...</Text>
+            <Text style={styles.creatingText}>Game Over.</Text>
             <View
               style={{
                 flexDirection: "row",
