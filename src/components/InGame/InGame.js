@@ -36,6 +36,9 @@ const InGame = ({ navigation, route }) => {
   const gameInfo = useRef();
   const [location, setLocation] = useState(null);
   const [lastLocation, setLastLocation] = useState(null);
+  const [gameOverAccountingVisible, setGameOverAccountingVisible] = useState(
+    false
+  );
   const [challengesSolved, setChallengesSolved] = useState(0);
   const distanceTravelled = useRef(0);
   const [distanceCovered, setDistanceCovered] = useState(0);
