@@ -21,12 +21,10 @@ import { Icon } from "react-native-elements";
 import MilitaryMedal from "../../assets/img/military-medal.svg";
 import { join } from "./joinOrCreate";
 import { URL } from "../constants.json";
-import { wsSend } from "../App";
 import { color } from "../constants";
 MapboxGL.setAccessToken(
   "pk.eyJ1IjoiaGVjdG9yY2hjaCIsImEiOiJja205YmhldXUwdHQ1Mm9xbGw4N2RodndhIn0.yX90QKE2jcgG-7V5wOGXeQ"
 );
-let link = `https://picsum.photos/200?t=${Date.now()}`;
 
 import histroy from "./history";
 import RealHome from "./RealHome";
@@ -52,7 +50,10 @@ const Home = ({ navigation }) => {
 
       <View style={styles.headerContainer}>
         <Text style={styles.headerText}>{MMKV.getString("userName")}</Text>
-        <Image style={styles.playerAvatar} source={{ uri: link }} />
+        <Image
+          style={styles.playerAvatar}
+          source={{ uri: MMKV.getString("userAvatar") }}
+        />
       </View>
 
       <Button

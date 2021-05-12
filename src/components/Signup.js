@@ -12,6 +12,7 @@ import {
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
   Keyboard,
+  Platform,
 } from "react-native";
 
 import { color } from "../constants";
@@ -49,7 +50,7 @@ export default SignUp = ({ navigation }) => {
                   placeholder={"Username"}
                   autoCapitalize={"none"}
                   onChangeText={setUsername}
-                ></TextInput>
+                />
               </View>
             </View>
             <View style={styles.emailView}>
@@ -70,7 +71,7 @@ export default SignUp = ({ navigation }) => {
                   placeholder={"example@abcmail.com"}
                   autoCapitalize={"none"}
                   onChangeText={setEmail}
-                ></TextInput>
+                />
               </View>
             </View>
 
@@ -96,29 +97,50 @@ export default SignUp = ({ navigation }) => {
             <View style={styles.loginButtonView}>
               <TouchableOpacity
                 onPress={() => {
-                  auth()
-                    .createUserWithEmailAndPassword(email, pw)
-                    .then((authData) => {
-                      database()
-                        .ref("users/" + authData.user.uid)
-                        .set({
-                          username: username,
-                          email: email,
-                          status: "ONLINE",
-                        });
-                      console.log("User account created & signed in!");
-                    })
-                    .catch((error) => {
-                      if (error.code === "auth/email-already-in-use") {
-                        console.log("That email address is already in use!");
-                      }
+                  let avatar = "";
+                  const ranNum = Math.floor(Math.random() * 950 + 1);
+                  let response;
+                  fetch(
+                    "https://picsum.photos/v2/list?page=" +
+                      ranNum.toString() +
+                      "&limit=1"
+                  ).then((res) => {
+                    res
+                      .json()
+                      .then((json) => {
+                        console.log(json);
+                        avatar = json[0].download_url;
+                        console.log(avatar);
+                      })
+                      .then(() => {
+                        auth()
+                          .createUserWithEmailAndPassword(email, pw)
+                          .then((authData) => {
+                            database()
+                              .ref("users/" + authData.user.uid)
+                              .set({
+                                username: username,
+                                email: email,
+                                status: "ONLINE",
+                                avatar: avatar,
+                              });
+                            console.log("User account created & signed in!");
+                          })
+                          .catch((error) => {
+                            if (error.code === "auth/email-already-in-use") {
+                              console.log(
+                                "That email address is already in use!"
+                              );
+                            }
 
-                      if (error.code === "auth/invalid-email") {
-                        console.log("That email address is invalid!");
-                      }
+                            if (error.code === "auth/invalid-email") {
+                              console.log("That email address is invalid!");
+                            }
 
-                      console.error(error);
-                    });
+                            console.error(error);
+                          });
+                      });
+                  });
                 }}
               >
                 <View style={styles.loginButton}>
@@ -202,10 +224,11 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins-Regular",
     fontSize: 14,
     lineHeight: 24,
-    color: color.darkGrey,
+    color: "black",
     flex: 0.5,
   },
   inputText: {
     flex: 0.5,
+    color: "black",
   },
 });

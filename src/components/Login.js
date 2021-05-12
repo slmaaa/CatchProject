@@ -12,6 +12,7 @@ import {
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
   Keyboard,
+  Platform,
 } from "react-native";
 
 import logoImage from "./image/IMG_4059.jpg";
@@ -185,6 +186,7 @@ const styles = StyleSheet.create({
   inputText: {
     flex: 1,
     marginHorizontal: -20,
+    color: "black",
   },
   signUp: {
     flex: 0.2,
