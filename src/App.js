@@ -26,6 +26,7 @@ import history from "./components/history";
 import JoinOrCreate from "./components/joinOrCreate";
 import PrepareRoom from "./components/PrepareRoom";
 import { color } from "./constants";
+import GaveOverScreen from "./components/GameOverScreen";
 [];
 const MMKV = new MMKVStorage.Loader().initialize();
 const Stack = createStackNavigator();
@@ -223,6 +224,13 @@ const App = () => {
             <Stack.Screen
               name="Waiting"
               component={Waiting}
+              options={() => ({
+                headerShown: false,
+              })}
+            />
+            <Stack.Screen
+              name="GameOver"
+              component={GaveOverScreen}
               options={() => ({
                 headerShown: false,
               })}

@@ -27,6 +27,7 @@ import { wsSend } from "../../App";
 import { color } from "../../constants.json";
 import { Button, Overlay } from "react-native-elements";
 import { useFocusEffect } from "@react-navigation/core";
+import { makeMutable } from "react-native-reanimated";
 const CP_RANGE = 25;
 
 const InGame = ({ navigation, route }) => {
@@ -233,6 +234,7 @@ const InGame = ({ navigation, route }) => {
     }
     MMKV.setMap("joinedGame", gameRef.current.game);
     if (gameRef.current.game.status === "OVER") {
+      setGameOverAccountingVisible(true);
       wsSend(
         JSON.stringify({
           header: "PLAYER_STATS",
@@ -248,6 +250,11 @@ const InGame = ({ navigation, route }) => {
             if (endStats == null) return;
             clearInterval(interval);
             gameRef.current.game.players = endStats.players;
+            gameRef.current.game.winTeam = endStats.winTeam;
+            MMKV.setMap("joinedGame", gameRef.current.game);
+            MMKV.setString("pointMVP", endStats.pointMVP.toString());
+            MMKV.setString("distMVP", endStats.distMVP.toString());
+            navigation.replace("GameOver");
           }, 100);
         })
       );
@@ -320,7 +327,7 @@ const InGame = ({ navigation, route }) => {
               {distanceCovered > 1000
                 ? distanceCovered / 1000 + "km"
                 : distanceCovered + "m"}{" "}
-              | {challengesSolved} points
+              | {challengesSolved} pts
             </Text>
           </View>
         </SafeAreaView>

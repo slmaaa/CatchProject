@@ -39,7 +39,7 @@ class Game:
         teaming = []
         random.shuffle(self.players)
         players_per_team = round(
-            len(self.players) / len(self.teams) + 0.5)
+            len(self.players) / (len(self.teams) + 0.5))
         for team_number in range(len(self.teams)):
             teaming += players_per_team * [self.teams[team_number]]
         for player, team in zip(self.players, teaming):
@@ -86,6 +86,20 @@ class Game:
             return True
         else:
             return False
+
+    def findMVPs(self):
+        max_dist = 0
+        key_dist = 0
+        max_points = 0
+        key_point = 0
+        for player in self.players:
+            if(player.dist > max_dist):
+                max_dist = player.dist
+                key_dist = player.key
+            if(player.points > max_points):
+                max_points = player.points
+                key_point = player.key
+        return [key_dist, key_point]
 
     @ staticmethod
     def from_dict(_dict):

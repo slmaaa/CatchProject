@@ -16,6 +16,7 @@ import {
 import { Overlay, Input, Button } from "react-native-elements";
 import MMKVStorage from "react-native-mmkv-storage";
 import MapboxGL from "@react-native-mapbox-gl/maps";
+import auth from "@react-native-firebase/auth";
 import { Icon } from "react-native-elements";
 import MilitaryMedal from "../../assets/img/military-medal.svg";
 import { join } from "./joinOrCreate";
@@ -39,7 +40,6 @@ var { height, width } = Dimensions.get("window");
 const Home = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
-      <MilitaryMedal width={120} height={40} />
       <MapboxGL.MapView
         style={styles.map}
         pitchEnabled={false}
@@ -77,7 +77,8 @@ const Home = ({ navigation }) => {
         containerStyle={styles.friendsButtonContianer}
         buttonStyle={styles.friendsButton}
         onPress={() => {
-          navigation.navigate("Friends");
+          //navigation.navigate("Friends");
+          auth().signOut();
         }}
         icon={
           <Icon

@@ -82,6 +82,7 @@ async def confirm_game_handler(websocket, gid):
         #     return
 
         game.assignTeam()
+        game.status = "PREPARE"
         gdb[gid] = game.to_dict()
         db.push(gdb, G_DB)
         game = gdb[gid]
@@ -187,16 +188,17 @@ async def player_stats_handler(websocket, _dict):
         await websocket.send('{"header": "ERROR", "content": "Updatae stats fail"}')
         return
     try:
-        if flag:
-            await broadcast(_dict["gid"], "CLOSE_ACCOUNT", {"players": game["players"]})
-    except:
-        await websocket.send('{"header": "ERROR", "content": "Broadcast fail"}')
-        return
-    try:
         gdb[_dict["gid"]] = game.to_dict()
         db.push(gdb, G_DB)
     except:
         await websocket.send('{"header": "ERROR", "content": "Save game fail"}')
+    try:
+        if flag:
+            [distMVP, pointMVP] = game.findMVPs()
+            await broadcast(_dict["gid"], "ACCOUNT_FINISHED", {"players": game["players"], "winTeam": game["winTeam"], "distMVP": distMVP, "pointMVP": pointMVP})
+    except:
+        await websocket.send('{"header": "ERROR", "content": "Broadcast fail"}')
+        return
 
 
 async def broadcast(room, header, content):
