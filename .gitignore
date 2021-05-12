@@ -60,4 +60,3 @@ buck-out/
 
 #Android build
 *.hprof
-android/app/build
