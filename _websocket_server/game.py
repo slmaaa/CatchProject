@@ -79,8 +79,8 @@ class Game:
                         "cpsLevel": cpsLevel, "cpsCaptured": cpsCaptured}
 
     def setPlayerStats(self, key, points, dist):
-        self.players[key].points = points
-        self.players[key].dist = dist
+        self.players[key].points = int(points)
+        self.players[key].dist = int(dist)
         self.statsCount += 1
         if (self.statsCount == len(self.players)):
             return True
@@ -88,15 +88,15 @@ class Game:
             return False
 
     def findMVPs(self):
-        max_dist = 0
-        key_dist = 0
-        max_points = 0
-        key_point = 0
+        max_dist = self.players[0].dist
+        key_dist = self.players[0].key
+        max_points = self.players[0].points
+        key_point = self.players[0].key
         for player in self.players:
-            if(player.dist > max_dist):
+            if(int(player.dist) > int(max_dist)):
                 max_dist = player.dist
                 key_dist = player.key
-            if(player.points > max_points):
+            if(int(player.points) > int(max_points)):
                 max_points = player.points
                 key_point = player.key
         return [key_dist, key_point]
