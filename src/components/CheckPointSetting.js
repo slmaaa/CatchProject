@@ -19,7 +19,7 @@ const CheckPointSetting = ({ navigation }) => {
   const [checkpointsCoor, setCheckpointsCoor] = useState([]);
   const [infoToServe, setInfoToServe] = useState([]);
   const [radius, setRadius] = useState(15);
-  const [checkpointpower, setcheckpointpower] = useState(3);
+  const [checkpointpower, setcheckpointpower] = useState(1);
   const [saving, setSaving] = useState(false);
   const [tooCloseAlertVisible, setTooCloseAlertVisible] = useState(false);
   const [cpNumberWarningVisible, setCPNumberWaringVisible] = useState(false);

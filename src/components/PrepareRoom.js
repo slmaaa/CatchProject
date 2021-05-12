@@ -128,6 +128,7 @@ export default PrepareRoom = ({ navigation }) => {
           followUserMode={"course"}
           zoomLevel={17}
         />
+        <MapboxGL.UserLocation />
         <RenderCheckpointsOnMap />
       </MapboxGL.MapView>
       <View style={styles.headerContainer}>
@@ -195,11 +196,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   headerText: {
-    fontSize: 10,
+    fontSize: 12,
     color: "#FFFFFF",
-    fontWeight: "normal",
+    fontWeight: "700",
     paddingLeft: 10,
     textAlign: "left",
+    marginRight: 10,
   },
   PlayerAvatar: {
     borderRadius: height / 30,
@@ -220,9 +222,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#00000080",
     justifyContent: "space-between",
     alignItems: "center",
-    borderTopWidth: 2,
-    borderBottomWidth: 2,
-    borderRightWidth: 2,
+    borderTopWidth: 3,
+    borderBottomWidth: 3,
+    borderRightWidth: 3,
     borderBottomRightRadius: height * 0.05,
     borderTopRightRadius: height * 0.05,
     borderColor: "#98E7FD",
@@ -234,9 +236,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#00000080",
     justifyContent: "space-between",
     alignItems: "center",
-    borderTopWidth: 2,
-    borderBottomWidth: 2,
-    borderRightWidth: 2,
+    borderTopWidth: 3,
+    borderBottomWidth: 3,
+    borderRightWidth: 3,
     borderBottomRightRadius: height * 0.05,
     borderTopRightRadius: height * 0.05,
     borderColor: "#FF8F62",

@@ -1,5 +1,5 @@
 /* eslint-disable quotes */
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { getDistance } from "geolib";
 import * as Progress from "react-native-progress";
 import MapboxGL from "@react-native-mapbox-gl/maps";
@@ -223,43 +223,46 @@ const InGame = ({ navigation, route }) => {
     gameInfo.current = MMKV.getMap("gameInfo");
   }, 100);
 
-  useEffect(() => {
-    if (gameRef.current.game.status === "OVER") return;
-    if (gameInfo.current == null) {
-      return;
-    }
-    gameRef.current.game.status = gameInfo.current.status;
-    for (let i = 0; i < gameRef.current.numberOfCheckpoints; i++) {
-      gameRef.current.game.checkpoints[i].level = gameInfo.current.cpsLevel[i];
-    }
-    MMKV.setMap("joinedGame", gameRef.current.game);
-    if (gameRef.current.game.status === "OVER") {
-      setGameOverAccountingVisible(true);
-      wsSend(
-        JSON.stringify({
-          header: "PLAYER_STATS",
-          content: {
-            gid: gameRef.current.game.gid.toString(),
-            key: MMKV.getInt("key").toString(),
-            points: MMKV.getInt("challengesSolved").toString(),
-            dist: distanceTravelled.current.toString(),
-          },
-        })
-      ).then(() => {
-        let interval = setInterval(() => {
-          const endStats = MMKV.getMap("endStats");
-          if (endStats == null) return;
-          clearInterval(interval);
-          gameRef.current.game.players = endStats.players;
-          gameRef.current.game.winTeam = endStats.winTeam;
-          MMKV.setMap("joinedGame", gameRef.current.game);
-          MMKV.setString("pointMVP", endStats.pointMVP.toString());
-          MMKV.setString("distMVP", endStats.distMVP.toString());
-          navigation.replace("GameOver");
-        }, 100);
-      });
-    }
-  }, [gameInfo.current]);
+  useFocusEffect(
+    useCallback(() => {
+      if (gameRef.current.game.status === "OVER") return;
+      if (gameInfo.current == null) {
+        return;
+      }
+      gameRef.current.game.status = gameInfo.current.status;
+      for (let i = 0; i < gameRef.current.numberOfCheckpoints; i++) {
+        gameRef.current.game.checkpoints[i].level =
+          gameInfo.current.cpsLevel[i];
+      }
+      MMKV.setMap("joinedGame", gameRef.current.game);
+      if (gameRef.current.game.status === "OVER") {
+        setGameOverAccountingVisible(true);
+        wsSend(
+          JSON.stringify({
+            header: "PLAYER_STATS",
+            content: {
+              gid: gameRef.current.game.gid.toString(),
+              key: MMKV.getInt("key").toString(),
+              points: MMKV.getInt("challengesSolved").toString(),
+              dist: distanceTravelled.current.toString(),
+            },
+          })
+        ).then(() => {
+          let interval = setInterval(() => {
+            const endStats = MMKV.getMap("endStats");
+            if (endStats == null) return;
+            clearInterval(interval);
+            gameRef.current.game.players = endStats.players;
+            gameRef.current.game.winTeam = endStats.winTeam;
+            MMKV.setMap("joinedGame", gameRef.current.game);
+            MMKV.setString("pointMVP", endStats.pointMVP.toString());
+            MMKV.setString("distMVP", endStats.distMVP.toString());
+            navigation.replace("GameOver");
+          }, 100);
+        });
+      }
+    }, [gameInfo.current])
+  );
 
   useFocusEffect(() => {
     setChallengesSolved(MMKV.getInt("challengesSolved"));
@@ -299,8 +302,11 @@ const InGame = ({ navigation, route }) => {
               pitchEnabled={false}
               rotateEnabled={false}
               compassEnabled={false}
+              scrollEnabled={false}
             >
               <MapboxGL.Camera
+                followUserLocation={true}
+                followUserMode={"compass"}
                 defaultSettings={{
                   zoomLevel: 17,
                   centerCoordinate: [114.263981, 22.339158],
@@ -395,7 +401,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 50,
     borderBottomLeftRadius: 50,
     right: 0,
-    borderWidth: 2,
+    borderWidth: 3,
     borderRightWidth: 0,
     backgroundColor: color.transBlack,
     alignItems: "center",

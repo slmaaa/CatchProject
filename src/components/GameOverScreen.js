@@ -15,40 +15,40 @@ import { Avatar, Button, Card, ListItem, Icon } from "react-native-elements";
 import MMKVStorage from "react-native-mmkv-storage";
 import { color } from "../constants.json";
 
-var { height, width } = Dimensions.get("window");
+const { height, width } = Dimensions.get("window");
 var link =
   "https://images-na.ssl-images-amazon.com/images/S/pv-target-images/7bbe5762c79ee0ad11c1267483b4a2d5e12868de779eaf751e8e86596e978bbb._V_SX1080_.jpg";
 
 export default GameOverScreen = ({ navigation }) => {
   const MMKV = new MMKVStorage.Loader().initialize();
-  //const [game, setGame] = useState(MMKV.getMap("joinedGame"));
-  const [roomInfo, setRoomInfo] = useState(null);
   const [playerView, setPlayersView] = useState([]);
-  //   const gameID = MMKV.getString("gameID");
-  //   const userID = MMKV.getString("userID");
-  const gameID = "gameID";
-  const userID = "userID";
-  let game, status, distMVP, pointMVP;
+  const [initializing, setInitializing] = useState(true);
+  const [game, setGame] = useState(MMKV.getMap("joinedGame"));
+  let status,
+    distMVP,
+    pointMVP,
+    blueTeam = [],
+    redTeam = [];
 
   useEffect(() => {
-    game = MMKV.getMap("joinedGame");
+    if (!initializing) return;
+    game.players.map((player) => {
+      player.team === "BLUE" ? blueTeam.push(player) : redTeam.push(player);
+    });
     distMVP = MMKV.getString("distMVP");
     pointMVP = MMKV.getString("pointMVP");
     setPlayersView(renderPlayersList());
-    if (status === "RUNNING") {
-      navigation.replace("InGame");
-      return;
-    }
+    setInitializing(false);
   }, []);
 
   const renderPlayersList = () => {
     if (game.players.length === 0) return;
     let list = [],
-      length = game.players.length,
+      length = game.players.length / 2,
       i;
-    for (i = 0; i + 1 < length; i += 2) {
+    for (i = 0; i < length; ++i) {
       list.push(
-        game.winTeam == "BLUE" ? (
+        game.winTeam === "BLUE" ? (
           <View style={styles.playerListRowConatiner} key={i % 2}>
             <View style={styles.LeftPlayerWin} key={i}>
               <View style={{ marginStart: 20, marginEnd: 10 }}>
@@ -63,16 +63,16 @@ export default GameOverScreen = ({ navigation }) => {
                 }}
               >
                 <Text style={[styles.PlayerName]}>
-                  {game.players[i].name + "\n"}
-                  {game.players[i].dist > 1000
-                    ? game.players[i].dist / 1000 + "km"
-                    : game.players[i].dist + "m"}{" "}
-                  | {game.players[i].points} pts
+                  {blueTeam[i].name + "\n"}
+                  {blueTeam[i].dist > 1000
+                    ? blueTeam[i].dist / 1000 + "km"
+                    : blueTeam[i].dist + "m"}{" "}
+                  | {blueTeam[i].points} pts
                 </Text>
               </View>
               <Image style={styles.PlayerAvatar} source={{ uri: link }} />
               {/* With Crown start*/}
-              {game.players[i].key.toString() === distMVP && (
+              {blueTeam[i].key.toString() === distMVP && (
                 <View
                   style={{ top: -20, paddingStart: 5, position: "absolute" }}
                 >
@@ -87,7 +87,7 @@ export default GameOverScreen = ({ navigation }) => {
                   </View>
                 </View>
               )}
-              {game.players[i].key.toString() === pointMVP && (
+              {blueTeam[i].key.toString() === pointMVP && (
                 <View
                   style={{ top: -20, paddingStart: 5, position: "absolute" }}
                 >
@@ -107,7 +107,7 @@ export default GameOverScreen = ({ navigation }) => {
             <View style={styles.RightPlayer} key={i + 1}>
               <Image style={styles.PlayerAvatar} source={{ uri: link }} />
               {/* With Crown start*/}
-              {game.players[i + 1].key.toString() === distMVP && (
+              {redTeam[i].key.toString() === distMVP && (
                 <View
                   style={{ top: -20, paddingStart: 5, position: "absolute" }}
                 >
@@ -122,7 +122,7 @@ export default GameOverScreen = ({ navigation }) => {
                   </View>
                 </View>
               )}
-              {game.players[i + 1].key.toString() === pointMVP && (
+              {redTeam[i].key.toString() === pointMVP && (
                 <View
                   style={{ top: -20, paddingStart: 5, position: "absolute" }}
                 >
@@ -140,11 +140,11 @@ export default GameOverScreen = ({ navigation }) => {
 
               {/* With Crown end*/}
               <Text style={[styles.PlayerName, { marginLeft: 0 }]}>
-                {game.players[i + 1].name + "\n"}
-                {game.players[i + 1].dist > 1000
-                  ? game.players[i + 1].dist / 1000 + "km"
-                  : game.players[i + 1].dist + "m"}{" "}
-                | {game.players[i + 1].points} pts
+                {redTeam[i].name + "\n"}
+                {redTeam[i].dist > 1000
+                  ? redTeam[i].dist / 1000 + "km"
+                  : redTeam[i].dist + "m"}{" "}
+                | {redTeam[i].points} pts
               </Text>
             </View>
           </View>
@@ -158,16 +158,16 @@ export default GameOverScreen = ({ navigation }) => {
                 }}
               >
                 <Text style={[styles.PlayerName]}>
-                  {game.players[i].name + "\n"}
-                  {game.players[i].dist > 1000
-                    ? game.players[i].dist / 1000 + "km"
-                    : game.players[i].dist + "m"}{" "}
-                  | {game.players[i].points} pts
+                  {blueTeam[i].name + "\n"}
+                  {blueTeam[i].dist > 1000
+                    ? blueTeam[i].dist / 1000 + "km"
+                    : blueTeam[i].dist + "m"}{" "}
+                  | {blueTeam[i].points} pts
                 </Text>
               </View>
               <Image style={styles.PlayerAvatar} source={{ uri: link }} />
               {/* With Crown start*/}
-              {game.players[i].key.toString() === distMVP && (
+              {blueTeam[i].key.toString() === distMVP && (
                 <View
                   style={{ top: -20, paddingStart: 5, position: "absolute" }}
                 >
@@ -182,7 +182,7 @@ export default GameOverScreen = ({ navigation }) => {
                   </View>
                 </View>
               )}
-              {game.players[i].key.toString() === pointMVP && (
+              {blueTeam[i].key.toString() === pointMVP && (
                 <View
                   style={{ top: -20, paddingStart: 5, position: "absolute" }}
                 >
@@ -202,7 +202,7 @@ export default GameOverScreen = ({ navigation }) => {
             <View style={styles.RightPlayerWin} key={i + 1}>
               <Image style={styles.PlayerAvatar} source={{ uri: link }} />
               {/* With Crown start*/}
-              {game.players[i + 1].key.toString() === distMVP && (
+              {redTeam[i].key.toString() === distMVP && (
                 <View
                   style={{ top: -20, paddingStart: 5, position: "absolute" }}
                 >
@@ -217,7 +217,7 @@ export default GameOverScreen = ({ navigation }) => {
                   </View>
                 </View>
               )}
-              {game.players[i + 1].key.toString() === pointMVP && (
+              {redTeam[i].key.toString() === pointMVP && (
                 <View
                   style={{ top: -20, paddingStart: 5, position: "absolute" }}
                 >
@@ -235,11 +235,11 @@ export default GameOverScreen = ({ navigation }) => {
 
               {/* With Crown end*/}
               <Text style={[styles.PlayerName, { marginLeft: 0 }]}>
-                {game.players[i + 1].name + "\n"}
-                {game.players[i + 1].dist > 1000
-                  ? game.players[i + 1].dist / 1000 + "km"
-                  : game.players[i + 1].dist + "m"}{" "}
-                | {game.players[i + 1].points} pts
+                {redTeam[i].name + "\n"}
+                {redTeam[i].dist > 1000
+                  ? redTeam[i].dist / 1000 + "km"
+                  : redTeam[i].dist + "m"}{" "}
+                | {redTeam[i].points} pts
               </Text>
               <View style={{ marginStart: 10, marginEnd: 10 }}>
                 <Text style={[styles.WinText, { color: "#FF8F62" }]}>
@@ -254,30 +254,33 @@ export default GameOverScreen = ({ navigation }) => {
     return list;
   };
 
-  return (
-    <View style={styles.container}>
-      <View style={styles.headerContainer2}>
-        <Text style={styles.headerText}>
-          {`${game.hostName}'s Room`}
-          {`\nRoom ID: ${game.gid}`}
-        </Text>
-        <Image style={styles.PlayerAvatar} source={{ uri: link }} />
+  if (!initializing)
+    return (
+      <View style={styles.container}>
+        <>
+          <View style={styles.headerContainer2}>
+            <Text style={styles.headerText}>
+              {`${game.hostName}'s Room`}
+              {`\nRoom ID: ${game.gid}`}
+            </Text>
+            <Image style={styles.PlayerAvatar} source={{ uri: link }} />
+          </View>
+          <View style={styles.playersListContainer}>
+            <ScrollView>{playerView}</ScrollView>
+          </View>
+          <Button
+            title={"Home"}
+            containerStyle={styles.button}
+            titleStyle={{ color: "white", fontSize: 24 }}
+            buttonStyle={{ backgroundColor: color.brown }}
+            onPress={() => {
+              console.log("Home");
+            }}
+          ></Button>
+        </>
       </View>
-      <View style={styles.playersListContainer}>
-        <ScrollView>{playerView}</ScrollView>
-      </View>
-      <Button
-        title={"Home"}
-        containerStyle={styles.button}
-        titleStyle={{ color: "white", fontSize: 24 }}
-        buttonStyle={{ backgroundColor: color.brown }}
-        onPress={() => {
-          //wsSend(JSON.stringify({ header: "START", content: gameID }));
-          console.log("Home");
-        }}
-      ></Button>
-    </View>
-  );
+    );
+  else return null;
 };
 
 const styles = StyleSheet.create({
@@ -299,11 +302,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   headerText: {
-    fontSize: 10,
+    fontSize: 12,
     color: "#FFFFFF",
-    fontWeight: "normal",
+    fontWeight: "700",
     paddingLeft: 10,
     textAlign: "left",
+    marginRight: 10,
   },
   PlayerAvatar: {
     borderRadius: height / 30,
@@ -324,9 +328,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#00000080",
     justifyContent: "flex-end",
     alignItems: "center",
-    borderTopWidth: 5,
-    borderBottomWidth: 5,
-    borderRightWidth: 5,
+    borderWidth: 3,
+    borderLeftWidth: 0,
     borderBottomRightRadius: height * 0.05,
     borderTopRightRadius: height * 0.05,
     borderColor: "#98E7FD",
@@ -338,9 +341,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#00000080",
     justifyContent: "flex-end",
     alignItems: "center",
-    borderTopWidth: 5,
-    borderBottomWidth: 5,
-    borderRightWidth: 5,
+    borderWidth: 3,
+    borderLeftWidth: 0,
     borderBottomRightRadius: height * 0.05,
     borderTopRightRadius: height * 0.05,
     borderColor: "#98E7FD",
@@ -352,9 +354,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#00000080",
     justifyContent: "flex-start",
     alignItems: "center",
-    borderTopWidth: 5,
-    borderBottomWidth: 5,
-    borderLeftWidth: 5,
+    borderWidth: 3,
+    borderRightWidth: 0,
     borderBottomLeftRadius: height * 0.05,
     borderTopLeftRadius: height * 0.05,
     borderColor: "#FF8F62",
@@ -366,9 +367,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#00000080",
     justifyContent: "flex-start",
     alignItems: "center",
-    borderTopWidth: 5,
-    borderBottomWidth: 5,
-    borderLeftWidth: 5,
+    borderWidth: 3,
+    borderRightWidth: 0,
     borderBottomLeftRadius: height * 0.05,
     borderTopLeftRadius: height * 0.05,
     borderColor: "#FF8F62",

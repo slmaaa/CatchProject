@@ -181,6 +181,7 @@ export default Waiting = ({ navigation }) => {
         pitchEnabled={false}
         scrollEnabled={false}
         rotateEnabled={false}
+        compassEnabled={false}
         zoomLevel={16}
       >
         <MapboxGL.Camera
@@ -191,6 +192,7 @@ export default Waiting = ({ navigation }) => {
           followUserMode={"course"}
           zoomLevel={17}
         />
+        <MapboxGL.UserLocation />
       </MapboxGL.MapView>
       <Button
         containerStyle={styles.backButtonContainer}
