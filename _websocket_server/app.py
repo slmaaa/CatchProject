@@ -201,8 +201,9 @@ async def player_stats_handler(websocket, _dict):
         await websocket.send('{"header": "ERROR", "content": "Save game fail"}')
     try:
         if flag:
+            game = gdb[_dict["gid"]]
             [distMVP, pointMVP] = game.findMVPs()
-            await broadcast(_dict["gid"], "ACCOUNT_FINISHED", {"players": game.players, "winTeam": game.winTeam, "distMVP": distMVP, "pointMVP": pointMVP})
+            await broadcast(_dict["gid"], "ACCOUNT_FINISHED", {"players": game["players"], "winTeam": game["winTeam"], "distMVP": distMVP, "pointMVP": pointMVP})
     except Exception as e:
         print(e)
         await websocket.send('{"header": "ERROR", "content": "Broadcast fail"}')

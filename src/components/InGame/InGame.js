@@ -315,7 +315,9 @@ const InGame = ({ navigation, route }) => {
               styles.playerStatsBar,
               {
                 borderColor:
-                  gameRef.team === "BLUE" ? color.teamBlue : color.teamRed,
+                  gameRef.current.team === "BLUE"
+                    ? color.teamBlue
+                    : color.teamRed,
               },
             ]}
           >
