@@ -151,7 +151,7 @@ export default Maths = ({ navigation, route }) => {
             progress={
               level / MMKV.getMap("joinedGame").checkpoints[cid].maxLevel
             }
-            color={team === "RED" ? "red" : "blue"}
+            color={team === "RED" ? color.teamRed : color.teamBlue}
             width={200}
             height={30}
             style={{ alignSelf: "center" }}

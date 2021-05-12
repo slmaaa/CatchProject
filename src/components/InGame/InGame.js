@@ -13,11 +13,9 @@ import {
   View,
   Dimensions,
   Vibration,
-  Image,
   SafeAreaView,
   StatusBar,
   StyleSheet,
-  TouchableHighlight,
 } from "react-native";
 
 import MMKVStorage from "react-native-mmkv-storage";
@@ -25,10 +23,12 @@ import React from "react";
 import useInterval from "../Helper/useInterval";
 import { wsSend } from "../../App";
 import { color } from "../../constants.json";
-import { Button, Overlay } from "react-native-elements";
+import { Button, Overlay, Icon } from "react-native-elements";
 import { useFocusEffect } from "@react-navigation/core";
 import { makeMutable } from "react-native-reanimated";
+
 const CP_RANGE = 25;
+const { height, width } = Dimensions.get("window");
 
 const InGame = ({ navigation, route }) => {
   const MMKV = new MMKVStorage.Loader().initialize();
@@ -242,22 +242,22 @@ const InGame = ({ navigation, route }) => {
             gid: gameRef.current.game.gid.toString(),
             key: MMKV.getInt("key").toString(),
             points: MMKV.getInt("challengesSolved").toString(),
-            dist: distanceTravelled.toString(),
+            dist: distanceTravelled.current.toString(),
           },
-        }).then(() => {
-          let interval = setInterval(() => {
-            const endStats = MMKV.getMap("endStats");
-            if (endStats == null) return;
-            clearInterval(interval);
-            gameRef.current.game.players = endStats.players;
-            gameRef.current.game.winTeam = endStats.winTeam;
-            MMKV.setMap("joinedGame", gameRef.current.game);
-            MMKV.setString("pointMVP", endStats.pointMVP.toString());
-            MMKV.setString("distMVP", endStats.distMVP.toString());
-            navigation.replace("GameOver");
-          }, 100);
         })
-      );
+      ).then(() => {
+        let interval = setInterval(() => {
+          const endStats = MMKV.getMap("endStats");
+          if (endStats == null) return;
+          clearInterval(interval);
+          gameRef.current.game.players = endStats.players;
+          gameRef.current.game.winTeam = endStats.winTeam;
+          MMKV.setMap("joinedGame", gameRef.current.game);
+          MMKV.setString("pointMVP", endStats.pointMVP.toString());
+          MMKV.setString("distMVP", endStats.distMVP.toString());
+          navigation.replace("GameOver");
+        }, 100);
+      });
     }
   }, [gameInfo.current]);
 
@@ -330,6 +330,27 @@ const InGame = ({ navigation, route }) => {
               | {challengesSolved} pts
             </Text>
           </View>
+          <Button
+            disabled={currentCID != -1 ? false : true}
+            icon={
+              <Icon
+                name="plus"
+                type={"material-community"}
+                color={"white"}
+                size={height / 15}
+              />
+            }
+            containerStyle={styles.addButton}
+            buttonStyle={{ backgroundColor: color.brown, borderRadius: 60 }}
+            onPress={() => {
+              navigation.navigate("Maths", {
+                cpName: gameRef.current.game.checkpoints[currentCID].name,
+                gid: gameRef.current.game.gid,
+                team: gameRef.current.team,
+                cid: currentCID,
+              });
+            }}
+          />
         </SafeAreaView>
       </>
     );
@@ -404,5 +425,20 @@ const styles = StyleSheet.create({
     height: 30,
     width: 30,
     resizeMode: "contain",
+  },
+  addButton: {
+    position: "absolute",
+    top: height * 0.9,
+    alignSelf: "center",
+    color: color.brown,
+    borderRadius: height / 15,
+    shadowColor: "black",
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.37,
+    shadowRadius: height / 15,
+    elevation: 5,
   },
 });

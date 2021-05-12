@@ -125,7 +125,7 @@ export default PrepareRoom = ({ navigation }) => {
             zoomLevel: 17,
           }}
           followUserLocation={true}
-          followUserMode={"compass"}
+          followUserMode={"course"}
           zoomLevel={17}
         />
         <RenderCheckpointsOnMap />
@@ -140,30 +140,39 @@ export default PrepareRoom = ({ navigation }) => {
       <View style={styles.playersListContainer}>
         <ScrollView>{playerView}</ScrollView>
       </View>
-      <Button
-        containerStyle={styles.setCPButton}
-        titleStyle={{ color: "white", fontSize: 24 }}
-        buttonStyle={{ backgroundColor: color.brown, borderRadius: 50 }}
-        onPress={() => {
-          navigation.navigate("CheckPointSetting");
-        }}
-        icon={
-          <Icon
-            name="map-marker-plus"
-            type={"material-community"}
-            color={"white"}
-          />
-        }
-      ></Button>
-      <Button
-        title={"Start"}
-        containerStyle={styles.startButton}
-        titleStyle={{ color: "white", fontSize: 24 }}
-        buttonStyle={{ backgroundColor: color.brown }}
-        onPress={() => {
-          wsSend(JSON.stringify({ header: "START", content: gameID }));
-        }}
-      ></Button>
+      {MMKV.getString("userStatus") === "PREPARE_HOST" && (
+        <>
+          <Button
+            containerStyle={styles.setCPButton}
+            titleStyle={{ color: "white", fontSize: 24 }}
+            buttonStyle={{ backgroundColor: color.brown, borderRadius: 100 }}
+            onPress={() => {
+              navigation.navigate("CheckPointSetting");
+            }}
+            icon={
+              <Icon
+                name="map-marker-plus"
+                type={"material-community"}
+                color={"white"}
+                size={height * 0.05}
+              />
+            }
+          ></Button>
+          <Button
+            title={"Start"}
+            containerStyle={styles.startButton}
+            titleStyle={{
+              color: "white",
+              fontSize: 24,
+              height: height * 0.05,
+            }}
+            buttonStyle={{ backgroundColor: color.brown }}
+            onPress={() => {
+              wsSend(JSON.stringify({ header: "START", content: gameID }));
+            }}
+          ></Button>
+        </>
+      )}
     </SafeAreaView>
   );
 };
@@ -259,10 +268,18 @@ const styles = StyleSheet.create({
   setCPButton: {
     position: "absolute",
     width: 80,
-    borderRadius: 50,
+    borderRadius: 10,
     top: height * 0.9,
-    right: width * 0.1,
+    right: width * 0.05,
     color: color.brown,
+    shadowColor: "black",
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.37,
+    shadowRadius: 100,
+    elevation: 5,
   },
   backButton: {
     marginLeft: height / 6,

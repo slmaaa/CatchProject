@@ -188,7 +188,7 @@ export default Waiting = ({ navigation }) => {
             zoomLevel: 17,
           }}
           followUserLocation={true}
-          followUserMode={"compass"}
+          followUserMode={"course"}
           zoomLevel={17}
         />
       </MapboxGL.MapView>
@@ -212,7 +212,7 @@ export default Waiting = ({ navigation }) => {
         <Button
           title={"Confirm"}
           containerStyle={styles.button}
-          titleStyle={{ color: "white", fontSize: 24 }}
+          titleStyle={{ color: "white", fontSize: 24, height: height * 0.05 }}
           buttonStyle={{ backgroundColor: color.brown }}
           onPress={() => {
             wsSend(JSON.stringify({ header: "CONFIRM", content: gameID }));

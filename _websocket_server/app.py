@@ -154,23 +154,27 @@ async def add_handler(websocket, _dict):
     try:
         gdb = db.pull(G_DB)
         game = Game.from_dict(gdb[_dict["gid"]])
-    except:
+    except Exception as e:
+        print(e)
         await websocket.send('{"header": "ERROR", "content": "Cannot find game"}')
         return
     try:
         game.incrementLevel(int(_dict["cid"]), _dict["team"])
-    except:
+    except Exception as e:
+        print(e)
         await websocket.send('{"header": "ERROR", "content": "Incremnet fail"}')
         return
     try:
         await broadcast(_dict["gid"], "GAME_INFO", game.keyInfo)
-    except:
+    except Exception as e:
+        print(e)
         await websocket.send('{"header": "ERROR", "content": "Broadcast fail"}')
         return
     try:
         gdb[_dict["gid"]] = game.to_dict()
         db.push(gdb, G_DB)
-    except:
+    except Exception as e:
+        print(e)
         await websocket.send('{"header": "ERROR", "content": "Save game fail"}')
 
 
@@ -178,25 +182,29 @@ async def player_stats_handler(websocket, _dict):
     try:
         gdb = db.pull(G_DB)
         game = Game.from_dict(gdb[_dict["gid"]])
-    except:
+    except Exception as e:
+        print(e)
         await websocket.send('{"header": "ERROR", "content": "Cannot find game"}')
         return
     try:
         flag = game.setPlayerStats(
             int(_dict["key"]), _dict["points"], _dict["dist"])
-    except:
+    except Exception as e:
+        print(e)
         await websocket.send('{"header": "ERROR", "content": "Updatae stats fail"}')
         return
     try:
         gdb[_dict["gid"]] = game.to_dict()
         db.push(gdb, G_DB)
-    except:
+    except Exception as e:
+        print(e)
         await websocket.send('{"header": "ERROR", "content": "Save game fail"}')
     try:
         if flag:
             [distMVP, pointMVP] = game.findMVPs()
             await broadcast(_dict["gid"], "ACCOUNT_FINISHED", {"players": game["players"], "winTeam": game["winTeam"], "distMVP": distMVP, "pointMVP": pointMVP})
-    except:
+    except Exception as e:
+        print(e)
         await websocket.send('{"header": "ERROR", "content": "Broadcast fail"}')
         return
 

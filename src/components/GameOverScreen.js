@@ -12,14 +12,8 @@ import {
   ImageBackground,
 } from "react-native";
 import { Avatar, Button, Card, ListItem, Icon } from "react-native-elements";
-//import database from "@react-native-firebase/database";
 import MMKVStorage from "react-native-mmkv-storage";
-// import AsyncStorage from "@react-native-async-storage/async-storage";
-
 import { color } from "../constants.json";
-//import { deleteGame, getGame } from "./Helper/server";
-import useInterval from "./useInterval";
-import { TouchableOpacity } from "react-native-gesture-handler";
 
 var { height, width } = Dimensions.get("window");
 var link =
