@@ -225,6 +225,7 @@ async def register(websocket, gameID):
 async def handler(websocket, path):
     try:
         async for message in websocket:
+            print(message)
             _dict = json.loads(message)
             if (_dict["header"] == "CREATE"):
                 print("Received CREATE request")
