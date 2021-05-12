@@ -69,7 +69,7 @@ class Game:
             if (win):
                 self.status = "OVER"
                 self.winTeam = team
-                self.endTime = now
+                self.endTime = now()
         cpsLevel = []
         cpsCaptured = []
         for cp in self.checkpoints:
