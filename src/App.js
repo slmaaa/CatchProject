@@ -72,7 +72,7 @@ const App = () => {
         console.log("Recieved game info");
         MMKV.setMap("gameInfo", data.content);
         break;
-      case "CLOSE_ACCOUNT":
+      case "ACCOUNT_FINISED":
         console.log("Recieved endStats");
         MMKV.setMap("endStats", data.content);
         break;

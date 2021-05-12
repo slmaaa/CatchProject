@@ -12,7 +12,6 @@ import {
   Text,
   View,
   Dimensions,
-  Modal,
   Vibration,
   Image,
   SafeAreaView,
@@ -26,7 +25,7 @@ import React from "react";
 import useInterval from "../Helper/useInterval";
 import { wsSend } from "../../App";
 import { color } from "../../constants.json";
-import { Button } from "react-native-elements";
+import { Button, Overlay } from "react-native-elements";
 import { useFocusEffect } from "@react-navigation/core";
 const CP_RANGE = 25;
 
@@ -262,6 +261,27 @@ const InGame = ({ navigation, route }) => {
       <>
         <StatusBar barStyle="dark-content" />
         <SafeAreaView style={styles.container}>
+          <Overlay
+            isVisible={creating}
+            overlayStyle={{ width: "80%", borderRadius: 30 }}
+          >
+            <Text style={styles.creatingText}>Creating...</Text>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+                margin: 5,
+              }}
+            >
+              <Progress.CircleSnail
+                indeterminate
+                size={100}
+                thickness={7}
+                color={[color.teamRed, color.teamBlue]}
+              />
+            </View>
+          </Overlay>
           <View style={styles.mapContainer}>
             <MapboxGL.MapView
               ref={mapRef}
@@ -289,7 +309,7 @@ const InGame = ({ navigation, route }) => {
               },
             ]}
           >
-            <View style={styles.profilePictureContainer}></View>
+            <View style={styles.profilePictureContainer} />
             <Text style={[styles.playerStatsText, { textAlign: "left" }]}>
               {MMKV.getString("userName")}
             </Text>
@@ -299,7 +319,6 @@ const InGame = ({ navigation, route }) => {
                 : distanceCovered + "m"}{" "}
               | {challengesSolved} points
             </Text>
-            <Text></Text>
           </View>
         </SafeAreaView>
       </>

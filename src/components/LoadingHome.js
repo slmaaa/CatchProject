@@ -1,5 +1,5 @@
-import React from "react";
-import { SafeAreaView, Text } from "react-native";
+import React, { useEffect } from "react";
+import { SafeAreaView, Text, PermissionsAndroid } from "react-native";
 import auth from "@react-native-firebase/auth";
 import database from "@react-native-firebase/database";
 
@@ -9,6 +9,29 @@ export default LoadingHome = ({ navigation }) => {
   const MMKV = new MMKVStorage.Loader().initialize();
   MMKV.clearStore();
   let userID, userName, userStatus, gameID;
+  const requestLocationPermission = async () => {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+        {
+          title: "Location game access location permission",
+          message: "Access to location is required to continue. ",
+          buttonNegative: "Cancel",
+          buttonPositive: "OK",
+        }
+      );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        console.log("Permission granted");
+      } else {
+        requestLocationPermission();
+      }
+    } catch (err) {
+      console.warn(err);
+    }
+  };
+  useEffect(() => {
+    requestLocationPermission();
+  }, []);
   async function getDataFromDB() {
     userID = auth().currentUser.uid;
     database()
