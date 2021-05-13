@@ -12,7 +12,17 @@ import {
   ActivityIndicator,
   Image,
   TextInput,
+  Dimensions,
 } from "react-native";
+
+import {
+  Overlay,
+  Input,
+  ListItem,
+  Divider,
+  Avatar,
+} from "react-native-elements";
+
 import MapboxGL from "@react-native-mapbox-gl/maps";
 import mapboxgl from "mapbox-gl/dist/mapbox-gl-csp";
 const accessToken =
@@ -28,7 +38,11 @@ import Icon2 from "react-native-vector-icons/MaterialCommunityIcons";
 import Icon3 from "react-native-vector-icons/MaterialIcons";
 import Icon4 from "react-native-vector-icons/Ionicons";
 import * as Progress from "react-native-progress";
-const App = () => {
+import { color } from "../constants";
+
+var { height, width } = Dimensions.get("window");
+
+const App = ({ navigation }) => {
   const [route, setRoute] = useState(null);
   const [ModalOpen, setModalOpen] = useState(false);
   const [coordinates, setcoordinates] = useState([114.2655, 22.3364]);
@@ -151,6 +165,12 @@ const App = () => {
   return (
     <View style={styles.page}>
       <View style={styles.container}>
+
+      <Button
+        title="Back"
+        onPress={() => navigation.goBack()}
+      />
+
         <MapboxGL.MapView style={styles.map}>
           <MapboxGL.Camera zoomLevel={15} centerCoordinate={coordinates} />
           {/* {
@@ -185,6 +205,9 @@ const App = () => {
         {detailbutton()}
         {modal()}
       </View>
+
+      
+      
     </View>
   );
 };

@@ -21,7 +21,6 @@ import {
 } from "react-native-elements";
 import * as Progress from "react-native-progress";
 import MMKVStorage from "react-native-mmkv-storage";
-import documentOnePage24Regular from "@iconify/icons-fluent/document-one-page-24-regular";
 import database from "@react-native-firebase/database";
 import { join } from "./joinOrCreate";
 import { URL } from "../constants.json";
@@ -60,6 +59,7 @@ const Friends = ({ navigation }) => {
         <Text style={styles.header}>Friends</Text>
       </View>
       
+      
       <Button
         containerStyle={styles.backButtonContainer}
         buttonStyle={styles.backButton}
@@ -87,7 +87,7 @@ const Friends = ({ navigation }) => {
         }}
         icon={
           <Icon
-            name="account-multiple-plus"
+            name="account-search"
             type={"material-community"}
             color={"white"}
           />
