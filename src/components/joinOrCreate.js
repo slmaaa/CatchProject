@@ -72,7 +72,7 @@ const JoinOrCreate = ({ navigation }) => {
         {
           pid: MMKV.getString("userID"),
           name: MMKV.getString("userName"),
-          avatar: "None",
+          avatar: MMKV.getString("userAvatar"),
         },
       ],
       teams: ["RED", "BLUE"],
@@ -113,7 +113,7 @@ const JoinOrCreate = ({ navigation }) => {
           player: {
             pid: MMKV.getString("userID"),
             name: MMKV.getString("userName"),
-            avatar: "None",
+            avatar: MMKV.getString("userAvatar"),
           },
           gid: roomID,
         },

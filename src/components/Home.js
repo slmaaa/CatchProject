@@ -10,27 +10,15 @@ import {
   View,
   Image,
   Dimensions,
-  TouchableOpacity,
-  PermissionsAndroid,
 } from "react-native";
 import { Overlay, Input, Button } from "react-native-elements";
 import MMKVStorage from "react-native-mmkv-storage";
 import MapboxGL from "@react-native-mapbox-gl/maps";
-import auth from "@react-native-firebase/auth";
 import { Icon } from "react-native-elements";
-import MilitaryMedal from "../../assets/img/military-medal.svg";
-import { join } from "./joinOrCreate";
-import { URL } from "../constants.json";
 import { color } from "../constants";
 MapboxGL.setAccessToken(
   "pk.eyJ1IjoiaGVjdG9yY2hjaCIsImEiOiJja205YmhldXUwdHQ1Mm9xbGw4N2RodndhIn0.yX90QKE2jcgG-7V5wOGXeQ"
 );
-
-import histroy from "./history";
-import RealHome from "./RealHome";
-import Badges from "./Badges";
-import Friends from "./Friends";
-import HistoryPage from "./HistoryPage";
 
 const MMKV = new MMKVStorage.Loader().initialize();
 var { height, width } = Dimensions.get("window");
@@ -102,23 +90,6 @@ const Home = ({ navigation }) => {
     </SafeAreaView>
   );
 };
-
-const stylesImage = StyleSheet.create({
-  container: {
-    flex: 0.001,
-    justifyContent: "flex-end",
-    alignItems: "center",
-  },
-  tinyLogo: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-  },
-  logo: {
-    width: 66,
-    height: 58,
-  },
-});
 
 const styles = StyleSheet.create({
   container: {

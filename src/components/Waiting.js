@@ -73,7 +73,6 @@ export default Waiting = ({ navigation }) => {
       MMKV.setMap("joinedGame", game);
       let list = [];
       roomInfo.players.map((value) => {
-        list.push(value.name);
         if (value.team != null) {
           if (value.pid === MMKV.getString("userID")) {
             MMKV.setString("team", value.team);
@@ -91,7 +90,7 @@ export default Waiting = ({ navigation }) => {
   );
 
   const renderPlayersList = () => {
-    if (playerList.length === 0) return;
+    if (game.players.length === 0) return;
     let list = [],
       i;
     for (i = 0; i + 1 < playerList.length; i += 2) {
@@ -99,7 +98,7 @@ export default Waiting = ({ navigation }) => {
         <View style={styles.playerListRowConatiner} key={i % 2}>
           <View style={styles.LeftPlayer} key={i}>
             <Text style={[styles.PlayerName, { paddingLeft: 20 }]}>
-              {playerList[i]}
+              {game.players[i].name}
             </Text>
             <Image style={styles.playerAvatar} source={{ uri: link }} />
           </View>

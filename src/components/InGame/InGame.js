@@ -327,7 +327,9 @@ const InGame = ({ navigation, route }) => {
               },
             ]}
           >
-            <View style={styles.profilePictureContainer} />
+            <View style={styles.profilePictureContainer}>
+              <Image source={{ uri: MMKV.getString("userAvatar") }} />
+            </View>
             <Text style={[styles.playerStatsText, { textAlign: "left" }]}>
               {MMKV.getString("userName")}
             </Text>
@@ -412,7 +414,6 @@ const styles = StyleSheet.create({
     borderRadius: 40,
     width: 45,
     height: 45,
-    backgroundColor: "white",
   },
   playerStatsText: {
     fontSize: 13,
