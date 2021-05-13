@@ -149,7 +149,11 @@ const JoinOrCreate = ({ navigation }) => {
         onBackdropPress={() => setJoinOverlayVisible(false)}
         overlayStyle={{ width: "80%" }}
       >
-        <Input placeholder="Enter room ID" onChangeText={setRoomID} />
+        <Input
+          placeholder="Enter room ID"
+          onChangeText={setRoomID}
+          keyboardType={"numeric"}
+        />
         <Button title={"Join"} onPress={handleOnPressJoin} />
       </Overlay>
       <Button

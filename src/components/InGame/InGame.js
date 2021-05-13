@@ -26,7 +26,6 @@ import { wsSend } from "../../App";
 import { color } from "../../constants.json";
 import { Button, Overlay, Icon } from "react-native-elements";
 import { useFocusEffect } from "@react-navigation/core";
-import { makeMutable } from "react-native-reanimated";
 
 const CP_RANGE = 25;
 const { height, width } = Dimensions.get("window");
@@ -51,50 +50,88 @@ const InGame = ({ navigation, route }) => {
     team: null,
     checkpointsLocation: null,
     numberOfCheckpoints: null,
+    checkpointsCaptured: [],
   });
   const renderCheckpointsOnMap = () => {
     let cpRenderList = [];
     for (let i = 0; i < gameRef.current.numberOfCheckpoints; i++) {
-      cpRenderList.push(
-        <>
-          <MapboxGL.MarkerView
-            id={"CP" + i}
-            key={i + "m"}
-            coordinate={[
-              gameRef.current.checkpointsLocation[i].longitude,
-              gameRef.current.checkpointsLocation[i].latitude,
-            ]}
-          >
-            <View
-              style={{ width: 50, height: 100, backgroundColor: "#FFFFFF00" }}
+      gameRef.current.checkpointsCaptured[i] === null
+        ? cpRenderList.push(
+            <>
+              <MapboxGL.MarkerView
+                id={"CP" + i}
+                key={i + "m"}
+                coordinate={[
+                  gameRef.current.checkpointsLocation[i].longitude,
+                  gameRef.current.checkpointsLocation[i].latitude,
+                ]}
+              >
+                <View
+                  style={{
+                    width: 50,
+                    height: 100,
+                    backgroundColor: "#FFFFFF00",
+                  }}
+                >
+                  <Progress.Bar
+                    progress={
+                      gameRef.current.game.checkpoints[i].level.BLUE /
+                      gameRef.current.game.checkpoints[i].maxLevel
+                    }
+                    color={color.teamBlue}
+                    width={50}
+                  />
+                  <Progress.Bar
+                    progress={
+                      gameRef.current.game.checkpoints[i].level.RED /
+                      gameRef.current.game.checkpoints[i].maxLevel
+                    }
+                    width={50}
+                    color={color.teamRed}
+                  />
+                </View>
+              </MapboxGL.MarkerView>
+              <MapboxGL.PointAnnotation
+                id={"CP" + i}
+                key={i + "p"}
+                coordinate={[
+                  gameRef.current.checkpointsLocation[i].longitude,
+                  gameRef.current.checkpointsLocation[i].latitude,
+                ]}
+              />
+            </>
+          )
+        : gameRef.current.checkpointsCaptured[i] === "BLUE"
+        ? cpRenderList.push(
+            <MapboxGL.PointAnnotation
+              id={"CP" + i}
+              key={i + "p"}
+              coordinate={[
+                gameRef.current.checkpointsLocation[i].longitude,
+                gameRef.current.checkpointsLocation[i].latitude,
+              ]}
             >
-              <Progress.Bar
-                progress={
-                  gameRef.current.game.checkpoints[i].level.BLUE /
-                  gameRef.current.game.checkpoints[i].maxLevel
-                }
-                width={50}
+              <Image
+                style={{ height: 200 }}
+                source={require("../../../assets/img/blue-flag.png")}
               />
-              <Progress.Bar
-                progress={
-                  gameRef.current.game.checkpoints[i].level.RED /
-                  gameRef.current.game.checkpoints[i].maxLevel
-                }
-                width={50}
-                color={"red"}
+            </MapboxGL.PointAnnotation>
+          )
+        : cpRenderList.push(
+            <MapboxGL.PointAnnotation
+              id={"CP" + i}
+              key={i + "p"}
+              coordinate={[
+                gameRef.current.checkpointsLocation[i].longitude,
+                gameRef.current.checkpointsLocation[i].latitude,
+              ]}
+            >
+              <Image
+                style={{ height: 200 }}
+                source={require("../../../assets/img/red-flag.png")}
               />
-            </View>
-          </MapboxGL.MarkerView>
-          <MapboxGL.PointAnnotation
-            id={"CP" + i}
-            key={i + "p"}
-            coordinate={[
-              gameRef.current.checkpointsLocation[i].longitude,
-              gameRef.current.checkpointsLocation[i].latitude,
-            ]}
-          />
-        </>
-      );
+            </MapboxGL.PointAnnotation>
+          );
     }
     return cpRenderList;
   };
@@ -110,6 +147,7 @@ const InGame = ({ navigation, route }) => {
         latitude: val.area.center.lat,
         longitude: val.area.center.lng,
       });
+      gameRef.current.checkpointsCaptured.push(null);
       coolDowns.push(-1);
     });
     gameRef.current.checkpointsLocation = checkpointsLocation;
@@ -208,7 +246,11 @@ const InGame = ({ navigation, route }) => {
 
   useEffect(() => {
     if (gameRef.current.game.status === "OVER") return;
-    if (currentCID !== -1) {
+    if (currentCID === -1) {
+      navigation.navigate("InGame");
+      return;
+    }
+    if (gameRef.current.checkpointsCaptured[currentCID] === null) {
       navigation.navigate("Maths", {
         cpName: gameRef.current.game.checkpoints[currentCID].name,
         gid: gameRef.current.game.gid,
@@ -218,7 +260,7 @@ const InGame = ({ navigation, route }) => {
     } else {
       navigation.navigate("InGame");
     }
-  }, [currentCID]);
+  }, [currentCID, gameRef.current]);
 
   useInterval(() => {
     setDistanceCovered(distanceTravelled.current);
@@ -236,6 +278,7 @@ const InGame = ({ navigation, route }) => {
         gameRef.current.game.checkpoints[i].level =
           gameInfo.current.cpsLevel[i];
       }
+      gameRef.current.checkpointsCaptured = gameInfo.current.cpsCaptured;
       MMKV.setMap("joinedGame", gameRef.current.game);
       if (gameRef.current.game.status === "OVER") {
         setGameOverAccountingVisible(true);

@@ -59,8 +59,10 @@ class Game:
 
     def incrementLevel(self, cid, team):
         self.checkpoints[cid].level[team] += 1
+        message = team+" team gets a point in "+self.checkpoints[cid].name
         if(self.checkpoints[cid].level[team] == self.checkpoints[cid].maxLevel):
             self.checkpoints[cid].capturedBy = team
+            message = team+" captured " + self.checkpoints[cid].name
             self.capturedCount[team] += 1
             self.unCapturedCount -= 1
             otherTeams = [x for x in self.teams if x != team]
@@ -78,7 +80,7 @@ class Game:
             cpsLevel.append(cp.level)
             cpsCaptured.append(cp.capturedBy)
         self.keyInfo = {"status": self.status,
-                        "cpsLevel": cpsLevel, "cpsCaptured": cpsCaptured}
+                        "cpsLevel": cpsLevel, "cpsCaptured": cpsCaptured, "message": message}
 
     def setPlayerStats(self, key, points, dist):
         self.players[key].points = int(points)
