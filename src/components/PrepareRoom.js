@@ -8,6 +8,7 @@ import {
   View,
   Image,
   Dimensions,
+  Alert,
 } from "react-native";
 
 import { Button, Icon } from "react-native-elements";
@@ -15,17 +16,14 @@ import database from "@react-native-firebase/database";
 import MMKVStorage from "react-native-mmkv-storage";
 import { useFocusEffect } from "@react-navigation/core";
 import { color } from "../constants.json";
-import { deleteGame, getGame } from "./Helper/server";
+import { deleteGame } from "./Helper/server";
 import useInterval from "./Helper/useInterval";
 import { wsSend } from "../App";
 import MapboxGL from "@react-native-mapbox-gl/maps";
 MapboxGL.setAccessToken(
   "pk.eyJ1IjoiaGVjdG9yY2hjaCIsImEiOiJja205YmhldXUwdHQ1Mm9xbGw4N2RodndhIn0.yX90QKE2jcgG-7V5wOGXeQ"
 );
-var { height, width } = Dimensions.get("window");
-var link =
-  "https://images-na.ssl-images-amazon.com/images/S/pv-target-images/7bbe5762c79ee0ad11c1267483b4a2d5e12868de779eaf751e8e86596e978bbb._V_SX1080_.jpg";
-
+const { height, width } = Dimensions.get("window");
 export default PrepareRoom = ({ navigation }) => {
   const MMKV = new MMKVStorage.Loader().initialize();
   const [roomInfo, setRoomInfo] = useState(null);
@@ -52,9 +50,9 @@ export default PrepareRoom = ({ navigation }) => {
 
   useEffect(() => {
     let list = [];
-    gameRef.current.players.map((value) =>
-      list.push({ name: value.name, team: value.team })
-    );
+    gameRef.current.players.map((value) => {
+      list.push({ name: value.name, team: value.team, avatar: value.avatar });
+    });
     setPlayersView(renderPlayersList(list));
   }, []);
 
@@ -62,21 +60,49 @@ export default PrepareRoom = ({ navigation }) => {
     useCallback(() => {
       if (roomInfo === null || roomInfo === undefined) return;
       MMKV.setMap("roomInfo", null);
-      setRoomInfo(null);
       let game = MMKV.getMap("joinedGame");
       game["status"] = roomInfo.status;
       if (roomInfo.checkpoints !== undefined && roomInfo.checkpoints.length > 0)
         game["checkpoints"] = roomInfo.checkpoints;
       MMKV.setMap("joinedGame", game);
       if (roomInfo.checkpoints !== undefined) {
+        let list = [];
         roomInfo.checkpoints.map((val) => {
-          setCheckpoints([...checkpoints, val.area.center]);
+          list.push(val.area.center);
         });
+        setCheckpoints(list);
       }
-      if (roomInfo.status === "RUNNING") {
+      gameRef.current = game;
+      setRoomInfo(null);
+      if (gameRef.current.status === "RUNNING") {
         navigation.replace("InGame");
       }
     }, [roomInfo])
+  );
+  useEffect(
+    () =>
+      navigation.addListener("beforeRemove", (e) => {
+        if (gameRef.current.status === "RUNNING") {
+          // If we don't have unsaved changes, then we don't need to do anything
+          return;
+        }
+
+        // Prevent default behavior of leaving the screen
+        e.preventDefault();
+
+        // Prompt the user before leaving the screen
+        Alert.alert("Leave game?", "Are you sure tou want to leave the game?", [
+          { text: "Don't leave", style: "cancel", onPress: () => {} },
+          {
+            text: "Leave",
+            style: "destructive",
+            // If the user confirmed, then we dispatch the action we blocked earlier
+            // This will continue the action that had triggered the removal of the screen
+            onPress: () => navigation.dispatch(e.data.action),
+          },
+        ]);
+      }),
+    [navigation]
   );
   const RenderCheckpointsOnMap = () => {
     if (checkpoints.length > 0) {
@@ -99,17 +125,18 @@ export default PrepareRoom = ({ navigation }) => {
     let list = [],
       i;
     for (i = 0; i < playerList.length; ++i) {
+      const link = playerList[i].avatar;
       list.push(
         playerList[i].team === "BLUE" ? (
           <View style={styles.playerListRowConatiner} key={i}>
             <View style={styles.BluePlayer} key={i}>
-              <Image style={styles.PlayerAvatar} source={{ uri: link }} />
+              <Image style={styles.listPlayerAvatar} source={{ uri: link }} />
             </View>
           </View>
         ) : (
           <View style={styles.playerListRowConatiner} key={i}>
             <View style={styles.OrangePlayer} key={i}>
-              <Image style={styles.PlayerAvatar} source={{ uri: link }} />
+              <Image style={styles.listPlayerAvatar} source={{ uri: link }} />
             </View>
           </View>
         )
@@ -136,7 +163,10 @@ export default PrepareRoom = ({ navigation }) => {
           {`${gameRef.current.hostName}'s Room`}
           {`\nRoom ID: ${gameRef.current.gid}`}
         </Text>
-        <Image style={styles.PlayerAvatar} source={{ uri: link }} />
+        <Image
+          style={styles.headerPlayerAvatar}
+          source={{ uri: gameRef.current.hostAvatar }}
+        />
       </View>
       <View style={styles.playersListContainer}>
         <ScrollView>{playerView}</ScrollView>
@@ -183,12 +213,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   headerContainer: {
+    position: "absolute",
     width: width * 0.45,
     height: height * 0.1,
     flexDirection: "row",
     marginTop: height * 0.03,
-    paddingRight: 40,
-    marginBottom: height * 0.05,
+    paddingRight: height / 60,
     borderBottomRightRadius: height / 20,
     borderTopRightRadius: height / 20,
     backgroundColor: "#00000080",
@@ -197,19 +227,26 @@ const styles = StyleSheet.create({
   },
   headerText: {
     fontSize: 12,
-    color: "#FFFFFF",
+    color: "white",
     fontWeight: "700",
-    paddingLeft: 10,
     textAlign: "left",
-    marginRight: 10,
+    marginLeft: height / 60,
   },
-  PlayerAvatar: {
+  headerPlayerAvatar: {
     borderRadius: height / 30,
     height: height / 15,
     width: height / 15,
-    marginHorizontal: height / 80,
   },
-  playersListContainer: { height: "50%", width: "30%" },
+  listPlayerAvatar: {
+    borderRadius: height / 30,
+    height: height / 15,
+    width: height / 15,
+  },
+  playersListContainer: {
+    marginTop: height * 0.2,
+    height: height * 0.5,
+    width: width * 0.2,
+  },
   playerListRowConatiner: {
     height: height / 8,
     flexDirection: "row",
@@ -220,8 +257,9 @@ const styles = StyleSheet.create({
     height: height * 0.1,
     flexDirection: "row",
     backgroundColor: "#00000080",
-    justifyContent: "space-between",
+    justifyContent: "flex-end",
     alignItems: "center",
+    paddingRight: height / 60,
     borderTopWidth: 3,
     borderBottomWidth: 3,
     borderRightWidth: 3,
@@ -234,7 +272,8 @@ const styles = StyleSheet.create({
     height: height * 0.1,
     flexDirection: "row",
     backgroundColor: "#00000080",
-    justifyContent: "space-between",
+    paddingRight: height / 60,
+    justifyContent: "flex-end",
     alignItems: "center",
     borderTopWidth: 3,
     borderBottomWidth: 3,

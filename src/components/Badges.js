@@ -4,29 +4,13 @@ import {
   SafeAreaView,
   StyleSheet,
   View,
-  Image,
   Dimensions,
-  TouchableHighlight,
-  FlatList,
-  SectionList,
   StatusBar,
   ScrollView,
 } from "react-native";
-import {
-  Overlay,
-  Input,
-  Button,
-  ListItem,
-  Divider,
-  Avatar,
-  Icon,
-} from "react-native-elements";
-import * as Progress from "react-native-progress";
+import { Button, Icon } from "react-native-elements";
 import MMKVStorage from "react-native-mmkv-storage";
-import documentOnePage24Regular from "@iconify/icons-fluent/document-one-page-24-regular";
 import database from "@react-native-firebase/database";
-import { join } from "./joinOrCreate";
-import { URL } from "../constants.json";
 import { wsSend } from "../App";
 import { color } from "../constants";
 import Medal1 from "./medals/military-medal.svg";
@@ -39,8 +23,6 @@ const MMKV = new MMKVStorage.Loader().initialize();
 
 var { height, width } = Dimensions.get("window");
 const Badges = ({ navigation }) => {
-  const [initializing, setInitializing] = useState(true);
-  const [joinOverlayVisible, setJoinOverlayVisible] = useState(false);
   const [roomID, setRoomID] = useState();
   const [creating, setCreating] = useState(false);
   const friends = [];

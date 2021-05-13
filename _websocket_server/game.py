@@ -53,6 +53,7 @@ class Game:
         for team in self.teams:
             for cp in self.checkpoints:
                 cp.level[team] = 0
+        self.unCapturedCount = len(self.checkpoints)
         self.startTime = now()
         self.status = "RUNNING"
 
@@ -154,7 +155,7 @@ class Game:
             capturedCount[team] = 0
             for cp in checkpoints:
                 cp.level[team] = 0
-        unCapturedCount = len(checkpoints)
+        unCapturedCount = null
         winTeam = _dict.get(
             "winTeam", None)
         return Game(gid, gname, status, hostID, hostName, hostAvatar, checkpoints,

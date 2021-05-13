@@ -68,20 +68,6 @@ const App = ({ navigation }) => {
       },
     },
   ];
-  // useEffect(() => {
-  //   fetchRoute();
-  // })
-  // const fetchRoute = async () => {
-  //   const reqOptions = {
-  //     waypoints: addcor,
-  //     profile: 'driving-traffic',
-  //     geometries: 'geojson',
-  //   };
-  //   const res = await directionsClient.getDirections(reqOptions).send();
-  //   console.log(res.body.routes[0].geometry.coordinates);
-  //   const newRoute = makeLineString(res.body.routes[0].geometry.coordinates);
-  //   setRoute(newRoute);
-  // };
 
   const modalslideone = () => {
     for (let i = 0; i < addcor.length - 1; i++) {
@@ -165,11 +151,7 @@ const App = ({ navigation }) => {
   return (
     <View style={styles.page}>
       <View style={styles.container}>
-
-      <Button
-        title="Back"
-        onPress={() => navigation.goBack()}
-      />
+        <Button title="Back" onPress={() => navigation.goBack()} />
 
         <MapboxGL.MapView style={styles.map}>
           <MapboxGL.Camera zoomLevel={15} centerCoordinate={coordinates} />
@@ -205,9 +187,6 @@ const App = ({ navigation }) => {
         {detailbutton()}
         {modal()}
       </View>
-
-      
-      
     </View>
   );
 };

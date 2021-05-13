@@ -27,7 +27,9 @@ const CheckPointSetting = ({ navigation }) => {
   const cpsRef = useRef([]);
   const numberOfPlayers = MMKV.getMap("joinedGame").players.length;
   const recommendedNumOfCPs =
-    (numberOfPlayers / 2) % 2 === 0 ? numberOfPlayers + 1 : numberOfPlayers;
+    (numberOfPlayers / 2) % 2 === 0
+      ? numberOfPlayers / 2 + 1
+      : numberOfPlayers / 2;
   useEffect(() => {
     let unsub;
     RNLocation.configure({

@@ -4,7 +4,7 @@ import { getDistance } from "geolib";
 import * as Progress from "react-native-progress";
 import MapboxGL from "@react-native-mapbox-gl/maps";
 import RNLocation, { Location } from "react-native-location";
-import GeoJSON from "geojson";
+
 MapboxGL.setAccessToken(
   "pk.eyJ1IjoiaGVjdG9yY2hjaCIsImEiOiJja205YmhldXUwdHQ1Mm9xbGw4N2RodndhIn0.yX90QKE2jcgG-7V5wOGXeQ"
 );
@@ -13,6 +13,7 @@ import {
   View,
   Dimensions,
   Vibration,
+  Image,
   SafeAreaView,
   StatusBar,
   StyleSheet,
@@ -37,9 +38,8 @@ const InGame = ({ navigation, route }) => {
   const gameInfo = useRef();
   const [location, setLocation] = useState(null);
   const [lastLocation, setLastLocation] = useState(null);
-  const [gameOverAccountingVisible, setGameOverAccountingVisible] = useState(
-    false
-  );
+  const [gameOverAccountingVisible, setGameOverAccountingVisible] =
+    useState(false);
   const [challengesSolved, setChallengesSolved] = useState(0);
   const distanceTravelled = useRef(0);
   const [distanceCovered, setDistanceCovered] = useState(0);
@@ -215,6 +215,8 @@ const InGame = ({ navigation, route }) => {
         team: gameRef.current.team,
         cid: currentCID,
       });
+    } else {
+      navigation.navigate("InGame");
     }
   }, [currentCID]);
 
@@ -328,7 +330,10 @@ const InGame = ({ navigation, route }) => {
             ]}
           >
             <View style={styles.profilePictureContainer}>
-              <Image source={{ uri: MMKV.getString("userAvatar") }} />
+              <Image
+                style={styles.headerPlayerAvatar}
+                source={{ uri: MMKV.getString("userAvatar") }}
+              />
             </View>
             <Text style={[styles.playerStatsText, { textAlign: "left" }]}>
               {MMKV.getString("userName")}
@@ -398,8 +403,8 @@ const styles = StyleSheet.create({
   playerStatsBar: {
     position: "absolute",
     width: "60%",
-    top: 30,
-    height: "8%",
+    top: height * 0.03,
+    height: height * 0.1,
     borderTopLeftRadius: 50,
     borderBottomLeftRadius: 50,
     right: 0,
@@ -409,11 +414,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexDirection: "row",
   },
-  profilePictureContainer: {
-    marginHorizontal: 5,
-    borderRadius: 40,
-    width: 45,
-    height: 45,
+  headerPlayerAvatar: {
+    borderRadius: height / 30,
+    height: height / 15,
+    width: height / 15,
+    marginHorizontal: height / 60,
   },
   playerStatsText: {
     fontSize: 13,

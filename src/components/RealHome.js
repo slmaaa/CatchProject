@@ -17,7 +17,6 @@ import database from "@react-native-firebase/database";
 import MMKVStorage from "react-native-mmkv-storage";
 
 import { Icon, InlineIcon } from "@iconify/react";
-import documentOnePage24Regular from "@iconify/icons-fluent/document-one-page-24-regular";
 import { join } from "./joinOrCreate";
 import { URL } from "../constants.json";
 import { wsSend } from "../App";
@@ -74,10 +73,6 @@ const RealHome = ({ navigation }) => {
       </Overlay>
 
       <Text>{"Welcome " + MMKV.getString("userName")}</Text>
-      <Icon
-        recordIcon={documentOnePage24Regular}
-        style={{ color: "#ffffff", fontSize: "100px" }}
-      />
       <Button
         title={"Game"}
         onPress={() => {
