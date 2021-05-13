@@ -151,12 +151,11 @@ class Game:
         startTime = None
         endTime = None
         capturedCount = dict()
-        unCapturedCount = None
+        unCapturedCount = 0
         for team in teams:
             capturedCount[team] = 0
             for cp in checkpoints:
                 cp.level[team] = 0
-        unCapturedCount = null
         winTeam = _dict.get(
             "winTeam", None)
         return Game(gid, gname, status, hostID, hostName, hostAvatar, checkpoints,
