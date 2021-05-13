@@ -111,10 +111,15 @@ const InGame = ({ navigation, route }) => {
                 gameRef.current.checkpointsLocation[i].latitude,
               ]}
             >
-              <Image
-                style={{ height: 200 }}
-                source={require("../../../assets/img/blue-flag.png")}
-              />
+              <View
+                style={{
+                  height: 50,
+                  width: 50,
+                  backgroundColor: "#00000000",
+                }}
+              >
+                <Image source={require("../../../assets/img/blue-flag.png")} />
+              </View>
             </MapboxGL.PointAnnotation>
           )
         : cpRenderList.push(
@@ -126,10 +131,15 @@ const InGame = ({ navigation, route }) => {
                 gameRef.current.checkpointsLocation[i].latitude,
               ]}
             >
-              <Image
-                style={{ height: 200 }}
-                source={require("../../../assets/img/red-flag.png")}
-              />
+              <View
+                style={{
+                  height: 50,
+                  width: 50,
+                  backgroundColor: "#00000000",
+                }}
+              >
+                <Image source={require("../../../assets/img/red-flag.png")} />
+              </View>
             </MapboxGL.PointAnnotation>
           );
     }
@@ -389,10 +399,16 @@ const InGame = ({ navigation, route }) => {
             </Text>
           </View>
           <Button
-            disabled={currentCID != -1 ? false : true}
+            disabled={
+              currentCID != -1
+                ? false
+                : gameRef.current.checkpointsCaptured[currentCID] === null
+                ? true
+                : false
+            }
             icon={
               <Icon
-                name="plus"
+                name="circle-edit-outline"
                 type={"material-community"}
                 color={"white"}
                 size={height / 15}
