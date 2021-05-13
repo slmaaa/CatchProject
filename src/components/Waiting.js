@@ -1,17 +1,15 @@
 /* eslint-disable quotes */
 import React, { useState, useEffect, useCallback } from "react";
 import {
-  SafeAreaView,
   Text,
   ScrollView,
   StyleSheet,
   View,
   Image,
-  StatusBar,
   Dimensions,
   TouchableOpacity,
 } from "react-native";
-import { Avatar, Button, Icon } from "react-native-elements";
+import { Button, Icon } from "react-native-elements";
 import database from "@react-native-firebase/database";
 import MMKVStorage from "react-native-mmkv-storage";
 import MapboxGL from "@react-native-mapbox-gl/maps";
@@ -313,7 +311,7 @@ const styles = StyleSheet.create({
   backButtonContainer: {
     position: "absolute",
     top: height * 0.06,
-    right: width / 12,
+    left: width * 0.8,
     color: color.brown,
     alignItems: "center",
     justifyContent: "center",
@@ -346,11 +344,4 @@ const styles = StyleSheet.create({
     width: "100%",
     position: "absolute",
   },
-  // Icon: {
-  //   // backgroundColor: "#00000080",
-  //   color: "black",
-  //   width: height * 0.1,
-  //   height: height * 0.1,
-  //   // justifyContent: "center"
-  // }
 });

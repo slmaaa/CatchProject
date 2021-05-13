@@ -109,7 +109,9 @@ export default SignUp = ({ navigation }) => {
                       .json()
                       .then((json) => {
                         console.log(json);
-                        avatar = json[0].download_url;
+
+                        avatar =
+                          "https://picsum.photos/id/" + json[0].id + "/200";
                         console.log(avatar);
                       })
                       .then(() => {

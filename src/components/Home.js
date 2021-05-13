@@ -2,7 +2,7 @@
 HomeScreen:
 Shown nearby player location and route player to screens
 */
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   Text,
   SafeAreaView,
@@ -11,17 +11,18 @@ import {
   Image,
   Dimensions,
 } from "react-native";
-import { Overlay, Input, Button } from "react-native-elements";
+import { Button } from "react-native-elements";
 import MMKVStorage from "react-native-mmkv-storage";
 import MapboxGL from "@react-native-mapbox-gl/maps";
 import { Icon } from "react-native-elements";
 import { color } from "../constants";
+import auth from "@react-native-firebase/auth";
 MapboxGL.setAccessToken(
   "pk.eyJ1IjoiaGVjdG9yY2hjaCIsImEiOiJja205YmhldXUwdHQ1Mm9xbGw4N2RodndhIn0.yX90QKE2jcgG-7V5wOGXeQ"
 );
 
 const MMKV = new MMKVStorage.Loader().initialize();
-var { height, width } = Dimensions.get("window");
+const { height, width } = Dimensions.get("window");
 
 const Home = ({ navigation }) => {
   return (
@@ -31,16 +32,18 @@ const Home = ({ navigation }) => {
         pitchEnabled={false}
         scrollEnabled={false}
         rotateEnabled={false}
+        compassEnabled={false}
       >
         <MapboxGL.Camera followUserLocation={true} followUserMode={"compass"} />
         <MapboxGL.UserLocation />
       </MapboxGL.MapView>
-
       <View style={styles.headerContainer}>
         <Text style={styles.headerText}>{MMKV.getString("userName")}</Text>
         <Image
           style={styles.playerAvatar}
-          source={{ uri: MMKV.getString("userAvatar") }}
+          source={{
+            uri: MMKV.getString("userAvatar"),
+          }}
         />
       </View>
 
@@ -67,7 +70,6 @@ const Home = ({ navigation }) => {
         buttonStyle={styles.friendsButton}
         onPress={() => {
           navigation.navigate("Friends");
-          //auth().signOut();
         }}
         icon={
           <Icon
@@ -76,6 +78,14 @@ const Home = ({ navigation }) => {
             color={"white"}
           />
         }
+      />
+      <Button
+        containerStyle={styles.logoutButtonContianer}
+        buttonStyle={styles.logoutButton}
+        onPress={() => {
+          auth().signOut();
+        }}
+        icon={<Icon name="logout" type="material-community" color={"white"} />}
       />
 
       <Button
@@ -160,14 +170,28 @@ const styles = StyleSheet.create({
     height: height / 15,
     borderRadius: height / 60,
   },
+  logoutButtonContianer: {
+    position: "absolute",
+    top: height * 0.29,
+    left: width * 0.8,
+    color: color.brown,
+    alignItems: "flex-end",
+    justifyContent: "center",
+    margin: 10,
+  },
+  logoutButton: {
+    backgroundColor: color.brown,
+    width: height / 15,
+    height: height / 15,
+    borderRadius: height / 60,
+  },
   headerContainer: {
     position: "absolute",
     width: width * 0.45,
     height: height * 0.1,
     flexDirection: "row",
     marginTop: height * 0.03,
-    paddingRight: 40,
-    marginBottom: height * 0.05,
+    paddingRight: height / 60,
     borderBottomRightRadius: height / 20,
     borderTopRightRadius: height / 20,
     backgroundColor: "#00000080",
@@ -178,15 +202,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "white",
     fontWeight: "700",
-    paddingLeft: 30,
     textAlign: "left",
-    marginRight: 10,
+    marginLeft: height / 30,
   },
   playerAvatar: {
     borderRadius: height / 30,
     height: height / 15,
     width: height / 15,
-    marginHorizontal: height / 80,
+    backgroundColor: "white",
   },
 });
 export default Home;

@@ -29,9 +29,6 @@ export default LoadingHome = ({ navigation }) => {
       console.warn(err);
     }
   };
-  useEffect(() => {
-    requestLocationPermission();
-  }, []);
   async function getDataFromDB() {
     userID = auth().currentUser.uid;
     database()
@@ -70,7 +67,10 @@ export default LoadingHome = ({ navigation }) => {
   const getData = async () => {
     await getDataFromDB();
   };
-  getData();
+  requestLocationPermission().then(() => {
+    getData();
+  });
+
   return (
     <SafeAreaView>
       <Text>Loading</Text>

@@ -6,12 +6,13 @@ import random
 
 
 class Game:
-    def __init__(self, gid, gname, status, hostID, hostName, checkpoints: [Checkpoint] = None, players: [Player] = None,
+    def __init__(self, gid, gname, status, hostID, hostName, hostAvatar, checkpoints: [Checkpoint] = None, players: [Player] = None,
                  teams: [str] = None, min_players=6, max_players=20, startTime=None, endTime=None, capturedCount=None, unCapturedCount=None, winTeam=None, statsCount=0):
         self.gid = gid
         self.gname = gname
         self.hostID = hostID
         self.hostName = hostName
+        self.hostAvatar = hostAvatar
         self.status = status
         self.checkpoints = checkpoints or []
         self.players = players or []
@@ -27,7 +28,7 @@ class Game:
 
     def to_dict(self):
         return {"gid": self.gid, "gname": self.gname, "status": self.status,
-                "hostID": self.hostID, "hostName": self.hostName,
+                "hostID": self.hostID, "hostName": self.hostName, "hostAvatar": self.hostAvatar,
                 "checkpoints": [checkpoint.to_dict() for checkpoint in self.checkpoints],
                 "players": [player.to_dict() for player in self.players], "teams": self.teams,
                 "min_players": self.min_players, "max_players": self.max_players,
@@ -109,6 +110,7 @@ class Game:
             "status", None)
         hostID = _dict["hostID"]
         hostName = _dict["hostName"]
+        hostAvatar = _dict["hostAvatar"]
         checkpoints = [Checkpoint.from_dict(cp) for cp in _dict["checkpoints"]]
         players = [Player.from_dict(player)
                    for player in _dict.get("players", [])]
@@ -127,7 +129,7 @@ class Game:
         winTeam = _dict.get(
             "winTeam", None)
         statsCount = dict.get(_dict, "statsCount", 0)
-        return Game(gid, gname, status, hostID, hostName, checkpoints,
+        return Game(gid, gname, status, hostID, hostName, hostAvatar, checkpoints,
                     players, teams, min_players, max_players, startTime, endTime, capturedCount, unCapturedCount, winTeam, statsCount)
 
     @ staticmethod
@@ -138,6 +140,7 @@ class Game:
             "status", None)
         hostID = _dict["hostID"]
         hostName = _dict["hostName"]
+        hostAvatar = _dict["hostAvatar"]
         checkpoints = []
         players = [Player.from_dict(player)
                    for player in _dict.get("players", [])]
@@ -154,5 +157,5 @@ class Game:
         unCapturedCount = len(checkpoints)
         winTeam = _dict.get(
             "winTeam", None)
-        return Game(gid, gname, status, hostID, hostName, checkpoints,
+        return Game(gid, gname, status, hostID, hostName, hostAvatar, checkpoints,
                     players, teams, min_players, max_players, startTime, endTime, capturedCount, unCapturedCount, winTeam)
