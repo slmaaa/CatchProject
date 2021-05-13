@@ -151,6 +151,7 @@ class Game:
         startTime = None
         endTime = None
         capturedCount = dict()
+        unCapturedCount = None
         for team in teams:
             capturedCount[team] = 0
             for cp in checkpoints:
