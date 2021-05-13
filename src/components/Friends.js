@@ -31,6 +31,7 @@ import { color } from "../constants";
 const MMKV = new MMKVStorage.Loader().initialize();
 
 var { height, width } = Dimensions.get("window");
+
 const Friends = ({ navigation }) => {
   const [initializing, setInitializing] = useState(true);
   const [joinOverlayVisible, setJoinOverlayVisible] = useState(false);
@@ -40,132 +41,22 @@ const Friends = ({ navigation }) => {
   const nearbyRooms = [];
   const list = [
     {
-      title: "Friend’s Room",
+      title: "Friends",
       data:
         friends.length === 0
           ? ["So sad, you have no friends, please add oil:("]
           : friends,
     },
-    {
-      title: "Nearby Room",
-      data:
-        nearbyRooms.length === 0
-          ? ["There are no nearby rooms, try create one"]
-          : nearbyRooms,
-    },
   ];
-
   const Item = ({ title }) => (
     <View style={styles.item}>
       <Text style={styles.title}>{title}</Text>
     </View>
   );
-
-  async function setGame() {
-    const game = {
-      gid: "None",
-      gname: "None",
-      status: "WAITING",
-      hostID: MMKV.getString("userID"),
-      hostName: MMKV.getString("userName"),
-      players: [
-        {
-          pid: MMKV.getString("userID"),
-          name: MMKV.getString("userName"),
-          avatar: "None",
-        },
-      ],
-      teams: ["RED", "BLUE"],
-    };
-
-    let createdGame = null;
-    wsSend(JSON.stringify({ header: "CREATE", content: game }))
-      .then(async () => {
-        let interval = setInterval(() => {
-          createdGame = MMKV.getMap("joinedGame");
-          if (createdGame == null) return;
-          clearInterval(interval);
-          MMKV.setString("gameID", createdGame.gid.toString());
-          database()
-            .ref("users/" + MMKV.getString("userID"))
-            .update({
-              gameID: createdGame.gid.toString(),
-              status: "PREPARE_HOST",
-            });
-          MMKV.setString("userStatus", "PREPARE_HOST");
-          navigation.replace("Waiting");
-        }, 100);
-      })
-      .catch((e) => {
-        console.log(e);
-      });
-  }
-  const handleCreate = () => {
-    setCreating(true);
-    setGame();
-  };
-  const handleOnPressJoin = () => {
-    let game;
-    wsSend(
-      JSON.stringify({
-        header: "JOIN",
-        content: {
-          player: {
-            pid: MMKV.getString("userID"),
-            name: MMKV.getString("userName"),
-            avatar: "None",
-          },
-          gid: roomID,
-        },
-      })
-    ).then(() => {
-      let interval = setInterval(() => {
-        game = MMKV.getMap("joinedGame");
-        if (game == null) return;
-        clearInterval(interval);
-        MMKV.setString("gameID", roomID);
-        MMKV.setString("gameName", game.gname);
-        database()
-          .ref("users/" + MMKV.getString("userID"))
-          .update({ gameID: roomID, status: "WAITING" });
-        MMKV.setString("userStatus", "WAITING");
-        navigation.replace("Waiting", {
-          gameName: game.gname,
-        });
-      }, 100);
-    });
-  };
+  
   return (
     <SafeAreaView container={styles.container}>
-      <Overlay
-        isVisible={creating}
-        overlayStyle={{ width: "80%", borderRadius: 30 }}
-      >
-        <Text style={styles.creatingText}>Creating...</Text>
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-            margin: 5,
-          }}
-        >
-          <Progress.CircleSnail
-            indeterminate
-            size={100}
-            thickness={7}
-            color={[color.teamRed, color.teamBlue]}
-          />
-        </View>
-      </Overlay>
-      <Overlay
-        isVisible={joinOverlayVisible}
-        onBackdropPress={() => setJoinOverlayVisible(false)}
-        overlayStyle={{ width: "80%" }}
-      >
-        <Input placeholder="Enter room ID" onChangeText={setRoomID} />
-        <Button title={"Join"} onPress={handleOnPressJoin} />
-      </Overlay>
+
       <Button
         containerStyle={styles.backButtonContainer}
         buttonStyle={styles.backButton}

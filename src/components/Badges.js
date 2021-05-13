@@ -185,6 +185,21 @@ const Badges = ({ navigation }) => {
           </>
         )}
       />
+
+      <Button
+        containerStyle={styles.createButtonContianer}
+        buttonStyle={styles.createButton}
+        onPress={() => {
+          setJoinOverlayVisible(true);
+        }}
+        icon={
+          <Icon
+            name="account-multiple-plus"
+            type={"material-community"}
+            color={"white"}
+          />
+        }
+      />
     </SafeAreaView>
   );
 };
@@ -203,7 +218,7 @@ const styles = StyleSheet.create({
   backButtonContainer: {
     position: "absolute",
     top: height * 0.06,
-    right: width / 12,
+    left: width * 0.8,
     color: color.brown,
     alignItems: "center",
     justifyContent: "center",
@@ -216,6 +231,9 @@ const styles = StyleSheet.create({
     height: height / 15,
   },
   createButtonContianer: {
+    position:"absolute",
+    top: height * 0.85,
+    left: width * 0.8,
     alignSelf: "flex-end",
     color: color.brown,
     alignItems: "center",
@@ -224,8 +242,8 @@ const styles = StyleSheet.create({
   },
   createButton: {
     backgroundColor: color.brown,
-    width: height / 10,
-    height: height / 10,
+    width: height / 15,
+    height: height / 15,
     borderRadius: height / 60,
   },
   item: {
