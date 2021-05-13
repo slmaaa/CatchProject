@@ -275,7 +275,7 @@ const styles = StyleSheet.create({
   },
   teamContainer:{
     position:"absolute",
-    top: height * 0.6,
+    top: height * 0.5,
     left: width * 0.05,
     color: color.brown,
     alignSelf: "flex-end",
@@ -295,14 +295,14 @@ const styles = StyleSheet.create({
   },
   scrollViewIndividual: {
     position:"absolute",
-    top: height * 0.2,
+    top: height * 0.22,
     left: width * 0.05,
     backgroundColor: color.primaryDark,
     marginHorizontal: 20,
   },
   scrollViewTeam: {
     position:"absolute",
-    top: height * 0.65,
+    top: height * 0.57,
     left: width * 0.05,
     backgroundColor: color.primaryDark,
     marginHorizontal: 20,
