@@ -26,10 +26,11 @@ import history from "./components/history";
 import JoinOrCreate from "./components/joinOrCreate";
 import PrepareRoom from "./components/PrepareRoom";
 import { color } from "./constants";
+import GaveOverScreen from "./components/GameOverScreen";
 [];
 const MMKV = new MMKVStorage.Loader().initialize();
 const Stack = createStackNavigator();
-const ws = new WebSocket("ws://113.254.98.79:80");
+const ws = new WebSocket("ws://3.19.239.35:8765");
 
 export const wsSend = async (data) => {
   await ws.send(data);
@@ -72,7 +73,7 @@ const App = () => {
         console.log("Recieved game info");
         MMKV.setMap("gameInfo", data.content);
         break;
-      case "CLOSE_ACCOUNT":
+      case "ACCOUNT_FINISHED":
         console.log("Recieved endStats");
         MMKV.setMap("endStats", data.content);
         break;
@@ -223,6 +224,13 @@ const App = () => {
             <Stack.Screen
               name="Waiting"
               component={Waiting}
+              options={() => ({
+                headerShown: false,
+              })}
+            />
+            <Stack.Screen
+              name="GameOver"
+              component={GaveOverScreen}
               options={() => ({
                 headerShown: false,
               })}

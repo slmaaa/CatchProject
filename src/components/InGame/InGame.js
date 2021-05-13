@@ -1,5 +1,5 @@
 /* eslint-disable quotes */
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { getDistance } from "geolib";
 import * as Progress from "react-native-progress";
 import MapboxGL from "@react-native-mapbox-gl/maps";
@@ -12,13 +12,10 @@ import {
   Text,
   View,
   Dimensions,
-  Modal,
   Vibration,
-  Image,
   SafeAreaView,
   StatusBar,
   StyleSheet,
-  TouchableHighlight,
 } from "react-native";
 
 import MMKVStorage from "react-native-mmkv-storage";
@@ -26,9 +23,12 @@ import React from "react";
 import useInterval from "../Helper/useInterval";
 import { wsSend } from "../../App";
 import { color } from "../../constants.json";
-import { Button } from "react-native-elements";
+import { Button, Overlay, Icon } from "react-native-elements";
 import { useFocusEffect } from "@react-navigation/core";
+import { makeMutable } from "react-native-reanimated";
+
 const CP_RANGE = 25;
+const { height, width } = Dimensions.get("window");
 
 const InGame = ({ navigation, route }) => {
   const MMKV = new MMKVStorage.Loader().initialize();
@@ -37,6 +37,9 @@ const InGame = ({ navigation, route }) => {
   const gameInfo = useRef();
   const [location, setLocation] = useState(null);
   const [lastLocation, setLastLocation] = useState(null);
+  const [gameOverAccountingVisible, setGameOverAccountingVisible] = useState(
+    false
+  );
   const [challengesSolved, setChallengesSolved] = useState(0);
   const distanceTravelled = useRef(0);
   const [distanceCovered, setDistanceCovered] = useState(0);
@@ -220,37 +223,46 @@ const InGame = ({ navigation, route }) => {
     gameInfo.current = MMKV.getMap("gameInfo");
   }, 100);
 
-  useEffect(() => {
-    if (gameRef.current.game.status === "OVER") return;
-    if (gameInfo.current == null) {
-      return;
-    }
-    gameRef.current.game.status = gameInfo.current.status;
-    for (let i = 0; i < gameRef.current.numberOfCheckpoints; i++) {
-      gameRef.current.game.checkpoints[i].level = gameInfo.current.cpsLevel[i];
-    }
-    MMKV.setMap("joinedGame", gameRef.current.game);
-    if (gameRef.current.game.status === "OVER") {
-      wsSend(
-        JSON.stringify({
-          header: "PLAYER_STATS",
-          content: {
-            gid: gameRef.current.game.gid.toString(),
-            key: MMKV.getInt("key").toString(),
-            points: MMKV.getInt("challengesSolved").toString(),
-            dist: distanceTravelled.toString(),
-          },
-        }).then(() => {
+  useFocusEffect(
+    useCallback(() => {
+      if (gameRef.current.game.status === "OVER") return;
+      if (gameInfo.current == null) {
+        return;
+      }
+      gameRef.current.game.status = gameInfo.current.status;
+      for (let i = 0; i < gameRef.current.numberOfCheckpoints; i++) {
+        gameRef.current.game.checkpoints[i].level =
+          gameInfo.current.cpsLevel[i];
+      }
+      MMKV.setMap("joinedGame", gameRef.current.game);
+      if (gameRef.current.game.status === "OVER") {
+        setGameOverAccountingVisible(true);
+        wsSend(
+          JSON.stringify({
+            header: "PLAYER_STATS",
+            content: {
+              gid: gameRef.current.game.gid.toString(),
+              key: MMKV.getInt("key").toString(),
+              points: MMKV.getInt("challengesSolved").toString(),
+              dist: distanceTravelled.current.toString(),
+            },
+          })
+        ).then(() => {
           let interval = setInterval(() => {
             const endStats = MMKV.getMap("endStats");
             if (endStats == null) return;
             clearInterval(interval);
             gameRef.current.game.players = endStats.players;
+            gameRef.current.game.winTeam = endStats.winTeam;
+            MMKV.setMap("joinedGame", gameRef.current.game);
+            MMKV.setString("pointMVP", endStats.pointMVP.toString());
+            MMKV.setString("distMVP", endStats.distMVP.toString());
+            navigation.replace("GameOver");
           }, 100);
-        })
-      );
-    }
-  }, [gameInfo.current]);
+        });
+      }
+    }, [gameInfo.current])
+  );
 
   useFocusEffect(() => {
     setChallengesSolved(MMKV.getInt("challengesSolved"));
@@ -262,6 +274,27 @@ const InGame = ({ navigation, route }) => {
       <>
         <StatusBar barStyle="dark-content" />
         <SafeAreaView style={styles.container}>
+          <Overlay
+            isVisible={gameOverAccountingVisible}
+            overlayStyle={{ width: "80%", borderRadius: 30 }}
+          >
+            <Text style={styles.creatingText}>Game Over.</Text>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+                margin: 5,
+              }}
+            >
+              <Progress.CircleSnail
+                indeterminate
+                size={100}
+                thickness={7}
+                color={[color.teamRed, color.teamBlue]}
+              />
+            </View>
+          </Overlay>
           <View style={styles.mapContainer}>
             <MapboxGL.MapView
               ref={mapRef}
@@ -269,8 +302,11 @@ const InGame = ({ navigation, route }) => {
               pitchEnabled={false}
               rotateEnabled={false}
               compassEnabled={false}
+              scrollEnabled={false}
             >
               <MapboxGL.Camera
+                followUserLocation={true}
+                followUserMode={"compass"}
                 defaultSettings={{
                   zoomLevel: 17,
                   centerCoordinate: [114.263981, 22.339158],
@@ -285,11 +321,13 @@ const InGame = ({ navigation, route }) => {
               styles.playerStatsBar,
               {
                 borderColor:
-                  gameRef.team === "BLUE" ? color.teamBlue : color.teamRed,
+                  gameRef.current.team === "BLUE"
+                    ? color.teamBlue
+                    : color.teamRed,
               },
             ]}
           >
-            <View style={styles.profilePictureContainer}></View>
+            <View style={styles.profilePictureContainer} />
             <Text style={[styles.playerStatsText, { textAlign: "left" }]}>
               {MMKV.getString("userName")}
             </Text>
@@ -297,10 +335,30 @@ const InGame = ({ navigation, route }) => {
               {distanceCovered > 1000
                 ? distanceCovered / 1000 + "km"
                 : distanceCovered + "m"}{" "}
-              | {challengesSolved} points
+              | {challengesSolved} pts
             </Text>
-            <Text></Text>
           </View>
+          <Button
+            disabled={currentCID != -1 ? false : true}
+            icon={
+              <Icon
+                name="plus"
+                type={"material-community"}
+                color={"white"}
+                size={height / 15}
+              />
+            }
+            containerStyle={styles.addButton}
+            buttonStyle={{ backgroundColor: color.brown, borderRadius: 60 }}
+            onPress={() => {
+              navigation.navigate("Maths", {
+                cpName: gameRef.current.game.checkpoints[currentCID].name,
+                gid: gameRef.current.game.gid,
+                team: gameRef.current.team,
+                cid: currentCID,
+              });
+            }}
+          />
         </SafeAreaView>
       </>
     );
@@ -343,7 +401,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 50,
     borderBottomLeftRadius: 50,
     right: 0,
-    borderWidth: 2,
+    borderWidth: 3,
     borderRightWidth: 0,
     backgroundColor: color.transBlack,
     alignItems: "center",
@@ -375,5 +433,20 @@ const styles = StyleSheet.create({
     height: 30,
     width: 30,
     resizeMode: "contain",
+  },
+  addButton: {
+    position: "absolute",
+    top: height * 0.9,
+    alignSelf: "center",
+    color: color.brown,
+    borderRadius: height / 15,
+    shadowColor: "black",
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.37,
+    shadowRadius: height / 15,
+    elevation: 5,
   },
 });

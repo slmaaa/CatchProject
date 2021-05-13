@@ -125,9 +125,10 @@ export default PrepareRoom = ({ navigation }) => {
             zoomLevel: 17,
           }}
           followUserLocation={true}
-          followUserMode={"compass"}
+          followUserMode={"course"}
           zoomLevel={17}
         />
+        <MapboxGL.UserLocation />
         <RenderCheckpointsOnMap />
       </MapboxGL.MapView>
       <View style={styles.headerContainer}>
@@ -140,30 +141,39 @@ export default PrepareRoom = ({ navigation }) => {
       <View style={styles.playersListContainer}>
         <ScrollView>{playerView}</ScrollView>
       </View>
-      <Button
-        containerStyle={styles.setCPButton}
-        titleStyle={{ color: "white", fontSize: 24 }}
-        buttonStyle={{ backgroundColor: color.brown, borderRadius: 50 }}
-        onPress={() => {
-          navigation.navigate("CheckPointSetting");
-        }}
-        icon={
-          <Icon
-            name="map-marker-plus"
-            type={"material-community"}
-            color={"white"}
-          />
-        }
-      ></Button>
-      <Button
-        title={"Start"}
-        containerStyle={styles.startButton}
-        titleStyle={{ color: "white", fontSize: 24 }}
-        buttonStyle={{ backgroundColor: color.brown }}
-        onPress={() => {
-          wsSend(JSON.stringify({ header: "START", content: gameID }));
-        }}
-      ></Button>
+      {MMKV.getString("userStatus") === "PREPARE_HOST" && (
+        <>
+          <Button
+            containerStyle={styles.setCPButton}
+            titleStyle={{ color: "white", fontSize: 24 }}
+            buttonStyle={{ backgroundColor: color.brown, borderRadius: 100 }}
+            onPress={() => {
+              navigation.navigate("CheckPointSetting");
+            }}
+            icon={
+              <Icon
+                name="map-marker-plus"
+                type={"material-community"}
+                color={"white"}
+                size={height * 0.05}
+              />
+            }
+          ></Button>
+          <Button
+            title={"Start"}
+            containerStyle={styles.startButton}
+            titleStyle={{
+              color: "white",
+              fontSize: 24,
+              height: height * 0.05,
+            }}
+            buttonStyle={{ backgroundColor: color.brown }}
+            onPress={() => {
+              wsSend(JSON.stringify({ header: "START", content: gameID }));
+            }}
+          ></Button>
+        </>
+      )}
     </SafeAreaView>
   );
 };
@@ -186,11 +196,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   headerText: {
-    fontSize: 10,
+    fontSize: 12,
     color: "#FFFFFF",
-    fontWeight: "normal",
+    fontWeight: "700",
     paddingLeft: 10,
     textAlign: "left",
+    marginRight: 10,
   },
   PlayerAvatar: {
     borderRadius: height / 30,
@@ -211,9 +222,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#00000080",
     justifyContent: "space-between",
     alignItems: "center",
-    borderTopWidth: 2,
-    borderBottomWidth: 2,
-    borderRightWidth: 2,
+    borderTopWidth: 3,
+    borderBottomWidth: 3,
+    borderRightWidth: 3,
     borderBottomRightRadius: height * 0.05,
     borderTopRightRadius: height * 0.05,
     borderColor: "#98E7FD",
@@ -225,9 +236,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#00000080",
     justifyContent: "space-between",
     alignItems: "center",
-    borderTopWidth: 2,
-    borderBottomWidth: 2,
-    borderRightWidth: 2,
+    borderTopWidth: 3,
+    borderBottomWidth: 3,
+    borderRightWidth: 3,
     borderBottomRightRadius: height * 0.05,
     borderTopRightRadius: height * 0.05,
     borderColor: "#FF8F62",
@@ -259,10 +270,18 @@ const styles = StyleSheet.create({
   setCPButton: {
     position: "absolute",
     width: 80,
-    borderRadius: 50,
+    borderRadius: 10,
     top: height * 0.9,
-    right: width * 0.1,
+    right: width * 0.05,
     color: color.brown,
+    shadowColor: "black",
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.37,
+    shadowRadius: 100,
+    elevation: 5,
   },
   backButton: {
     marginLeft: height / 6,

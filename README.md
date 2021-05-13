@@ -1,2 +1,3 @@
 # CatchProject
-Demo app for 10-04-2021
+
+An app aims to motivate people to do exercise and keep fit through gamification - a localion-based checkpoint capture game.

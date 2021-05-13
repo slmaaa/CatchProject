@@ -12,14 +12,14 @@ import {
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
   Keyboard,
+  Platform,
 } from "react-native";
 
 import logoImage from "./image/IMG_4059.jpg";
 import { color } from "../constants";
-import { storeData } from "./Helper/async";
 import { Icon } from "react-native-elements";
 
-const exampleImageUri = Image.resolveAssetSource(logoImage).uri
+const exampleImageUri = Image.resolveAssetSource(logoImage).uri;
 const Login = ({ navigation }) => {
   const [email, setEmail] = useState();
   const [pw, setPW] = useState();
@@ -31,12 +31,13 @@ const Login = ({ navigation }) => {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={styles.loginView}>
-          <View style={stylesImage.container}>
-            <Image style = {stylesImage.tinyLogo}
-                source={{uri: exampleImageUri}}
+          <View style={styles.loginView}>
+            <View style={stylesImage.container}>
+              <Image
+                style={stylesImage.tinyLogo}
+                source={{ uri: exampleImageUri }}
               ></Image>
-          </View>
+            </View>
 
             <View style={styles.emailView}>
               <View style={styles.emailInputView}>
@@ -51,7 +52,7 @@ const Login = ({ navigation }) => {
                 ></TextInput>
               </View>
             </View>
-            
+
             <View style={styles.pwView}>
               <View style={styles.pwInputView}>
                 <Text style={styles.inputTitle}>Password</Text>
@@ -65,8 +66,7 @@ const Login = ({ navigation }) => {
                 ></TextInput>
               </View>
             </View>
-            
-              
+
             <View style={styles.loginButtonView}>
               <TouchableOpacity
                 onPress={() => {
@@ -98,7 +98,7 @@ const stylesImage = StyleSheet.create({
   container: {
     flex: 0.001,
     justifyContent: "flex-end",
-    alignItems: 'center',
+    alignItems: "center",
   },
   tinyLogo: {
     width: 100,
@@ -135,16 +135,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingLeft: "5%",
     paddingVertical: 5,
-    borderBottomColor: 'black',
+    borderBottomColor: "black",
     borderBottomWidth: 1,
   },
   pwView: {
-    
     height: 64,
     flexDirection: "row",
     alignItems: "center",
     paddingLeft: "5%",
-    borderBottomColor: 'black',
+    borderBottomColor: "black",
     borderBottomWidth: 1,
   },
   loginButtonView: {
@@ -187,8 +186,9 @@ const styles = StyleSheet.create({
   inputText: {
     flex: 1,
     marginHorizontal: -20,
+    color: "black",
   },
-  signUp:{
+  signUp: {
     flex: 0.2,
     fontSize: 14,
     lineHeight: 24,
@@ -196,7 +196,5 @@ const styles = StyleSheet.create({
     marginHorizontal: 110,
   },
 });
-
-
 
 export default Login;

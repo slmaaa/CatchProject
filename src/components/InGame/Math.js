@@ -39,6 +39,7 @@ export default Maths = ({ navigation, route }) => {
   const [cooldown, setCooldown] = useState(cooldowns.current[cid]);
   const [answer, setAnswer] = useState();
   const [level, setLevel] = useState(0);
+
   const handleOnPressSummit = () => {
     setDisabled(true);
     if (answerInput !== answer) {
@@ -47,26 +48,19 @@ export default Maths = ({ navigation, route }) => {
     } else {
       setLevel(MMKV.getMap("joinedGame").checkpoints[cid].level[team]);
       correct.current = true;
-      wsSend(
-        JSON.stringify({
-          header: "ADD",
-          content: { gid: gid.toString(), team: team, cid: cid },
-        })
-      )
-        .then(() => {
-          setTimeout(() => {
-            MMKV.setInt(
-              "challengesSolved",
-              MMKV.getInt("challengesSolved") + 1
-            );
-            setLevel(MMKV.getMap("joinedGame").checkpoints[cid].level[team]);
-          }, 1000);
-        })
-        .then(() => {
-          setTimeout(() => {
-            navigation.pop();
-          }, 2000);
-        });
+      setTimeout(() => {
+        MMKV.setInt("challengesSolved", MMKV.getInt("challengesSolved") + 1);
+        setLevel(MMKV.getMap("joinedGame").checkpoints[cid].level[team]);
+        wsSend(
+          JSON.stringify({
+            header: "ADD",
+            content: { gid: gid.toString(), team: team, cid: cid },
+          })
+        );
+      }, 1000);
+      setTimeout(() => {
+        navigation.pop();
+      }, 3000);
     }
   };
 
@@ -151,7 +145,7 @@ export default Maths = ({ navigation, route }) => {
             progress={
               level / MMKV.getMap("joinedGame").checkpoints[cid].maxLevel
             }
-            color={team === "RED" ? "red" : "blue"}
+            color={team === "RED" ? color.teamRed : color.teamBlue}
             width={200}
             height={30}
             style={{ alignSelf: "center" }}

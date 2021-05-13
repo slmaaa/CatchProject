@@ -11,22 +11,20 @@ import {
   Image,
   Dimensions,
   TouchableOpacity,
+  PermissionsAndroid,
 } from "react-native";
 import { Overlay, Input, Button } from "react-native-elements";
 import MMKVStorage from "react-native-mmkv-storage";
 import MapboxGL from "@react-native-mapbox-gl/maps";
-
-import { Icon } from 'react-native-elements'
-
-import documentOnePage24Regular from "@iconify/icons-fluent/document-one-page-24-regular";
+import auth from "@react-native-firebase/auth";
+import { Icon } from "react-native-elements";
+import MilitaryMedal from "../../assets/img/military-medal.svg";
 import { join } from "./joinOrCreate";
 import { URL } from "../constants.json";
-import { wsSend } from "../App";
 import { color } from "../constants";
 MapboxGL.setAccessToken(
   "pk.eyJ1IjoiaGVjdG9yY2hjaCIsImEiOiJja205YmhldXUwdHQ1Mm9xbGw4N2RodndhIn0.yX90QKE2jcgG-7V5wOGXeQ"
 );
-let link = `https://picsum.photos/200?t=${Date.now()}`;
 
 import histroy from "./history";
 import RealHome from "./RealHome";
@@ -40,8 +38,6 @@ var { height, width } = Dimensions.get("window");
 const Home = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
-      
-
       <MapboxGL.MapView
         style={styles.map}
         pitchEnabled={false}
@@ -52,12 +48,12 @@ const Home = ({ navigation }) => {
         <MapboxGL.UserLocation />
       </MapboxGL.MapView>
 
-
       <View style={styles.headerContainer}>
-        <Text style={styles.headerText}>
-            {MMKV.getString("userName")}
-        </Text>
-        <Image style={styles.playerAvatar} source={{ uri: link }} />
+        <Text style={styles.headerText}>{MMKV.getString("userName")}</Text>
+        <Image
+          style={styles.playerAvatar}
+          source={{ uri: MMKV.getString("userAvatar") }}
+        />
       </View>
 
       <Button
@@ -66,13 +62,7 @@ const Home = ({ navigation }) => {
         onPress={() => {
           navigation.navigate("HistoryPage");
         }}
-        icon={   
-          <Icon
-            name="archive"
-            type="material-community"
-            color={"white"}
-          />
-        }
+        icon={<Icon name="archive" type="material-community" color={"white"} />}
       />
 
       <Button
@@ -81,22 +71,17 @@ const Home = ({ navigation }) => {
         onPress={() => {
           navigation.navigate("Badges");
         }}
-        icon={   
-          <Icon
-            name="medal"
-            type="material-community"
-            color={"white"}
-          />
-        }
+        icon={<Icon name="medal" type="material-community" color={"white"} />}
       />
 
       <Button
         containerStyle={styles.friendsButtonContianer}
         buttonStyle={styles.friendsButton}
         onPress={() => {
-          navigation.navigate("Friends");
+          //navigation.navigate("Friends");
+          auth().signOut();
         }}
-        icon={   
+        icon={
           <Icon
             name="account-multiple"
             type="material-community"
@@ -104,7 +89,6 @@ const Home = ({ navigation }) => {
           />
         }
       />
-
 
       <Button
         title={"Game"}
@@ -115,11 +99,7 @@ const Home = ({ navigation }) => {
           navigation.navigate("joinOrCreate");
         }}
       ></Button>
-
-
-
     </SafeAreaView>
-
   );
 };
 
@@ -165,7 +145,7 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   historyButtonContianer: {
-    position:"absolute",
+    position: "absolute",
     top: height * 0.016,
     left: width * 0.8,
     color: color.brown,
@@ -180,7 +160,7 @@ const styles = StyleSheet.create({
     borderRadius: height / 60,
   },
   badgesButtonContianer: {
-    position:"absolute",
+    position: "absolute",
     top: height * 0.11,
     left: width * 0.8,
     color: color.brown,
@@ -195,8 +175,8 @@ const styles = StyleSheet.create({
     borderRadius: height / 60,
   },
   friendsButtonContianer: {
-    position:"absolute",
-    top: height * 0.20,
+    position: "absolute",
+    top: height * 0.2,
     left: width * 0.8,
     color: color.brown,
     alignItems: "flex-end",
@@ -210,7 +190,7 @@ const styles = StyleSheet.create({
     borderRadius: height / 60,
   },
   headerContainer: {
-    position:"absolute",
+    position: "absolute",
     width: width * 0.45,
     height: height * 0.1,
     flexDirection: "row",

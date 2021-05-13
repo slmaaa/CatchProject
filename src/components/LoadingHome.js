@@ -1,5 +1,5 @@
-import React from "react";
-import { SafeAreaView, Text } from "react-native";
+import React, { useEffect } from "react";
+import { SafeAreaView, Text, PermissionsAndroid } from "react-native";
 import auth from "@react-native-firebase/auth";
 import database from "@react-native-firebase/database";
 
@@ -8,7 +8,30 @@ import MMKVStorage from "react-native-mmkv-storage";
 export default LoadingHome = ({ navigation }) => {
   const MMKV = new MMKVStorage.Loader().initialize();
   MMKV.clearStore();
-  let userID, userName, userStatus, gameID;
+  let userID, userName, userStatus, gameID, avatar;
+  const requestLocationPermission = async () => {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+        {
+          title: "Location game access location permission",
+          message: "Access to location is required to continue. ",
+          buttonNegative: "Cancel",
+          buttonPositive: "OK",
+        }
+      );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        console.log("Permission granted");
+      } else {
+        requestLocationPermission();
+      }
+    } catch (err) {
+      console.warn(err);
+    }
+  };
+  useEffect(() => {
+    requestLocationPermission();
+  }, []);
   async function getDataFromDB() {
     userID = auth().currentUser.uid;
     database()
@@ -18,6 +41,7 @@ export default LoadingHome = ({ navigation }) => {
         userName = snapshot.child("username").val();
         userStatus = snapshot.child("status").val();
         gameID = snapshot.child("gameID").val();
+        avatar = snapshot.child("avatar").val();
       })
       .then(() => {
         setLocal();
@@ -35,15 +59,18 @@ export default LoadingHome = ({ navigation }) => {
       database().ref(`users/${userID}`).update({ status: "ONLINE" });
     }
     await MMKV.setStringAsync("userStatus", userStatus);
+    if (avatar != null) {
+      await MMKV.setStringAsync("userAvatar", avatar);
+    }
     if (gameID != null) {
       MMKV.setString("userGameID", gameID);
     }
     await navigation.replace("Home");
   }
-  const temp = async () => {
+  const getData = async () => {
     await getDataFromDB();
   };
-  temp();
+  getData();
   return (
     <SafeAreaView>
       <Text>Loading</Text>
