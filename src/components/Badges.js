@@ -9,6 +9,8 @@ import {
   TouchableHighlight,
   FlatList,
   SectionList,
+  StatusBar,
+  ScrollView,
 } from "react-native";
 import {
   Overlay,
@@ -27,7 +29,12 @@ import { join } from "./joinOrCreate";
 import { URL } from "../constants.json";
 import { wsSend } from "../App";
 import { color } from "../constants";
-
+import Medal1 from "/Users/zhongyueguan/CatchProject/src/components/medals/military-medal.svg";
+import Medal2 from "/Users/zhongyueguan/CatchProject/src/components/medals/military-medal-2.svg";
+import Medal3 from "/Users/zhongyueguan/CatchProject/src/components/medals/military-medal-3.svg";
+import Medal4 from "/Users/zhongyueguan/CatchProject/src/components/medals/military-medal-4.svg";
+import Medal5 from "/Users/zhongyueguan/CatchProject/src/components/medals/1st-place-medal.svg";
+import Medal6 from "/Users/zhongyueguan/CatchProject/src/components/medals/sports-medal.svg";
 const MMKV = new MMKVStorage.Loader().initialize();
 
 var { height, width } = Dimensions.get("window");
@@ -137,35 +144,11 @@ const Badges = ({ navigation }) => {
   };
   return (
     <SafeAreaView container={styles.container}>
-      <Overlay
-        isVisible={creating}
-        overlayStyle={{ width: "80%", borderRadius: 30 }}
-      >
-        <Text style={styles.creatingText}>Creating...</Text>
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-            margin: 5,
-          }}
-        >
-          <Progress.CircleSnail
-            indeterminate
-            size={100}
-            thickness={7}
-            color={[color.teamRed, color.teamBlue]}
-          />
-        </View>
-      </Overlay>
-      <Overlay
-        isVisible={joinOverlayVisible}
-        onBackdropPress={() => setJoinOverlayVisible(false)}
-        overlayStyle={{ width: "80%" }}
-      >
-        <Input placeholder="Enter room ID" onChangeText={setRoomID} />
-        <Button title={"Join"} onPress={handleOnPressJoin} />
-      </Overlay>
+
+      <View style={styles.headerContainer}>
+        <Text style={styles.header}>Badges</Text>
+      </View>
+
       <Button
         containerStyle={styles.backButtonContainer}
         buttonStyle={styles.backButton}
@@ -173,33 +156,49 @@ const Badges = ({ navigation }) => {
         icon={<Icon name="arrow-back" type={"material"} color={"white"} />}
       />
 
-      <SectionList
-        style={styles.listContainer}
-        sections={list}
-        keyExtractor={(item, index) => item + index}
-        renderItem={({ item }) => <Item title={item} />}
-        renderSectionHeader={({ section: { title } }) => (
-          <>
-            <Text style={styles.header}>{title}</Text>
-            <Divider style={{ backgroundColor: color.grey }} />
-          </>
-        )}
-      />
+      <View style={styles.individualContainer}>
+        <Text style={styles.normalText}>Individual</Text>
+      </View>
+      <ScrollView style={styles.scrollViewIndividual} horizontal={true}>
+        <View>
+          <Medal1 width = {100} height = {100} />
+          <Text>Distance(0/500m)</Text>
+        </View>
+        
+        <View>
+          <Medal2 width = {100} height = {100} />
+          <Text>    Riddles(0/2)</Text>
+        </View>
+        
+        <View>
+          <Medal3 width = {100} height = {100} />
+          <Text>  Smartest(0/1)</Text>
+        </View>
+        
+        <View>
+          <Medal4 width = {100} height = {100} />
+          <Text>   Sportest(0/1)</Text>
+        </View>
+        
+      </ScrollView>
+      
+      <View style={styles.teamContainer}>
+        <Text style={styles.normalText}>Team</Text>
+      </View>
 
-      <Button
-        containerStyle={styles.createButtonContianer}
-        buttonStyle={styles.createButton}
-        onPress={() => {
-          setJoinOverlayVisible(true);
-        }}
-        icon={
-          <Icon
-            name="account-multiple-plus"
-            type={"material-community"}
-            color={"white"}
-          />
-        }
-      />
+      <ScrollView style={styles.scrollViewTeam} horizontal={true}>
+        <View style={styles.container}>
+          <Medal5 width = {100} height = {100} />
+          <Text>      Win(0/1)</Text>
+        </View>
+
+        <View>
+          <Medal6 width = {100} height = {100} />
+          <Text>      Win(0/3)</Text>
+        </View>
+        
+      </ScrollView>
+
     </SafeAreaView>
   );
 };
@@ -251,14 +250,65 @@ const styles = StyleSheet.create({
     height: height * 0.085,
   },
   header: {
-    fontSize: 16,
+    fontSize: 36,
     fontWeight: "700",
   },
-  creatingText: {
-    fontSize: 22,
-    fontWeight: "700",
+  headerContainer:{
+    position:"absolute",
+    top: height * 0.07,
+    left: width * 0.05,
+    color: color.brown,
+    alignSelf: "flex-end",
+    alignItems: "center",
+    justifyContent: "center",
+    margin: 5,
+  },
+  individualContainer:{
+    position:"absolute",
+    top: height * 0.15,
+    left: width * 0.05,
+    color: color.brown,
+    alignSelf: "flex-end",
+    alignItems: "center",
+    justifyContent: "center",
+    margin: 5,
+  },
+  teamContainer:{
+    position:"absolute",
+    top: height * 0.6,
+    left: width * 0.05,
+    color: color.brown,
+    alignSelf: "flex-end",
+    alignItems: "center",
+    justifyContent: "center",
+    margin: 5,
+  },
+  normalText: {
+    fontSize: 20,
+    fontWeight: "bold",
     textAlign: "center",
     margin: 5,
+  },
+  scrollContainer: {
+    flex: 1,
+    paddingTop: StatusBar.currentHeight,
+  },
+  scrollViewIndividual: {
+    position:"absolute",
+    top: height * 0.2,
+    left: width * 0.05,
+    backgroundColor: color.primaryDark,
+    marginHorizontal: 20,
+  },
+  scrollViewTeam: {
+    position:"absolute",
+    top: height * 0.65,
+    left: width * 0.05,
+    backgroundColor: color.primaryDark,
+    marginHorizontal: 20,
+  },
+  text: {
+    fontSize: 42,
   },
 });
 export default Badges;

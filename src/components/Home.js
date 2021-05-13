@@ -78,8 +78,8 @@ const Home = ({ navigation }) => {
         containerStyle={styles.friendsButtonContianer}
         buttonStyle={styles.friendsButton}
         onPress={() => {
-          //navigation.navigate("Friends");
-          auth().signOut();
+          navigation.navigate("Friends");
+          //auth().signOut();
         }}
         icon={
           <Icon

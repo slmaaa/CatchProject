@@ -9,6 +9,8 @@ import {
   TouchableHighlight,
   FlatList,
   SectionList,
+  StatusBar,
+  ScrollView,
 } from "react-native";
 import {
   Overlay,
@@ -137,54 +139,17 @@ const HistoryPage = ({ navigation }) => {
   };
   return (
     <SafeAreaView container={styles.container}>
-      <Overlay
-        isVisible={creating}
-        overlayStyle={{ width: "80%", borderRadius: 30 }}
-      >
-        <Text style={styles.creatingText}>Creating...</Text>
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-            margin: 5,
-          }}
-        >
-          <Progress.CircleSnail
-            indeterminate
-            size={100}
-            thickness={7}
-            color={[color.teamRed, color.teamBlue]}
-          />
-        </View>
-      </Overlay>
-      <Overlay
-        isVisible={joinOverlayVisible}
-        onBackdropPress={() => setJoinOverlayVisible(false)}
-        overlayStyle={{ width: "80%" }}
-      >
-        <Input placeholder="Enter room ID" onChangeText={setRoomID} />
-        <Button title={"Join"} onPress={handleOnPressJoin} />
-      </Overlay>
+      <View style={styles.headerContainer}>
+        <Text style={styles.header}>History</Text>
+      </View>
+      
       <Button
         containerStyle={styles.backButtonContainer}
         buttonStyle={styles.backButton}
         onPress={() => navigation.goBack()}
         icon={<Icon name="arrow-back" type={"material"} color={"white"} />}
       />
-
-      <SectionList
-        style={styles.listContainer}
-        sections={list}
-        keyExtractor={(item, index) => item + index}
-        renderItem={({ item }) => <Item title={item} />}
-        renderSectionHeader={({ section: { title } }) => (
-          <>
-            <Text style={styles.header}>{title}</Text>
-            <Divider style={{ backgroundColor: color.grey }} />
-          </>
-        )}
-      />
+      
     </SafeAreaView>
   );
 };
@@ -233,14 +198,35 @@ const styles = StyleSheet.create({
     height: height * 0.085,
   },
   header: {
-    fontSize: 16,
+    fontSize: 36,
     fontWeight: "700",
+  },
+  headerContainer:{
+    position:"absolute",
+    top: height * 0.07,
+    left: width * 0.05,
+    color: color.brown,
+    alignSelf: "flex-end",
+    alignItems: "center",
+    justifyContent: "center",
+    margin: 5,
   },
   creatingText: {
     fontSize: 22,
     fontWeight: "700",
     textAlign: "center",
     margin: 5,
+  },
+  scrollContainer: {
+    flex: 1,
+    paddingTop: StatusBar.currentHeight,
+  },
+  scrollView: {
+    backgroundColor: 'pink',
+    marginHorizontal: 20,
+  },
+  text: {
+    fontSize: 42,
   },
 });
 export default HistoryPage;

@@ -56,7 +56,10 @@ const Friends = ({ navigation }) => {
   
   return (
     <SafeAreaView container={styles.container}>
-
+      <View style={styles.headerContainer}>
+        <Text style={styles.header}>Friends</Text>
+      </View>
+      
       <Button
         containerStyle={styles.backButtonContainer}
         buttonStyle={styles.backButton}
@@ -71,7 +74,6 @@ const Friends = ({ navigation }) => {
         renderItem={({ item }) => <Item title={item} />}
         renderSectionHeader={({ section: { title } }) => (
           <>
-            <Text style={styles.header}>{title}</Text>
             <Divider style={{ backgroundColor: color.grey }} />
           </>
         )}
@@ -142,8 +144,18 @@ const styles = StyleSheet.create({
     height: height * 0.085,
   },
   header: {
-    fontSize: 16,
+    fontSize: 36,
     fontWeight: "700",
+  },
+  headerContainer:{
+    position:"absolute",
+    top: height * 0.07,
+    left: width * 0.05,
+    color: color.brown,
+    alignSelf: "flex-end",
+    alignItems: "center",
+    justifyContent: "center",
+    margin: 5,
   },
   creatingText: {
     fontSize: 22,

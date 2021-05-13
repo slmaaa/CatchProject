@@ -15,7 +15,7 @@ import {
   Platform,
 } from "react-native";
 
-import logoImage from "./image/IMG_4059.jpg";
+import logoImage from "./image/Logo-white.png";
 import { color } from "../constants";
 import { Icon } from "react-native-elements";
 
@@ -190,10 +190,10 @@ const styles = StyleSheet.create({
   },
   signUp: {
     flex: 0.2,
-    fontSize: 14,
-    lineHeight: 24,
+    fontSize: 11,
+    lineHeight: 14,
     color: color.signUpBlue,
-    marginHorizontal: 110,
+    marginHorizontal: 105,
   },
 });
 
