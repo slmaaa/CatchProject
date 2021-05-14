@@ -12,7 +12,6 @@ import {
 } from "react-native";
 
 import MapboxGL from "@react-native-mapbox-gl/maps";
-import mapboxgl from "mapbox-gl/dist/mapbox-gl-csp";
 const accessToken =
   "pk.eyJ1IjoicmFzaGlkdGhlZGV2ZWxvcGVyIiwiYSI6ImNrYXBncGlwdjBjbG4yd3FqaXl2ams1NHQifQ.jvRoapH6Ae7QHb8Kx4z9FQ";
 MapboxGL.setAccessToken(accessToken);
@@ -22,11 +21,11 @@ import Icon from "react-native-vector-icons/FontAwesome5";
 import Icon2 from "react-native-vector-icons/MaterialCommunityIcons";
 import Icon3 from "react-native-vector-icons/MaterialIcons";
 import Icon4 from "react-native-vector-icons/Ionicons";
+import MMKVStorage from "react-native-mmkv-storage";
 import * as Progress from "react-native-progress";
 import { color } from "../constants";
-
-var { height, width } = Dimensions.get("window");
-
+const { height, width } = Dimensions.get("window");
+const MMKV = new MMKVStorage.Loader().initialize();
 const App = ({ navigation }) => {
   const [route, setRoute] = useState(null);
   const [ModalOpen, setModalOpen] = useState(false);
@@ -36,33 +35,24 @@ const App = ({ navigation }) => {
     { coordinates: [114.2655, 22.3364] },
     { coordinates: [114.2645, 22.3344] },
   ]); //from serve
-
-  var timespend = 26; // time of the game from serve
-  var distance = 0;
+  const selectedHistory = MMKV.getMap("selectedHistory");
   let featureCollection = [
     {
       type: "Feature",
       properties: { color: "red" },
       geometry: {
         type: "LineString",
-        coordinates: [
-          [114.2635, 22.3372],
-          [114.2655, 22.3364],
-          [114.2645, 22.3344],
-        ],
+        coordinates: selectedHistory.locationRecord,
       },
     },
   ];
 
   const modalslideone = () => {
-    for (let i = 0; i < addcor.length - 1; i++) {
-      distance =
-        distance +
-        getDistance(addcor[i].coordinates, addcor[i + 1].coordinates);
-    }
-    distance = distance / 1000;
-    var speed = 0;
-    speed = parseInt(timespend / distance);
+    const distance = selectedHistory.distance / 1000;
+    const timeSpent = Math.round(
+      (selectedHistory.endTime - selectedHistory.startTime) / 60
+    );
+    const speed = parseInt(timeSpent / distance);
     return (
       <View style={styles.slide1}>
         <Icon name="running" size={50} color="yellow" />
@@ -75,13 +65,15 @@ const App = ({ navigation }) => {
         <Text style={styles.text}> </Text>
         <Icon2 name="timer-outline" size={50} color="green" />
         <Text style={styles.text2}>Time used</Text>
-        <Text style={styles.text}>{timespend} minutes</Text>
+        <Text style={styles.text}>{timeSpent} minutes</Text>
       </View>
     );
   };
   const modalslidetwo = () => {
-    var calburn = parseFloat((distance / 1.632) * 100).toFixed(2);
-    var fatburn = parseFloat((calburn / 3500) * 453.592).toFixed(2);
+    const calburn = parseFloat(
+      (selectedHistory.distance / 1.632) * 100
+    ).toFixed(2);
+    const fatburn = parseFloat((calburn / 3500) * 453.592).toFixed(2);
     return (
       <View style={styles.slide1}>
         <Icon name="fire" size={50} color="red" />

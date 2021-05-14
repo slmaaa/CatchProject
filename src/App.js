@@ -18,6 +18,7 @@ import Riddle from "./components/InGame/Riddle";
 import Sudoku from "./components/InGame/Sudoku";
 import CreateGame from "./components/CreateGame";
 import Waiting from "./components/Waiting";
+import SelectHistory from "./components/SelectHistory";
 import LoadingHome from "./components/LoadingHome";
 import setmap from "./components/setmap";
 import Maths from "./components/InGame/Math";
@@ -27,6 +28,7 @@ import JoinOrCreate from "./components/joinOrCreate";
 import PrepareRoom from "./components/PrepareRoom";
 import { color } from "./constants";
 import GaveOverScreen from "./components/GameOverScreen";
+import SelectHistory from "./components/SelectHistory";
 [];
 const MMKV = new MMKVStorage.Loader().initialize();
 const Stack = createStackNavigator();
@@ -144,11 +146,7 @@ const App = () => {
               name="history"
               component={history}
               options={{
-                headerLeft: null,
-                title: "History",
-                headerStyle: {
-                  backgroundColor: color.blueOnBlack,
-                },
+                headerShown: false,
               }}
             />
             <Stack.Screen
@@ -168,6 +166,13 @@ const App = () => {
             <Stack.Screen
               name="Friends"
               component={Friends}
+              options={{
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="SelectHistory"
+              component={SelectHistory}
               options={{
                 headerShown: false,
               }}

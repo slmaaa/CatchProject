@@ -3,6 +3,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { getDistance } from "geolib";
 import * as Progress from "react-native-progress";
 import MapboxGL from "@react-native-mapbox-gl/maps";
+const MMKV = new MMKVStorage.Loader().initialize();
 import RNLocation, { Location } from "react-native-location";
 import database from "@react-native-firebase/database";
 import GeoJSON from "geojson";
@@ -327,7 +328,7 @@ const InGame = ({ navigation, route }) => {
             MMKV.setString("pointMVP", endStats.pointMVP.toString());
             MMKV.setString("distMVP", endStats.distMVP.toString());
             database()
-              .ref("users/" + authData.user.uid + "/gameRecord")
+              .ref("users/" + MMKV.getString("userID") + "/gameRecord")
               .push({
                 gameID: gameRef.current.gid,
                 locationRecord: locationRecord.current,
