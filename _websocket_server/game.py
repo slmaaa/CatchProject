@@ -6,12 +6,13 @@ import random
 
 
 class Game:
-    def __init__(self, gid, gname, status, hostID, hostName, checkpoints: [Checkpoint] = None, players: [Player] = None,
+    def __init__(self, gid, gname, status, hostID, hostName, hostAvatar, checkpoints: [Checkpoint] = None, players: [Player] = None,
                  teams: [str] = None, min_players=6, max_players=20, startTime=None, endTime=None, capturedCount=None, unCapturedCount=None, winTeam=None, statsCount=0):
         self.gid = gid
         self.gname = gname
         self.hostID = hostID
         self.hostName = hostName
+        self.hostAvatar = hostAvatar
         self.status = status
         self.checkpoints = checkpoints or []
         self.players = players or []
@@ -27,7 +28,7 @@ class Game:
 
     def to_dict(self):
         return {"gid": self.gid, "gname": self.gname, "status": self.status,
-                "hostID": self.hostID, "hostName": self.hostName,
+                "hostID": self.hostID, "hostName": self.hostName, "hostAvatar": self.hostAvatar,
                 "checkpoints": [checkpoint.to_dict() for checkpoint in self.checkpoints],
                 "players": [player.to_dict() for player in self.players], "teams": self.teams,
                 "min_players": self.min_players, "max_players": self.max_players,
@@ -52,13 +53,16 @@ class Game:
         for team in self.teams:
             for cp in self.checkpoints:
                 cp.level[team] = 0
+        self.unCapturedCount = len(self.checkpoints)
         self.startTime = now()
         self.status = "RUNNING"
 
     def incrementLevel(self, cid, team):
         self.checkpoints[cid].level[team] += 1
+        message = team+" team gets a point in "+self.checkpoints[cid].name
         if(self.checkpoints[cid].level[team] == self.checkpoints[cid].maxLevel):
             self.checkpoints[cid].capturedBy = team
+            message = team+" captured " + self.checkpoints[cid].name
             self.capturedCount[team] += 1
             self.unCapturedCount -= 1
             otherTeams = [x for x in self.teams if x != team]
@@ -76,7 +80,7 @@ class Game:
             cpsLevel.append(cp.level)
             cpsCaptured.append(cp.capturedBy)
         self.keyInfo = {"status": self.status,
-                        "cpsLevel": cpsLevel, "cpsCaptured": cpsCaptured}
+                        "cpsLevel": cpsLevel, "cpsCaptured": cpsCaptured, "message": [message, team]}
 
     def setPlayerStats(self, key, points, dist):
         self.players[key].points = int(points)
@@ -109,6 +113,7 @@ class Game:
             "status", None)
         hostID = _dict["hostID"]
         hostName = _dict["hostName"]
+        hostAvatar = _dict["hostAvatar"]
         checkpoints = [Checkpoint.from_dict(cp) for cp in _dict["checkpoints"]]
         players = [Player.from_dict(player)
                    for player in _dict.get("players", [])]
@@ -127,7 +132,7 @@ class Game:
         winTeam = _dict.get(
             "winTeam", None)
         statsCount = dict.get(_dict, "statsCount", 0)
-        return Game(gid, gname, status, hostID, hostName, checkpoints,
+        return Game(gid, gname, status, hostID, hostName, hostAvatar, checkpoints,
                     players, teams, min_players, max_players, startTime, endTime, capturedCount, unCapturedCount, winTeam, statsCount)
 
     @ staticmethod
@@ -138,6 +143,7 @@ class Game:
             "status", None)
         hostID = _dict["hostID"]
         hostName = _dict["hostName"]
+        hostAvatar = _dict["hostAvatar"]
         checkpoints = []
         players = [Player.from_dict(player)
                    for player in _dict.get("players", [])]
@@ -147,12 +153,12 @@ class Game:
         startTime = None
         endTime = None
         capturedCount = dict()
+        unCapturedCount = 0
         for team in teams:
             capturedCount[team] = 0
             for cp in checkpoints:
                 cp.level[team] = 0
-        unCapturedCount = len(checkpoints)
         winTeam = _dict.get(
             "winTeam", None)
-        return Game(gid, gname, status, hostID, hostName, checkpoints,
+        return Game(gid, gname, status, hostID, hostName, hostAvatar, checkpoints,
                     players, teams, min_players, max_players, startTime, endTime, capturedCount, unCapturedCount, winTeam)

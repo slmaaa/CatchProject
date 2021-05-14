@@ -4,43 +4,25 @@ import {
   SafeAreaView,
   StyleSheet,
   View,
-  Image,
   Dimensions,
-  TouchableHighlight,
-  FlatList,
-  SectionList,
   StatusBar,
   ScrollView,
 } from "react-native";
-import {
-  Overlay,
-  Input,
-  Button,
-  ListItem,
-  Divider,
-  Avatar,
-  Icon,
-} from "react-native-elements";
-import * as Progress from "react-native-progress";
+import { Button, Icon } from "react-native-elements";
 import MMKVStorage from "react-native-mmkv-storage";
-import documentOnePage24Regular from "@iconify/icons-fluent/document-one-page-24-regular";
 import database from "@react-native-firebase/database";
-import { join } from "./joinOrCreate";
-import { URL } from "../constants.json";
 import { wsSend } from "../App";
 import { color } from "../constants";
-import Medal1 from "/Users/zhongyueguan/CatchProject/src/components/medals/military-medal.svg";
-import Medal2 from "/Users/zhongyueguan/CatchProject/src/components/medals/military-medal-2.svg";
-import Medal3 from "/Users/zhongyueguan/CatchProject/src/components/medals/military-medal-3.svg";
-import Medal4 from "/Users/zhongyueguan/CatchProject/src/components/medals/military-medal-4.svg";
-import Medal5 from "/Users/zhongyueguan/CatchProject/src/components/medals/1st-place-medal.svg";
-import Medal6 from "/Users/zhongyueguan/CatchProject/src/components/medals/sports-medal.svg";
+import Medal1 from "./medals/military-medal.svg";
+import Medal2 from "./medals/military-medal-2.svg";
+import Medal3 from "./medals/military-medal-3.svg";
+import Medal4 from "./medals/military-medal-4.svg";
+import Medal5 from "./medals/1st-place-medal.svg";
+import Medal6 from "./medals/sports-medal.svg";
 const MMKV = new MMKVStorage.Loader().initialize();
 
 var { height, width } = Dimensions.get("window");
 const Badges = ({ navigation }) => {
-  const [initializing, setInitializing] = useState(true);
-  const [joinOverlayVisible, setJoinOverlayVisible] = useState(false);
   const [roomID, setRoomID] = useState();
   const [creating, setCreating] = useState(false);
   const friends = [];
@@ -144,7 +126,6 @@ const Badges = ({ navigation }) => {
   };
   return (
     <SafeAreaView container={styles.container}>
-
       <View style={styles.headerContainer}>
         <Text style={styles.header}>Badges</Text>
       </View>
@@ -161,44 +142,41 @@ const Badges = ({ navigation }) => {
       </View>
       <ScrollView style={styles.scrollViewIndividual} horizontal={true}>
         <View>
-          <Medal1 width = {100} height = {100} />
+          <Medal1 width={100} height={100} />
           <Text>Distance(0/500m)</Text>
         </View>
-        
+
         <View>
-          <Medal2 width = {100} height = {100} />
-          <Text>    Riddles(0/2)</Text>
+          <Medal2 width={100} height={100} />
+          <Text> Riddles(0/2)</Text>
         </View>
-        
+
         <View>
-          <Medal3 width = {100} height = {100} />
-          <Text>  Smartest(0/1)</Text>
+          <Medal3 width={100} height={100} />
+          <Text> Smartest(0/1)</Text>
         </View>
-        
+
         <View>
-          <Medal4 width = {100} height = {100} />
-          <Text>   Sportest(0/1)</Text>
+          <Medal4 width={100} height={100} />
+          <Text> Sportest(0/1)</Text>
         </View>
-        
       </ScrollView>
-      
+
       <View style={styles.teamContainer}>
         <Text style={styles.normalText}>Team</Text>
       </View>
 
       <ScrollView style={styles.scrollViewTeam} horizontal={true}>
         <View style={styles.container}>
-          <Medal5 width = {100} height = {100} />
-          <Text>      Win(0/1)</Text>
+          <Medal5 width={100} height={100} />
+          <Text> Win(0/1)</Text>
         </View>
 
         <View>
-          <Medal6 width = {100} height = {100} />
-          <Text>      Win(0/3)</Text>
+          <Medal6 width={100} height={100} />
+          <Text> Win(0/3)</Text>
         </View>
-        
       </ScrollView>
-
     </SafeAreaView>
   );
 };
@@ -230,7 +208,7 @@ const styles = StyleSheet.create({
     height: height / 15,
   },
   createButtonContianer: {
-    position:"absolute",
+    position: "absolute",
     top: height * 0.85,
     left: width * 0.8,
     alignSelf: "flex-end",
@@ -253,8 +231,8 @@ const styles = StyleSheet.create({
     fontSize: 36,
     fontWeight: "700",
   },
-  headerContainer:{
-    position:"absolute",
+  headerContainer: {
+    position: "absolute",
     top: height * 0.07,
     left: width * 0.05,
     color: color.brown,
@@ -263,8 +241,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     margin: 5,
   },
-  individualContainer:{
-    position:"absolute",
+  individualContainer: {
+    position: "absolute",
     top: height * 0.15,
     left: width * 0.05,
     color: color.brown,
@@ -273,8 +251,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     margin: 5,
   },
-  teamContainer:{
-    position:"absolute",
+  teamContainer: {
+    position: "absolute",
     top: height * 0.5,
     left: width * 0.05,
     color: color.brown,
@@ -294,14 +272,14 @@ const styles = StyleSheet.create({
     paddingTop: StatusBar.currentHeight,
   },
   scrollViewIndividual: {
-    position:"absolute",
+    position: "absolute",
     top: height * 0.22,
     left: width * 0.05,
     backgroundColor: color.primaryDark,
     marginHorizontal: 20,
   },
   scrollViewTeam: {
-    position:"absolute",
+    position: "absolute",
     top: height * 0.57,
     left: width * 0.05,
     backgroundColor: color.primaryDark,

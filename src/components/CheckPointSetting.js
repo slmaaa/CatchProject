@@ -12,6 +12,8 @@ import MMKVStorage from "react-native-mmkv-storage";
 import RNLocation, { Location } from "react-native-location";
 import { color } from "../constants.json";
 const { height, width } = Dimensions.get("window");
+const tooCloseDistance = 25;
+
 const CheckPointSetting = ({ navigation }) => {
   const MMKV = new MMKVStorage.Loader().initialize();
   MMKV.setBool("cpsSaved", false);
@@ -19,7 +21,7 @@ const CheckPointSetting = ({ navigation }) => {
   const [checkpointsCoor, setCheckpointsCoor] = useState([]);
   const [infoToServe, setInfoToServe] = useState([]);
   const [radius, setRadius] = useState(15);
-  const [checkpointpower, setcheckpointpower] = useState(1);
+  const [checkpointpower, setcheckpointpower] = useState(4);
   const [saving, setSaving] = useState(false);
   const [tooCloseAlertVisible, setTooCloseAlertVisible] = useState(false);
   const [cpNumberWarningVisible, setCPNumberWaringVisible] = useState(false);
@@ -27,7 +29,9 @@ const CheckPointSetting = ({ navigation }) => {
   const cpsRef = useRef([]);
   const numberOfPlayers = MMKV.getMap("joinedGame").players.length;
   const recommendedNumOfCPs =
-    (numberOfPlayers / 2) % 2 === 0 ? numberOfPlayers + 1 : numberOfPlayers;
+    (numberOfPlayers / 2) % 2 === 0
+      ? numberOfPlayers / 2 + 1
+      : numberOfPlayers / 2;
   useEffect(() => {
     let unsub;
     RNLocation.configure({
@@ -80,7 +84,7 @@ const CheckPointSetting = ({ navigation }) => {
     mapRef.current.getCenter().then((mapCenter) => {
       let tooClose = false;
       checkpointsCoor.map((val) => {
-        if (getDistance(val, mapCenter) < 100) tooClose = true;
+        if (getDistance(val, mapCenter) < tooCloseDistance) tooClose = true;
       });
       if (tooClose) {
         setTooCloseAlertVisible(true);

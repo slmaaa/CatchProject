@@ -21,10 +21,6 @@ import {
 } from "react-native-elements";
 import * as Progress from "react-native-progress";
 import MMKVStorage from "react-native-mmkv-storage";
-import database from "@react-native-firebase/database";
-import { join } from "./joinOrCreate";
-import { URL } from "../constants.json";
-import { wsSend } from "../App";
 import { color } from "../constants";
 
 const MMKV = new MMKVStorage.Loader().initialize();
@@ -52,14 +48,13 @@ const Friends = ({ navigation }) => {
       <Text style={styles.title}>{title}</Text>
     </View>
   );
-  
+
   return (
     <SafeAreaView container={styles.container}>
       <View style={styles.headerContainer}>
         <Text style={styles.header}>Friends</Text>
       </View>
-      
-      
+
       <Button
         containerStyle={styles.backButtonContainer}
         buttonStyle={styles.backButton}
@@ -124,7 +119,7 @@ const styles = StyleSheet.create({
     height: height / 15,
   },
   createButtonContianer: {
-    position:"absolute",
+    position: "absolute",
     top: height * 0.85,
     left: width * 0.8,
     alignSelf: "flex-end",
@@ -147,8 +142,8 @@ const styles = StyleSheet.create({
     fontSize: 36,
     fontWeight: "700",
   },
-  headerContainer:{
-    position:"absolute",
+  headerContainer: {
+    position: "absolute",
     top: height * 0.07,
     left: width * 0.05,
     color: color.brown,

@@ -1,30 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Text,
   SafeAreaView,
   StyleSheet,
   View,
-  Image,
   Dimensions,
-  TouchableHighlight,
-  FlatList,
   SectionList,
 } from "react-native";
-import {
-  Overlay,
-  Input,
-  Button,
-  ListItem,
-  Divider,
-  Avatar,
-  Icon,
-} from "react-native-elements";
+import { Overlay, Input, Button, Divider, Icon } from "react-native-elements";
 import * as Progress from "react-native-progress";
 import MMKVStorage from "react-native-mmkv-storage";
-import documentOnePage24Regular from "@iconify/icons-fluent/document-one-page-24-regular";
 import database from "@react-native-firebase/database";
-import { join } from "./joinOrCreate";
-import { URL } from "../constants.json";
 import { wsSend } from "../App";
 import { color } from "../constants";
 
@@ -32,7 +18,6 @@ const MMKV = new MMKVStorage.Loader().initialize();
 
 var { height, width } = Dimensions.get("window");
 const JoinOrCreate = ({ navigation }) => {
-  const [initializing, setInitializing] = useState(true);
   const [joinOverlayVisible, setJoinOverlayVisible] = useState(false);
   const [roomID, setRoomID] = useState();
   const [creating, setCreating] = useState(false);
@@ -68,6 +53,7 @@ const JoinOrCreate = ({ navigation }) => {
       status: "WAITING",
       hostID: MMKV.getString("userID"),
       hostName: MMKV.getString("userName"),
+      hostAvatar: MMKV.getString("userAvatar"),
       players: [
         {
           pid: MMKV.getString("userID"),
@@ -163,7 +149,11 @@ const JoinOrCreate = ({ navigation }) => {
         onBackdropPress={() => setJoinOverlayVisible(false)}
         overlayStyle={{ width: "80%" }}
       >
-        <Input placeholder="Enter room ID" onChangeText={setRoomID} />
+        <Input
+          placeholder="Enter room ID"
+          onChangeText={setRoomID}
+          keyboardType={"numeric"}
+        />
         <Button title={"Join"} onPress={handleOnPressJoin} />
       </Overlay>
       <Button
@@ -223,7 +213,7 @@ const styles = StyleSheet.create({
   backButtonContainer: {
     position: "absolute",
     top: height * 0.06,
-    right: width / 12,
+    left: width * 0.8,
     color: color.brown,
     alignItems: "center",
     justifyContent: "center",

@@ -6,6 +6,7 @@ import MapboxGL from "@react-native-mapbox-gl/maps";
 import RNLocation, { Location } from "react-native-location";
 import database from "@react-native-firebase/database";
 import GeoJSON from "geojson";
+
 MapboxGL.setAccessToken(
   "pk.eyJ1IjoiaGVjdG9yY2hjaCIsImEiOiJja205YmhldXUwdHQ1Mm9xbGw4N2RodndhIn0.yX90QKE2jcgG-7V5wOGXeQ"
 );
@@ -14,6 +15,8 @@ import {
   View,
   Dimensions,
   Vibration,
+  Modal,
+  Image,
   SafeAreaView,
   StatusBar,
   StyleSheet,
@@ -26,7 +29,6 @@ import { wsSend } from "../../App";
 import { color } from "../../constants.json";
 import { Button, Overlay, Icon } from "react-native-elements";
 import { useFocusEffect } from "@react-navigation/core";
-import { makeMutable } from "react-native-reanimated";
 
 const { height, width } = Dimensions.get("window");
 
@@ -41,60 +43,111 @@ const InGame = ({ navigation, route }) => {
     false
   );
   const [challengesSolved, setChallengesSolved] = useState(0);
+  const [notificationText, setNotificationText] = useState("");
   const distanceTravelled = useRef(0);
   const [distanceCovered, setDistanceCovered] = useState(0);
   const [currentCID, setCurrentCID] = useState(-1); //Current checkpoint id. -1 if not in any checkpoints
+  const [modalVisible, setModalVisible] = useState(false);
   const locationRecord = useRef([]);
   const mapRef = useRef();
+  const messageRef = useRef([]);
   const gameRef = useRef({
     game: null,
     team: null,
     checkpointsLocation: null,
     numberOfCheckpoints: null,
+    checkpointsCaptured: [],
   });
   const renderCheckpointsOnMap = () => {
     let cpRenderList = [];
     for (let i = 0; i < gameRef.current.numberOfCheckpoints; i++) {
-      cpRenderList.push(
-        <>
-          <MapboxGL.MarkerView
-            id={"CP" + i}
-            key={i + "m"}
-            coordinate={[
-              gameRef.current.checkpointsLocation[i].longitude,
-              gameRef.current.checkpointsLocation[i].latitude,
-            ]}
-          >
-            <View
-              style={{ width: 50, height: 100, backgroundColor: "#FFFFFF00" }}
+      gameRef.current.checkpointsCaptured[i] === null
+        ? cpRenderList.push(
+            <>
+              <MapboxGL.MarkerView
+                id={"CP" + i}
+                key={i + "m"}
+                coordinate={[
+                  gameRef.current.checkpointsLocation[i].longitude,
+                  gameRef.current.checkpointsLocation[i].latitude,
+                ]}
+              >
+                <View
+                  style={{
+                    width: 50,
+                    height: 100,
+                    backgroundColor: "#FFFFFF00",
+                  }}
+                >
+                  <Progress.Bar
+                    progress={
+                      gameRef.current.game.checkpoints[i].level.BLUE /
+                      gameRef.current.game.checkpoints[i].maxLevel
+                    }
+                    color={color.teamBlue}
+                    width={50}
+                  />
+                  <Progress.Bar
+                    progress={
+                      gameRef.current.game.checkpoints[i].level.RED /
+                      gameRef.current.game.checkpoints[i].maxLevel
+                    }
+                    width={50}
+                    color={color.teamRed}
+                  />
+                </View>
+              </MapboxGL.MarkerView>
+              <MapboxGL.PointAnnotation
+                id={"CP" + i}
+                key={i + "p"}
+                coordinate={[
+                  gameRef.current.checkpointsLocation[i].longitude,
+                  gameRef.current.checkpointsLocation[i].latitude,
+                ]}
+              />
+            </>
+          )
+        : gameRef.current.checkpointsCaptured[i] === "BLUE"
+        ? cpRenderList.push(
+            <MapboxGL.PointAnnotation
+              id={"CP" + i}
+              key={i + "p"}
+              coordinate={[
+                gameRef.current.checkpointsLocation[i].longitude,
+                gameRef.current.checkpointsLocation[i].latitude,
+              ]}
             >
-              <Progress.Bar
-                progress={
-                  gameRef.current.game.checkpoints[i].level.BLUE /
-                  gameRef.current.game.checkpoints[i].maxLevel
-                }
-                width={50}
-              />
-              <Progress.Bar
-                progress={
-                  gameRef.current.game.checkpoints[i].level.RED /
-                  gameRef.current.game.checkpoints[i].maxLevel
-                }
-                width={50}
-                color={"red"}
-              />
-            </View>
-          </MapboxGL.MarkerView>
-          <MapboxGL.PointAnnotation
-            id={"CP" + i}
-            key={i + "p"}
-            coordinate={[
-              gameRef.current.checkpointsLocation[i].longitude,
-              gameRef.current.checkpointsLocation[i].latitude,
-            ]}
-          />
-        </>
-      );
+              <View
+                style={{
+                  height: 50,
+                  width: 50,
+                  backgroundColor: "#00000000",
+                }}
+              >
+                <Image source={require("../../../assets/img/blue-flag.png")} />
+              </View>
+            </MapboxGL.PointAnnotation>
+          )
+        : cpRenderList.push(
+            <MapboxGL.PointAnnotation
+              id={"CP" + i}
+              key={i + "p"}
+              coordinate={[
+                gameRef.current.checkpointsLocation[i].longitude,
+                gameRef.current.checkpointsLocation[i].latitude,
+              ]}
+            >
+              <View
+                style={{
+                  height: 50,
+                  width: 50,
+                  backgroundColor: "#00000000",
+                }}
+              >
+                <Image source={require("../../../assets/img/red-flag.png")} />
+              </View>
+            </MapboxGL.PointAnnotation>
+          );
     }
     return cpRenderList;
   };
@@ -110,6 +163,7 @@ const InGame = ({ navigation, route }) => {
         latitude: val.area.center.lat,
         longitude: val.area.center.lng,
       });
+      gameRef.current.checkpointsCaptured.push(null);
       coolDowns.push(-1);
     });
     gameRef.current.checkpointsLocation = checkpointsLocation;
@@ -208,15 +262,21 @@ const InGame = ({ navigation, route }) => {
 
   useEffect(() => {
     if (gameRef.current.game.status === "OVER") return;
-    if (currentCID !== -1) {
+    if (currentCID === -1) {
+      navigation.navigate("InGame");
+      return;
+    }
+    if (gameRef.current.checkpointsCaptured[currentCID] === null) {
       navigation.navigate("Maths", {
         cpName: gameRef.current.game.checkpoints[currentCID].name,
         gid: gameRef.current.game.gid,
         team: gameRef.current.team,
         cid: currentCID,
       });
+    } else {
+      navigation.navigate("InGame");
     }
-  }, [currentCID]);
+  }, [currentCID, gameRef.current]);
 
   useInterval(() => {
     setDistanceCovered(distanceTravelled.current);
@@ -234,7 +294,14 @@ const InGame = ({ navigation, route }) => {
         gameRef.current.game.checkpoints[i].level =
           gameInfo.current.cpsLevel[i];
       }
+      gameRef.current.checkpointsCaptured = gameInfo.current.cpsCaptured;
+      let list = messageRef.current;
+      list.push();
+      list.push(gameInfo.current.message);
+      messageRef.current = list;
       MMKV.setMap("joinedGame", gameRef.current.game);
+      gameInfo.current = null;
+      MMKV.setMap("gameInfo", null);
       if (gameRef.current.game.status === "OVER") {
         setGameOverAccountingVisible(true);
         wsSend(
@@ -280,6 +347,12 @@ const InGame = ({ navigation, route }) => {
     }, [gameInfo.current])
   );
 
+  useEffect(() => {
+    if (modalVisible || messageRef.current.length === 0) return;
+    setNotificationText(messageRef.current.shift());
+    setModalVisible(true);
+  });
+
   useFocusEffect(() => {
     setChallengesSolved(MMKV.getInt("challengesSolved"));
   });
@@ -290,6 +363,31 @@ const InGame = ({ navigation, route }) => {
       <>
         <StatusBar barStyle="dark-content" />
         <SafeAreaView style={styles.container}>
+          <Modal
+            animationType={"fade"}
+            transparent
+            visible={modalVisible}
+            onShow={() => {
+              setTimeout(() => {
+                setModalVisible(false);
+              }, 3000);
+            }}
+          >
+            <View
+              style={[
+                styles.notificationContainer,
+                {
+                  borderBottomWidth: 5,
+                  borderColor:
+                    notificationText[1] === "BLUE"
+                      ? color.teamBlue
+                      : color.teamRed,
+                },
+              ]}
+            >
+              <Text style={styles.notificationText}>{notificationText[0]}</Text>
+            </View>
+          </Modal>
           <Overlay
             isVisible={gameOverAccountingVisible}
             overlayStyle={{ width: "80%", borderRadius: 30 }}
@@ -344,7 +442,10 @@ const InGame = ({ navigation, route }) => {
             ]}
           >
             <View style={styles.profilePictureContainer}>
-              <Image source={{ uri: MMKV.getString("userAvatar") }} />
+              <Image
+                style={styles.headerPlayerAvatar}
+                source={{ uri: MMKV.getString("userAvatar") }}
+              />
             </View>
             <Text style={[styles.playerStatsText, { textAlign: "left" }]}>
               {MMKV.getString("userName")}
@@ -357,10 +458,16 @@ const InGame = ({ navigation, route }) => {
             </Text>
           </View>
           <Button
-            disabled={currentCID != -1 ? false : true}
+            disabled={
+              currentCID != -1
+                ? false
+                : gameRef.current.checkpointsCaptured[currentCID] === null
+                ? true
+                : false
+            }
             icon={
               <Icon
-                name="plus"
+                name="circle-edit-outline"
                 type={"material-community"}
                 color={"white"}
                 size={height / 15}
@@ -391,6 +498,8 @@ const styles = StyleSheet.create({
     backgroundColor: "black",
   },
   notificationContainer: {
+    position: "absolute",
+    left: "10%",
     width: "80%",
     backgroundColor: "#D32F2F",
     borderRadius: 10,
@@ -411,11 +520,24 @@ const styles = StyleSheet.create({
   map: {
     flex: 1,
   },
+  notificationContainer: {
+    width: "80%",
+    backgroundColor: "white",
+    borderRadius: 10,
+    height: "8%",
+    justifyContent: "center",
+    alignSelf: "center",
+  },
+  notificationText: {
+    color: "black",
+    textAlign: "center",
+    textAlignVertical: "center",
+  },
   playerStatsBar: {
     position: "absolute",
     width: "60%",
-    top: 30,
-    height: "8%",
+    top: height * 0.03,
+    height: height * 0.1,
     borderTopLeftRadius: 50,
     borderBottomLeftRadius: 50,
     right: 0,
@@ -425,11 +547,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexDirection: "row",
   },
-  profilePictureContainer: {
-    marginHorizontal: 5,
-    borderRadius: 40,
-    width: 45,
-    height: 45,
+  headerPlayerAvatar: {
+    borderRadius: height / 30,
+    height: height / 15,
+    width: height / 15,
+    marginHorizontal: height / 60,
   },
   playerStatsText: {
     fontSize: 13,
