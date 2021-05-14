@@ -337,6 +337,15 @@ export default GameOverScreen = ({ navigation }) => {
               navigation.replace("Home");
             }}
           ></Button>
+          <Button
+            title={"Record"}
+            containerStyle={styles.button}
+            titleStyle={{ color: "white", fontSize: 24 }}
+            buttonStyle={{ backgroundColor: color.brown }}
+            onPress={() => {
+              navigation.replace("SelectHistory");
+            }}
+          ></Button>
         </>
       </View>
     );
@@ -354,7 +363,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     marginTop: height * 0.08,
     paddingRight: 40,
-    marginBottom: height * 0.1-50,
+    marginBottom: height * 0.1 - 50,
     borderBottomRightRadius: height / 20,
     borderTopRightRadius: height / 20,
     backgroundColor: "#00000080",
@@ -376,14 +385,14 @@ const styles = StyleSheet.create({
     marginHorizontal: height / 80,
   },
   playersListContainer: {
-    height: height/2,
+    height: height / 2,
   },
   playerListRowConatiner: {
-    paddingTop:50,
+    paddingTop: 50,
     height: height / 8,
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingBottom:50,
+    paddingBottom: 50,
   },
   LeftPlayer: {
     width: width * 0.4,

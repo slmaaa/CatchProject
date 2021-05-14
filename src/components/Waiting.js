@@ -63,9 +63,9 @@ export default Waiting = ({ navigation }) => {
       game.status = roomInfo.status;
       status.current = roomInfo.status;
       setGame(game);
-      MMKV.setMap("joinedGame", game);
+      game.setMap("joinedGame", game);
       roomInfo.players.map((value) => {
-        if (value.team != null) {
+        if (value.team !== null) {
           if (value.pid === MMKV.getString("userID")) {
             MMKV.setString("team", value.team);
             MMKV.setInt("key", value.key);
