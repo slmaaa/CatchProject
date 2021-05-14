@@ -18,7 +18,6 @@ import Riddle from "./components/InGame/Riddle";
 import Sudoku from "./components/InGame/Sudoku";
 import CreateGame from "./components/CreateGame";
 import Waiting from "./components/Waiting";
-import SelectHistory from "./components/SelectHistory";
 import LoadingHome from "./components/LoadingHome";
 import setmap from "./components/setmap";
 import Maths from "./components/InGame/Math";

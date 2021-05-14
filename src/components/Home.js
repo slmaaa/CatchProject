@@ -51,7 +51,7 @@ const Home = ({ navigation }) => {
         containerStyle={styles.historyButtonContianer}
         buttonStyle={styles.historyButton}
         onPress={() => {
-          navigation.navigate("history");
+          navigation.navigate("SelectHistory");
         }}
         icon={<Icon name="archive" type="material-community" color={"white"} />}
       />

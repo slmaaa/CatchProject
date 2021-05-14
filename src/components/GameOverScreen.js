@@ -11,7 +11,7 @@ import {
   Dimensions,
   ImageBackground,
 } from "react-native";
-import { Avatar, Button } from "react-native-elements";
+import { Avatar, Button,Icon } from "react-native-elements";
 import MMKVStorage from "react-native-mmkv-storage";
 
 import MapboxGL from "@react-native-mapbox-gl/maps";
@@ -75,7 +75,7 @@ export default GameOverScreen = ({ navigation }) => {
               </View>
               <Image
                 style={styles.PlayerAvatar}
-                source={{ uri: game.players[i].avatar }}
+                source={{ uri: blueTeam[i].avatar }}
               />
               {/* With Crown start*/}
               {blueTeam[i].key.toString() === distMVP && (
@@ -85,7 +85,7 @@ export default GameOverScreen = ({ navigation }) => {
                   <View style={{ top: 28, right: 5, bottom: 0 }}>
                     <Image
                       style={styles.PlayerAvatar}
-                      source={{ uri: game.players[i].avatar }}
+                      source={{ uri: blueTeam[i].avatar }}
                     />
                   </View>
                   <View style={{ top: -43, left: 25, width: 40, height: 40 }}>
@@ -103,7 +103,7 @@ export default GameOverScreen = ({ navigation }) => {
                   <View style={{ top: 28, right: 5, bottom: 0 }}>
                     <Image
                       style={styles.PlayerAvatar}
-                      source={{ uri: game.players[i].avatar }}
+                      source={{ uri: blueTeam[i].avatar }}
                     />
                   </View>
                   <View style={{ top: -43, left: 65, width: 40, height: 40 }}>
@@ -119,7 +119,7 @@ export default GameOverScreen = ({ navigation }) => {
             <View style={styles.RightPlayer} key={i + 1}>
               <Image
                 style={styles.PlayerAvatar}
-                source={{ uri: game.players[i].avatar }}
+                source={{ uri: redTeam[i].avatar }}
               />
               {/* With Crown start*/}
               {redTeam[i].key.toString() === distMVP && (
@@ -129,7 +129,7 @@ export default GameOverScreen = ({ navigation }) => {
                   <View style={{ top: 28, right: 5, bottom: 0 }}>
                     <Image
                       style={styles.PlayerAvatar}
-                      source={{ uri: game.players[i].avatar }}
+                      source={{ uri: redTeam[i].avatar }}
                     />
                   </View>
                   <View style={{ top: -43, left: 25, width: 40, height: 40 }}>
@@ -147,7 +147,7 @@ export default GameOverScreen = ({ navigation }) => {
                   <View style={{ top: 28, right: 5, bottom: 0 }}>
                     <Image
                       style={styles.PlayerAvatar}
-                      source={{ uri: game.players[i].avatar }}
+                      source={{ uri: redTeam[i].avatar }}
                     />
                   </View>
                   <View style={{ top: -43, left: 65, width: 40, height: 40 }}>
@@ -188,7 +188,7 @@ export default GameOverScreen = ({ navigation }) => {
               </View>
               <Image
                 style={styles.PlayerAvatar}
-                source={{ uri: game.players[i].avatar }}
+                source={{ uri: blueTeam[i].avatar }}
               />
               {/* With Crown start*/}
               {blueTeam[i].key.toString() === distMVP && (
@@ -198,7 +198,7 @@ export default GameOverScreen = ({ navigation }) => {
                   <View style={{ top: 28, right: 5, bottom: 0 }}>
                     <Image
                       style={styles.PlayerAvatar}
-                      source={{ uri: game.players[i].avatar }}
+                      source={{ uri: blueTeam[i].avatar }}
                     />
                   </View>
                   <View style={{ top: -43, left: 25, width: 40, height: 40 }}>
@@ -216,7 +216,7 @@ export default GameOverScreen = ({ navigation }) => {
                   <View style={{ top: 28, right: 5, bottom: 0 }}>
                     <Image
                       style={styles.PlayerAvatar}
-                      source={{ uri: game.players[i].avatar }}
+                      source={{ uri: blueTeam[i].avatar }}
                     />
                   </View>
                   <View style={{ top: -43, left: 65, width: 40, height: 40 }}>
@@ -232,7 +232,7 @@ export default GameOverScreen = ({ navigation }) => {
             <View style={styles.RightPlayerWin} key={i + 1}>
               <Image
                 style={styles.PlayerAvatar}
-                source={{ uri: game.players[i].avatar }}
+                source={{ uri: redTeam[i].avatar }}
               />
               {/* With Crown start*/}
               {redTeam[i].key.toString() === distMVP && (
@@ -242,7 +242,7 @@ export default GameOverScreen = ({ navigation }) => {
                   <View style={{ top: 28, right: 5, bottom: 0 }}>
                     <Image
                       style={styles.PlayerAvatar}
-                      source={{ uri: game.players[i].avatar }}
+                      source={{ uri: redTeam[i].avatar}}
                     />
                   </View>
                   <View style={{ top: -43, left: 25, width: 40, height: 40 }}>
@@ -260,7 +260,7 @@ export default GameOverScreen = ({ navigation }) => {
                   <View style={{ top: 28, right: 5, bottom: 0 }}>
                     <Image
                       style={styles.PlayerAvatar}
-                      source={{ uri: game.players[i].avatar }}
+                      source={{ uri: redTeam[i].avatar }}
                     />
                   </View>
                   <View style={{ top: -43, left: 65, width: 40, height: 40 }}>
@@ -338,14 +338,18 @@ export default GameOverScreen = ({ navigation }) => {
             }}
           ></Button>
           <Button
-            title={"Record"}
-            containerStyle={styles.button}
-            titleStyle={{ color: "white", fontSize: 24 }}
-            buttonStyle={{ backgroundColor: color.brown }}
-            onPress={() => {
-              navigation.replace("SelectHistory");
-            }}
-          ></Button>
+        icon={
+          <Icon
+            name="undo-variant"
+            type={"material-community"}
+            color={"white"}
+            size={height / 15}
+          />
+        }
+        containerStyle={styles.undoButton}
+        buttonStyle={{ backgroundColor: color.brown, borderRadius: 60 }}
+        onPress={()=>{navigation.navigate("SelectHistory")}}
+      />
         </>
       </View>
     );
@@ -378,6 +382,21 @@ const styles = StyleSheet.create({
     textAlign: "left",
     marginRight: 10,
   },
+  undoButton: {
+    position: "absolute",
+    top: height * 0.9,
+    left: 10,
+    color: color.brown,
+    borderRadius: height / 15,
+    shadowColor: "black",
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.37,
+    shadowRadius: height / 15,
+    elevation: 5,
+  },
   PlayerAvatar: {
     borderRadius: height / 30,
     height: height / 15,
@@ -392,7 +411,7 @@ const styles = StyleSheet.create({
     height: height / 8,
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingBottom: 50,
+    marginBottom: 30,
   },
   LeftPlayer: {
     width: width * 0.4,

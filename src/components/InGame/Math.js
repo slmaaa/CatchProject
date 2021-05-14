@@ -50,7 +50,7 @@ export default Maths = ({ navigation, route }) => {
       correct.current = true;
       setTimeout(() => {
         MMKV.setInt("challengesSolved", MMKV.getInt("challengesSolved") + 1);
-        setLevel(MMKV.getMap("joinedGame").checkpoints[cid].level[team]);
+        setLevel(MMKV.getMap("joinedGame").checkpoints[cid].level[team]+1);
         wsSend(
           JSON.stringify({
             header: "ADD",

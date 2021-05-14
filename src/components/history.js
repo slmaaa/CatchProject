@@ -16,8 +16,9 @@ const accessToken =
   "pk.eyJ1IjoicmFzaGlkdGhlZGV2ZWxvcGVyIiwiYSI6ImNrYXBncGlwdjBjbG4yd3FqaXl2ams1NHQifQ.jvRoapH6Ae7QHb8Kx4z9FQ";
 MapboxGL.setAccessToken(accessToken);
 import Swiper from "react-native-swiper";
+import {ButtonGroupProps, Icon,Button as Bt} from "react-native-elements";
 import { getDistance } from "geolib";
-import Icon from "react-native-vector-icons/FontAwesome5";
+import Icon1 from "react-native-vector-icons/FontAwesome5";
 import Icon2 from "react-native-vector-icons/MaterialCommunityIcons";
 import Icon3 from "react-native-vector-icons/MaterialIcons";
 import Icon4 from "react-native-vector-icons/Ionicons";
@@ -30,19 +31,18 @@ const App = ({ navigation }) => {
   const [route, setRoute] = useState(null);
   const [ModalOpen, setModalOpen] = useState(false);
   const [coordinates, setcoordinates] = useState([114.2655, 22.3364]);
-  const [addcor, setaddcor] = useState([
-    { coordinates: [114.2635, 22.3372] },
-    { coordinates: [114.2655, 22.3364] },
-    { coordinates: [114.2645, 22.3344] },
-  ]); //from serve
   const selectedHistory = MMKV.getMap("selectedHistory");
-  let featureCollection = [
+  let coorList = [];
+  selectedHistory.locationRecord.map((val)=>{
+    coorList.push([val.longitude,val.latitude])
+  })
+ const featureCollection = [
     {
       type: "Feature",
       properties: { color: "red" },
       geometry: {
         type: "LineString",
-        coordinates: selectedHistory.locationRecord,
+        coordinates: coorList,
       },
     },
   ];
@@ -55,7 +55,7 @@ const App = ({ navigation }) => {
     const speed = parseInt(timeSpent / distance);
     return (
       <View style={styles.slide1}>
-        <Icon name="running" size={50} color="yellow" />
+        <Icon1 name="running" size={50} color="yellow" />
         <Text style={styles.text2}>Total Distance:</Text>
         <Text style={styles.text}>{distance} km</Text>
         <Text style={styles.text}> </Text>
@@ -76,7 +76,7 @@ const App = ({ navigation }) => {
     const fatburn = parseFloat((calburn / 3500) * 453.592).toFixed(2);
     return (
       <View style={styles.slide1}>
-        <Icon name="fire" size={50} color="red" />
+        <Icon1 name="fire" size={50} color="red" />
         <Text style={styles.text2}>Calories burns</Text>
         <Text style={styles.text}>{calburn} cal</Text>
         <Text style={styles.text}> </Text>
@@ -128,8 +128,6 @@ const App = ({ navigation }) => {
   return (
     <View style={styles.page}>
       <View style={styles.container}>
-        <Button title="Back" onPress={() => navigation.goBack()} />
-
         <MapboxGL.MapView style={styles.map}>
           <MapboxGL.Camera zoomLevel={15} centerCoordinate={coordinates} />
           {/* {
@@ -163,6 +161,12 @@ const App = ({ navigation }) => {
         </MapboxGL.MapView>
         {detailbutton()}
         {modal()}
+        <Bt
+        containerStyle={styles.backButtonContainer}
+        buttonStyle={styles.backButton}
+        onPress={() => navigation.goBack()}
+        icon={<Icon name="arrow-back" type={"material"} color={"white"} />}
+      />
       </View>
     </View>
   );
@@ -220,6 +224,21 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
+  },
+  backButtonContainer: {
+    position: "absolute",
+    top: height * 0.06,
+    left: width * 0.8,
+    color: color.brown,
+    alignItems: "center",
+    justifyContent: "center",
+    margin: 5,
+  },
+  backButton: {
+    backgroundColor: color.brown,
+    borderRadius: height / 60,
+    width: height / 15,
+    height: height / 15,
   },
   openButton: {
     backgroundColor: "#F194FF",

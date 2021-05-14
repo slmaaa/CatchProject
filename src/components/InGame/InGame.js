@@ -6,7 +6,6 @@ import MapboxGL from "@react-native-mapbox-gl/maps";
 const MMKV = new MMKVStorage.Loader().initialize();
 import RNLocation, { Location } from "react-native-location";
 import database from "@react-native-firebase/database";
-import GeoJSON from "geojson";
 
 MapboxGL.setAccessToken(
   "pk.eyJ1IjoiaGVjdG9yY2hjaCIsImEiOiJja205YmhldXUwdHQ1Mm9xbGw4N2RodndhIn0.yX90QKE2jcgG-7V5wOGXeQ"
@@ -32,7 +31,7 @@ import { Button, Overlay, Icon } from "react-native-elements";
 import { useFocusEffect } from "@react-navigation/core";
 
 const { height, width } = Dimensions.get("window");
-
+const CP_RANGE = 8;
 const InGame = ({ navigation, route }) => {
   const MMKV = new MMKVStorage.Loader().initialize();
   const [initializing, setInitializing] = useState(true);
@@ -46,6 +45,7 @@ const InGame = ({ navigation, route }) => {
   const [challengesSolved, setChallengesSolved] = useState(0);
   const [notificationText, setNotificationText] = useState("");
   const distanceTravelled = useRef(0);
+  const [checkpointsCaptured,setCheckpointsCaptured] = useState([]);
   const [distanceCovered, setDistanceCovered] = useState(0);
   const [currentCID, setCurrentCID] = useState(-1); //Current checkpoint id. -1 if not in any checkpoints
   const [modalVisible, setModalVisible] = useState(false);
@@ -57,12 +57,11 @@ const InGame = ({ navigation, route }) => {
     team: null,
     checkpointsLocation: null,
     numberOfCheckpoints: null,
-    checkpointsCaptured: [],
   });
   const renderCheckpointsOnMap = () => {
     let cpRenderList = [];
     for (let i = 0; i < gameRef.current.numberOfCheckpoints; i++) {
-      gameRef.current.checkpointsCaptured[i] === null
+      checkpointsCaptured[i] === null
         ? cpRenderList.push(
             <>
               <MapboxGL.MarkerView
@@ -108,7 +107,7 @@ const InGame = ({ navigation, route }) => {
               />
             </>
           )
-        : gameRef.current.checkpointsCaptured[i] === "BLUE"
+        : checkpointsCaptured[i] === "BLUE"
         ? cpRenderList.push(
             <MapboxGL.PointAnnotation
               id={"CP" + i}
@@ -158,13 +157,15 @@ const InGame = ({ navigation, route }) => {
     gameRef.current.game = game;
     gameRef.current.team = MMKV.getString("team");
     let coolDowns = [],
-      checkpointsLocation = [];
+      checkpointsLocation = [],
+      capturedList = [];
     game.checkpoints.map((val) => {
       checkpointsLocation.push({
         latitude: val.area.center.lat,
         longitude: val.area.center.lng,
       });
-      gameRef.current.checkpointsCaptured.push(null);
+     capturedList.push(null);
+     setCheckpointsCaptured(capturedList);
       coolDowns.push(-1);
     });
     gameRef.current.checkpointsLocation = checkpointsLocation;
@@ -172,6 +173,7 @@ const InGame = ({ navigation, route }) => {
     MMKV.setArray("cpCooldowns", coolDowns);
     MMKV.setInt("challengesSolved", 0);
     setInitializing(false);
+    console.log(gameRef.current.game.checkpoints);
   }, []);
   useEffect(() => {
     let unsub;
@@ -267,7 +269,7 @@ const InGame = ({ navigation, route }) => {
       navigation.navigate("InGame");
       return;
     }
-    if (gameRef.current.checkpointsCaptured[currentCID] === null) {
+    if (checkpointsCaptured[currentCID] === null) {
       navigation.navigate("Maths", {
         cpName: gameRef.current.game.checkpoints[currentCID].name,
         gid: gameRef.current.game.gid,
@@ -287,7 +289,7 @@ const InGame = ({ navigation, route }) => {
   useFocusEffect(
     useCallback(() => {
       if (gameRef.current.game.status === "OVER") return;
-      if (gameInfo.current == null) {
+      if (gameInfo.current === null|| gameInfo.current ===undefined) {
         return;
       }
       gameRef.current.game.status = gameInfo.current.status;
@@ -295,7 +297,7 @@ const InGame = ({ navigation, route }) => {
         gameRef.current.game.checkpoints[i].level =
           gameInfo.current.cpsLevel[i];
       }
-      gameRef.current.checkpointsCaptured = gameInfo.current.cpsCaptured;
+      setCheckpointsCaptured(gameInfo.current.cpsCaptured);
       let list = messageRef.current;
       list.push();
       list.push(gameInfo.current.message);
@@ -459,9 +461,9 @@ const InGame = ({ navigation, route }) => {
           </View>
           <Button
             disabled={
-              currentCID != -1
+              currentCID !== -1
                 ? false
-                : gameRef.current.checkpointsCaptured[currentCID] === null
+                : checkpointsCaptured[currentCID] === null
                 ? true
                 : false
             }

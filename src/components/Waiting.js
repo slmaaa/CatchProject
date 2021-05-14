@@ -58,13 +58,13 @@ export default Waiting = ({ navigation }) => {
   useFocusEffect(
     useCallback(() => {
       if (roomInfo === null) return;
-      let game = MMKV.getMap("joinedGame");
-      game.players = roomInfo.players;
-      game.status = roomInfo.status;
+      let _game = MMKV.getMap("joinedGame");
+      _game.players = roomInfo.players;
+      _game.status = roomInfo.status;
       status.current = roomInfo.status;
-      setGame(game);
-      game.setMap("joinedGame", game);
-      roomInfo.players.map((value) => {
+      setGame(_game);
+      MMKV.setMap("joinedGame", _game);
+      _game.players.map((value) => {
         if (value.team !== null) {
           if (value.pid === MMKV.getString("userID")) {
             MMKV.setString("team", value.team);
