@@ -266,8 +266,10 @@ const InGame = ({ navigation, route }) => {
                 locationRecord: locationRecord.current,
                 startTime: endStats.startTime,
                 endTime: endStats.endTime,
+                distance: distanceTravelled.current.toString(),
                 pointMVP: endStats.pointMVP.toString(),
                 distMVP: endStats.distMVP.toString(),
+                game: gameRef.current.game,
               })
               .then(() => {
                 navigation.replace("GameOver");
