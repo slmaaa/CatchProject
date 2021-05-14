@@ -336,6 +336,7 @@ const styles = StyleSheet.create({
         height: height / 8,
         flexDirection: "row",
         justifyContent: "space-between",
+        marginBottom:30,
     },
     LeftPlayer: {
         width: width * 0.4,

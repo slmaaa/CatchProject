@@ -9,7 +9,7 @@
  import React, { useState, useEffect } from 'react';
  import { NavigationContainer } from "@react-navigation/native";
  import { createStackNavigator } from "@react-navigation/stack";
- import InGamePlayerView from "./src/InGamePlayerView";
+//  import InGamePlayerView from "./src/InGamePlayerView";
 //  import Waiting from "./src/Waiting";
 //  import LoadingHome from "./src/LoadingHome";
 //  import SelectCheckPoint from "./src/SelectCheckPoint";
