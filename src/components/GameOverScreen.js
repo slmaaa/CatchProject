@@ -354,7 +354,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     marginTop: height * 0.08,
     paddingRight: 40,
-    marginBottom: height * 0.1,
+    marginBottom: height * 0.1-50,
     borderBottomRightRadius: height / 20,
     borderTopRightRadius: height / 20,
     backgroundColor: "#00000080",
@@ -375,8 +375,11 @@ const styles = StyleSheet.create({
     width: height / 15,
     marginHorizontal: height / 80,
   },
-  playersListContainer: { height: "50%" },
+  playersListContainer: {
+    height: height/2,
+  },
   playerListRowConatiner: {
+    paddingTop:50,
     height: height / 8,
     flexDirection: "row",
     justifyContent: "space-between",
