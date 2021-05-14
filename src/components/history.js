@@ -8,20 +8,8 @@ import {
   Modal,
   TouchableHighlight,
   Button,
-  FlatList,
-  ActivityIndicator,
-  Image,
-  TextInput,
   Dimensions,
 } from "react-native";
-
-import {
-  Overlay,
-  Input,
-  ListItem,
-  Divider,
-  Avatar,
-} from "react-native-elements";
 
 import MapboxGL from "@react-native-mapbox-gl/maps";
 import mapboxgl from "mapbox-gl/dist/mapbox-gl-csp";
@@ -29,9 +17,6 @@ const accessToken =
   "pk.eyJ1IjoicmFzaGlkdGhlZGV2ZWxvcGVyIiwiYSI6ImNrYXBncGlwdjBjbG4yd3FqaXl2ams1NHQifQ.jvRoapH6Ae7QHb8Kx4z9FQ";
 MapboxGL.setAccessToken(accessToken);
 import Swiper from "react-native-swiper";
-import Geolocation from "react-native-geolocation-service";
-import RNLocation, { Location } from "react-native-location";
-import { lineString as makeLineString } from "@turf/helpers";
 import { getDistance } from "geolib";
 import Icon from "react-native-vector-icons/FontAwesome5";
 import Icon2 from "react-native-vector-icons/MaterialCommunityIcons";

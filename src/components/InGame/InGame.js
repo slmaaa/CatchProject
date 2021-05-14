@@ -420,10 +420,9 @@ const InGame = ({ navigation, route }) => {
             >
               <MapboxGL.Camera
                 followUserLocation={true}
-                followUserMode={"compass"}
+                followUserMode={"normal"}
                 defaultSettings={{
                   zoomLevel: 17,
-                  centerCoordinate: [114.263981, 22.339158],
                 }}
               />
               {renderCheckpointsOnMap()}
