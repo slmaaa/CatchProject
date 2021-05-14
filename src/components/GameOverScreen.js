@@ -383,6 +383,7 @@ const styles = StyleSheet.create({
     height: height / 8,
     flexDirection: "row",
     justifyContent: "space-between",
+    paddingBottom:50,
   },
   LeftPlayer: {
     width: width * 0.4,
