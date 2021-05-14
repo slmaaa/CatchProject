@@ -4,6 +4,7 @@ import { getDistance } from "geolib";
 import * as Progress from "react-native-progress";
 import MapboxGL from "@react-native-mapbox-gl/maps";
 import RNLocation, { Location } from "react-native-location";
+import database from "@react-native-firebase/database";
 import GeoJSON from "geojson";
 MapboxGL.setAccessToken(
   "pk.eyJ1IjoiaGVjdG9yY2hjaCIsImEiOiJja205YmhldXUwdHQ1Mm9xbGw4N2RodndhIn0.yX90QKE2jcgG-7V5wOGXeQ"
@@ -27,7 +28,6 @@ import { Button, Overlay, Icon } from "react-native-elements";
 import { useFocusEffect } from "@react-navigation/core";
 import { makeMutable } from "react-native-reanimated";
 
-const CP_RANGE = 25;
 const { height, width } = Dimensions.get("window");
 
 const InGame = ({ navigation, route }) => {
@@ -254,10 +254,24 @@ const InGame = ({ navigation, route }) => {
             clearInterval(interval);
             gameRef.current.game.players = endStats.players;
             gameRef.current.game.winTeam = endStats.winTeam;
+            gameRef.current.game.startTime = endStats.startTime;
+            gameRef.current.game.endTime = endStats.endTime;
             MMKV.setMap("joinedGame", gameRef.current.game);
             MMKV.setString("pointMVP", endStats.pointMVP.toString());
             MMKV.setString("distMVP", endStats.distMVP.toString());
-            navigation.replace("GameOver");
+            database()
+              .ref("users/" + authData.user.uid + "/gameRecord")
+              .push({
+                gameID: gameRef.current.gid,
+                locationRecord: locationRecord.current,
+                startTime: endStats.startTime,
+                endTime: endStats.endTime,
+                pointMVP: endStats.pointMVP.toString(),
+                distMVP: endStats.distMVP.toString(),
+              })
+              .then(() => {
+                navigation.replace("GameOver");
+              });
           }, 100);
         });
       }
