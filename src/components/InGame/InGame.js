@@ -330,7 +330,6 @@ const InGame = ({ navigation, route }) => {
   );
 
   useEffect(() => {
-    console.log(messageRef.current);
     if (modalVisible || messageRef.current.length === 0) return;
     setNotificationText(messageRef.current.shift());
     setModalVisible(true);
@@ -357,16 +356,16 @@ const InGame = ({ navigation, route }) => {
             }}
           >
             <View
-              style={
-                ([styles.notificationContainer],
+              style={[
+                styles.notificationContainer,
                 {
-                  borderWidth: 3,
+                  borderBottomWidth: 5,
                   borderColor:
                     notificationText[1] === "BLUE"
                       ? color.teamBlue
                       : color.teamRed,
-                })
-              }
+                },
+              ]}
             >
               <Text style={styles.notificationText}>{notificationText[0]}</Text>
             </View>
