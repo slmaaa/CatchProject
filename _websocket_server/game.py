@@ -80,7 +80,7 @@ class Game:
             cpsLevel.append(cp.level)
             cpsCaptured.append(cp.capturedBy)
         self.keyInfo = {"status": self.status,
-                        "cpsLevel": cpsLevel, "cpsCaptured": cpsCaptured, "message": message}
+                        "cpsLevel": cpsLevel, "cpsCaptured": cpsCaptured, "message": [message, team]}
 
     def setPlayerStats(self, key, points, dist):
         self.players[key].points = int(points)

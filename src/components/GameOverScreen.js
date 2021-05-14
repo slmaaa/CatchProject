@@ -334,7 +334,7 @@ export default GameOverScreen = ({ navigation }) => {
             titleStyle={{ color: "white", fontSize: 24 }}
             buttonStyle={{ backgroundColor: color.brown }}
             onPress={() => {
-              console.log("Home");
+              navigation.replace("Home");
             }}
           ></Button>
         </>

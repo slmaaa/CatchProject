@@ -13,6 +13,7 @@ import {
   View,
   Dimensions,
   Vibration,
+  Modal,
   Image,
   SafeAreaView,
   StatusBar,
@@ -40,11 +41,14 @@ const InGame = ({ navigation, route }) => {
   const [gameOverAccountingVisible, setGameOverAccountingVisible] =
     useState(false);
   const [challengesSolved, setChallengesSolved] = useState(0);
+  const [notificationText, setNotificationText] = useState("");
   const distanceTravelled = useRef(0);
   const [distanceCovered, setDistanceCovered] = useState(0);
   const [currentCID, setCurrentCID] = useState(-1); //Current checkpoint id. -1 if not in any checkpoints
+  const [modalVisible, setModalVisible] = useState(false);
   const locationRecord = useRef([]);
   const mapRef = useRef();
+  const messageRef = useRef([]);
   const gameRef = useRef({
     game: null,
     team: null,
@@ -289,7 +293,13 @@ const InGame = ({ navigation, route }) => {
           gameInfo.current.cpsLevel[i];
       }
       gameRef.current.checkpointsCaptured = gameInfo.current.cpsCaptured;
+      let list = messageRef.current;
+      list.push();
+      list.push(gameInfo.current.message);
+      messageRef.current = list;
       MMKV.setMap("joinedGame", gameRef.current.game);
+      gameInfo.current = null;
+      MMKV.setMap("gameInfo", null);
       if (gameRef.current.game.status === "OVER") {
         setGameOverAccountingVisible(true);
         wsSend(
@@ -319,6 +329,13 @@ const InGame = ({ navigation, route }) => {
     }, [gameInfo.current])
   );
 
+  useEffect(() => {
+    console.log(messageRef.current);
+    if (modalVisible || messageRef.current.length === 0) return;
+    setNotificationText(messageRef.current.shift());
+    setModalVisible(true);
+  });
+
   useFocusEffect(() => {
     setChallengesSolved(MMKV.getInt("challengesSolved"));
   });
@@ -329,6 +346,31 @@ const InGame = ({ navigation, route }) => {
       <>
         <StatusBar barStyle="dark-content" />
         <SafeAreaView style={styles.container}>
+          <Modal
+            animationType={"fade"}
+            transparent
+            visible={modalVisible}
+            onShow={() => {
+              setTimeout(() => {
+                setModalVisible(false);
+              }, 3000);
+            }}
+          >
+            <View
+              style={
+                ([styles.notificationContainer],
+                {
+                  borderWidth: 3,
+                  borderColor:
+                    notificationText[1] === "BLUE"
+                      ? color.teamBlue
+                      : color.teamRed,
+                })
+              }
+            >
+              <Text style={styles.notificationText}>{notificationText[0]}</Text>
+            </View>
+          </Modal>
           <Overlay
             isVisible={gameOverAccountingVisible}
             overlayStyle={{ width: "80%", borderRadius: 30 }}
@@ -439,6 +481,8 @@ const styles = StyleSheet.create({
     backgroundColor: "black",
   },
   notificationContainer: {
+    position: "absolute",
+    left: "10%",
     width: "80%",
     backgroundColor: "#D32F2F",
     borderRadius: 10,
@@ -458,6 +502,19 @@ const styles = StyleSheet.create({
   },
   map: {
     flex: 1,
+  },
+  notificationContainer: {
+    width: "80%",
+    backgroundColor: "white",
+    borderRadius: 10,
+    height: "8%",
+    justifyContent: "center",
+    alignSelf: "center",
+  },
+  notificationText: {
+    color: "black",
+    textAlign: "center",
+    textAlignVertical: "center",
   },
   playerStatsBar: {
     position: "absolute",
