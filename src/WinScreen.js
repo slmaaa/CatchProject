@@ -166,12 +166,20 @@ export default Waiting = ({ navigation }) => {
                         </View>
                         <Image style={styles.PlayerAvatar} source={{ uri: link }} />
                         {/* With Crown start*/}
-                        <View style={{ top: -20, paddingStart: 5, position: "absolute" }}>
+                        <View
+                            style={{ top: -20, paddingStart: 5, position: "absolute" }}
+                        >
                             <View style={{ top: 28, right: 5, bottom: 0 }}>
-                                <Image style={styles.PlayerAvatar} source={{ uri: link }} />
+                                <Image
+                                    style={styles.PlayerAvatar}
+                                    source={{ uri: link }}
+                                />
                             </View>
                             <View style={{ top: -43, left: 25, width: 40, height: 40 }}>
-                                <Image style={styles.Crown} source={require("./image/PurpleCrown.png")} />
+                                <Image
+                                    style={styles.Crown}
+                                    source={require("./image/PurpleCrown.png")}
+                                />
                             </View>
                         </View>
                         {/* With Crown end*/}
@@ -296,22 +304,23 @@ const styles = StyleSheet.create({
     headerContainer2: {
         width: width * 0.45,
         height: height * 0.1,
-        flexDirection: 'row',
+        flexDirection: "row",
         marginTop: height * 0.08,
         paddingRight: 40,
-        marginBottom: height * 0.1,
+        marginBottom: height * 0.1-50,
         borderBottomRightRadius: height / 20,
         borderTopRightRadius: height / 20,
         backgroundColor: "#00000080",
-        justifyContent: 'space-between',
-        alignItems: 'center',
+        justifyContent: "space-between",
+        alignItems: "center",
     },
     headerText: {
-        fontSize: 10,
+        fontSize: 12,
         color: "#FFFFFF",
-        fontWeight: 'normal',
+        fontWeight: "700",
         paddingLeft: 10,
         textAlign: "left",
+        marginRight: 10,
     },
     PlayerAvatar: {
         borderRadius: height / 30,
@@ -319,67 +328,66 @@ const styles = StyleSheet.create({
         width: height / 15,
         marginHorizontal: height / 80,
     },
-    playersListContainer: { height: "50%" },
+    playersListContainer: {
+        height: height/2,
+    },
     playerListRowConatiner: {
+        paddingTop:50,
         height: height / 8,
         flexDirection: "row",
         justifyContent: "space-between",
     },
     LeftPlayer: {
-        width: width * 0.40,
+        width: width * 0.4,
         height: height * 0.1,
-        flexDirection: 'row',
+        flexDirection: "row",
         backgroundColor: "#00000080",
-        justifyContent: 'flex-end',
-        alignItems: 'center',
-        borderTopWidth: 5,
-        borderBottomWidth: 5,
-        borderRightWidth: 5,
+        justifyContent: "flex-end",
+        alignItems: "center",
+        borderWidth: 3,
+        borderLeftWidth: 0,
         borderBottomRightRadius: height * 0.05,
         borderTopRightRadius: height * 0.05,
-        borderColor: "#98E7FD"
+        borderColor: "#98E7FD",
     },
     LeftPlayerWin: {
         width: width * 0.55,
         height: height * 0.1,
-        flexDirection: 'row',
+        flexDirection: "row",
         backgroundColor: "#00000080",
-        justifyContent: 'flex-end',
-        alignItems: 'center',
-        borderTopWidth: 5,
-        borderBottomWidth: 5,
-        borderRightWidth: 5,
+        justifyContent: "flex-end",
+        alignItems: "center",
+        borderWidth: 3,
+        borderLeftWidth: 0,
         borderBottomRightRadius: height * 0.05,
         borderTopRightRadius: height * 0.05,
-        borderColor: "#98E7FD"
+        borderColor: "#98E7FD",
     },
     RightPlayer: {
-        width: width * 0.40,
+        width: width * 0.4,
         height: height * 0.1,
-        flexDirection: 'row',
+        flexDirection: "row",
         backgroundColor: "#00000080",
-        justifyContent: 'flex-start',
-        alignItems: 'center',
-        borderTopWidth: 5,
-        borderBottomWidth: 5,
-        borderLeftWidth: 5,
+        justifyContent: "flex-start",
+        alignItems: "center",
+        borderWidth: 3,
+        borderRightWidth: 0,
         borderBottomLeftRadius: height * 0.05,
         borderTopLeftRadius: height * 0.05,
-        borderColor: "#FF8F62"
+        borderColor: "#FF8F62",
     },
     RightPlayerWin: {
         width: width * 0.55,
         height: height * 0.1,
-        flexDirection: 'row',
+        flexDirection: "row",
         backgroundColor: "#00000080",
-        justifyContent: 'flex-start',
-        alignItems: 'center',
-        borderTopWidth: 5,
-        borderBottomWidth: 5,
-        borderLeftWidth: 5,
+        justifyContent: "flex-start",
+        alignItems: "center",
+        borderWidth: 3,
+        borderRightWidth: 0,
         borderBottomLeftRadius: height * 0.05,
         borderTopLeftRadius: height * 0.05,
-        borderColor: "#FF8F62"
+        borderColor: "#FF8F62",
     },
     PlayerName: {
         fontSize: 14,
@@ -437,12 +445,17 @@ const styles = StyleSheet.create({
         fontSize: 30,
         color: "white",
         textAlignVertical: "center",
-        justifyContent: "center"
+        justifyContent: "center",
     },
     Crown: {
         flex: 1,
         width: null,
         height: null,
         resizeMode: "cover",
-    }
+    },
+    map: {
+        height: "100%",
+        width: "100%",
+        position: "absolute",
+    },
 });
